@@ -10,6 +10,53 @@ Service for running the [Blockchain.info Wallet API](https://blockchain.info/api
   3. Install globally `npm install -g .`
   4. Use the [CLI](#cli) to develop
 
+## API
+
+Programmatic usage of this service. [See CLI usage here.](#cli)
+
+Usage:
+
+```js
+var walletService = require('service-my-wallet-v3');
+```
+
+### start
+
+Starts the wallet service.
+
+```js
+walletService.start(options);
+```
+
+Options:
+
+  * `port` - port number to run the server from
+
+## Service Endpoints
+
+View the [original documentaion](https://blockchain.info/api/blockchain_wallet_api).
+
+Visit the [new documentaion](https://docs.blockchain.com).
+
+### Log into Wallet
+
+Loads a blockchain.info wallet. A wallet must be loaded via this endpoint before any other api interactions can occur.
+
+Endpoint: `/:guid/login`
+
+Query Parameters:
+
+  * `password` - main wallet password (required)
+  * `api_code` - blockchain.info wallet api code
+
+### Fetch Wallet Balance
+
+Endpoint: `/:guid/balance`
+
+Query Parameters:
+
+  * `password` - main wallet password
+
 ## CLI
 
 When service-my-wallet-v3 is installed globally, it can be accessed via the `wallet-service` command.
