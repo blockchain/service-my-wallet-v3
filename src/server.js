@@ -28,6 +28,11 @@ merchantAPI.all('/:guid/balance', function (req, res) {
   handleResponse(apiAction, res);
 });
 
+merchantAPI.all('/:guid/list', function (req, res) {
+  var apiAction = api.listAddresses(req.params.guid, req.bc_options);
+  handleResponse(apiAction, res);
+});
+
 // Helper functions
 function handleResponse(apiAction, res) {
   apiAction

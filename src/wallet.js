@@ -25,7 +25,10 @@ Object.defineProperties(Wallet.prototype, {
   },
   addresses: {
     configurable: false,
-    get: function () { return this._addresses; }
+    get: function () {
+      var addressMap = function (addr) { return this._addresses[addr]; };
+      return Object.keys(this._addresses).map(addressMap.bind(this));
+    }
   }
 });
 

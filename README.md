@@ -57,6 +57,14 @@ Query Parameters:
 
   * `password` - main wallet password
 
+### List Addresses
+
+Endpoint: `/:guid/list`
+
+Query Parameters:
+
+  * `password` - main wallet password
+
 ## CLI
 
 When service-my-wallet-v3 is installed globally, it can be accessed via the `wallet-service` command.
