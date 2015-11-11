@@ -2,6 +2,7 @@
 
 var express     = require('express')
   , bodyParser  = require('body-parser')
+  , q           = require('q')
   , ecodes      = require('./error-codes')
   , api         = require('./api');
 
@@ -18,7 +19,7 @@ merchantAPI.use(bodyParser.json());
 merchantAPI.use(parseOptions());
 
 // Routing
-merchantAPI.all('/:guid/login', function (req, res) {
+merchantAPI.all('/:guid/login', required('password'), function (req, res) {
   var apiAction = api.login(req.params.guid, req.bc_options);
   handleResponse(apiAction, res);
 });
@@ -30,6 +31,11 @@ merchantAPI.all('/:guid/balance', function (req, res) {
 
 merchantAPI.all('/:guid/list', function (req, res) {
   var apiAction = api.listAddresses(req.params.guid, req.bc_options);
+  handleResponse(apiAction, res);
+});
+
+merchantAPI.all('/:guid/address_balance', required('address'), function (req, res) {
+  var apiAction = api.getAddressBalance(req.params.guid, req.bc_options);
   handleResponse(apiAction, res);
 });
 
@@ -53,8 +59,17 @@ function parseOptions() {
       , _b = req.body;
     req.bc_options = {
       password  : _q.password || _b.password,
-      api_code  : _q.api_code || _b.api_code
+      api_code  : _q.api_code || _b.api_code,
+      address   : _q.address  || _b.address,
     };
     next();
+  };
+}
+
+function required(prop) {
+  return function (req, res, next) {
+    var propExists  = req.bc_options[prop] != null
+      , rejection   = q.reject('ERR_PARAM');
+    propExists ? next() : handleResponse(rejection, res);
   };
 }

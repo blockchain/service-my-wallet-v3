@@ -53,17 +53,17 @@ Query Parameters:
 
 Endpoint: `/:guid/balance`
 
+### Fetch Address Balance
+
+Endpoint: `/:guid/address_balance`
+
 Query Parameters:
 
-  * `password` - main wallet password
+  * `address` - address to fetch balance for (required)
 
 ### List Addresses
 
 Endpoint: `/:guid/list`
-
-Query Parameters:
-
-  * `password` - main wallet password
 
 ## CLI
 

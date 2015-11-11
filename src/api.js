@@ -9,9 +9,10 @@ var MyWallet  = require('blockchain-wallet-client/src/wallet')
 var cache = new Cache();
 
 module.exports = {
-  login         : login,
-  getBalance    : getBalance,
-  listAddresses : listAddresses
+  login             : login,
+  getBalance        : getBalance,
+  listAddresses     : listAddresses,
+  getAddressBalance : getAddressBalance
 };
 
 function login(guid, options) {
@@ -41,4 +42,11 @@ function listAddresses(guid, options) {
       total_received: addr.total_received
     };
   }
+}
+
+function getAddressBalance(guid, options) {
+  return cache.wallet(guid).walletReady.then(function (wallet) {
+    var addr = wallet.address(options.address);
+    return { balance: addr.final_balance, address: addr.addr, total_received: addr.total_received };
+  });
 }

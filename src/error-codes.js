@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = {
+  // Original blockchain error
   ERR_DECRYPT   : 'Error Decrypting Wallet',
   ERR_DECODE    : 'Error decoding private key for address x',
   ERR_SECPASS   : 'Second password incorrect',
@@ -11,5 +12,7 @@ module.exports = {
   ERR_SAVING    : 'Error saving wallet',
   ERR_TX_LIMIT  : 'Wallets are currently restricted to 5000 transactions',
   ERR_WALLET_ID : 'Wallet identifier not found',
-  ERR_UNKNOWN   : 'Uknown method'
+  ERR_UNKNOWN   : 'Uknown method',
+  // Custom errors
+  ERR_PARAM     : 'Missing one or more query parameters'
 };
