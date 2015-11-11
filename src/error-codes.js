@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  // Original blockchain error
+  // Original blockchain error messages
   ERR_DECRYPT   : 'Error Decrypting Wallet',
   ERR_DECODE    : 'Error decoding private key for address x',
   ERR_SECPASS   : 'Second password incorrect',
@@ -13,6 +13,7 @@ module.exports = {
   ERR_TX_LIMIT  : 'Wallets are currently restricted to 5000 transactions',
   ERR_WALLET_ID : 'Wallet identifier not found',
   ERR_UNKNOWN   : 'Uknown method',
-  // Custom errors
-  ERR_PARAM     : 'Missing one or more query parameters'
+  // Custom error messages
+  ERR_PARAM     : 'Missing one or more query parameters',
+  ERR_HISTORY   : 'Experienced an error while fetching wallet history'
 };

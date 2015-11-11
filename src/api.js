@@ -1,12 +1,7 @@
 'use strict';
 
-var MyWallet  = require('blockchain-wallet-client/src/wallet')
-  , q         = require('q')
-  , request   = require('request-promise')
-  , Wallet    = require('./wallet')
-  , Cache     = require('./cache');
-
-var cache = new Cache();
+var bc  = require('blockchain-wallet-client')
+  , q   = require('q')
 
 module.exports = {
   login             : login,
@@ -16,37 +11,34 @@ module.exports = {
 };
 
 function login(guid, options) {
-  var wallet = new Wallet(guid, options.password, options.api_code);
-  cache.save(wallet);
-  function success() { return { guid: guid, success: true }; }
-  function error(e) { throw 'ERR_SAVING'; }
-  return wallet.walletReady.then(success).catch(error);
+  var deferred = q.defer();
+  function success() {
+    var resolve = deferred.resolve.bind(null, { guid: guid, success: true })
+      , reject  = deferred.reject.bind(null, 'ERR_HISTORY');
+    bc.MyWallet.wallet.getHistory().then(resolve).catch(reject);
+  }
+  function needs2FA() { deferred.reject('ERR_2FA'); }
+  function error(e) { deferred.reject('ERR_SAVING'); }
+  bc.MyWallet.login(guid, null, options.password, null, success, needs2FA, null, null, error);
+  return deferred.promise;
 }
 
 function getBalance(guid, options) {
-  return cache.wallet(guid).walletReady.then(function (wallet) {
-    return { balance: wallet.final_balance };
-  });
+  var wallet = bc.MyWallet.wallet;
+  return q({ balance: wallet.finalBalance });
 }
 
 function listAddresses(guid, options) {
-  return cache.wallet(guid).walletReady.then(function (wallet) {
-    var addresses = wallet.addresses.map(addressFactory);
-    return { addresses: addresses };
-  });
-  function addressFactory(addr) {
-    return {
-      address       : addr.addr,
-      label         : addr.label,
-      balance       : addr.final_balance,
-      total_received: addr.total_received
-    };
+  var wallet = bc.MyWallet.wallet
+    , addresses = wallet.keys.map(addressFactory);
+  return q({ addresses: addresses });
+  function addressFactory(a) {
+    return {address: a.address, label: a.label, balance: a.balance, total_received: a.totalReceived};
   }
 }
 
 function getAddressBalance(guid, options) {
-  return cache.wallet(guid).walletReady.then(function (wallet) {
-    var addr = wallet.address(options.address);
-    return { balance: addr.final_balance, address: addr.addr, total_received: addr.total_received };
-  });
+  var wallet  = bc.MyWallet.wallet
+    , addr    = wallet.key(options.address);
+  return q({ balance: addr.balance, address: addr.address, total_received: addr.totalReceived });
 }
