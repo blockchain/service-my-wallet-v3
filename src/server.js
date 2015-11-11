@@ -35,9 +35,9 @@ function handleResponse(apiAction, res) {
     .catch(function (err) { res.status(500).json({ error: ecodes[err] }); })
 }
 
-function start(port) {
-  app.listen(port, function () {
-    console.log('blockchain.info wallet api running on port %d', port);
+function start(options) {
+  app.listen(options.port, function () {
+    console.log('blockchain.info wallet service running on port %d', options.port);
   });
 }
 
