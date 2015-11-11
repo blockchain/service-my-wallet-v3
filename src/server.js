@@ -19,24 +19,20 @@ merchantAPI.use(parseOptions());
 
 // Routing
 merchantAPI.all('/:guid/login', function (req, res) {
-  api.login(req.params.guid, req.bc_options)
-    .then(handleResponse(res))
-    .catch(handleError(res));
+  var apiAction = api.login(req.params.guid, req.bc_options);
+  handleResponse(apiAction, res);
 });
 
 merchantAPI.all('/:guid/balance', function (req, res) {
-  api.getBalance(req.params.guid, req.bc_options)
-    .then(handleResponse(res))
-    .catch(handleError(res));
+  var apiAction = api.getBalance(req.params.guid, req.bc_options);
+  handleResponse(apiAction, res);
 });
 
 // Helper functions
-function handleResponse(res) {
-  return function (data) { res.status(200).json(data); };
-}
-
-function handleError(res) {
-  return function (err) { res.status(500).json({ error: ecodes[err] }); };
+function handleResponse(apiAction, res) {
+  apiAction
+    .then(function (data) { res.status(200).json(data); })
+    .catch(function (err) { res.status(500).json({ error: ecodes[err] }); })
 }
 
 function start(port) {
