@@ -17,12 +17,12 @@ function login(guid, options) {
   var wallet = new Wallet(guid, options.password, options.api_code);
   cache.save(wallet);
   function success() { return { guid: guid, success: true }; }
-  function error() { return 'ERR_SAVING'; }
+  function error(e) { throw 'ERR_SAVING'; }
   return wallet.walletReady.then(success).catch(error);
 }
 
 function getBalance(guid, options) {
   return cache.wallet(guid).walletReady.then(function (wallet) {
-    return { balance: wallet.finalBalance };
+    return { balance: wallet.final_balance };
   });
 }

@@ -15,13 +15,17 @@ function Wallet(guid, password, api_code) {
 }
 
 Object.defineProperties(Wallet.prototype, {
-  addresses: {
+  keys: {
     configurable: false,
     get: function () { return Object.keys(this._addresses); }
   },
-  key: {
+  address: {
     configurable: false,
     value: function (address) { return this._addresses[address]; }
+  },
+  addresses: {
+    configurable: false,
+    get: function () { return this._addresses; }
   }
 });
 
@@ -40,20 +44,20 @@ Wallet.prototype.initializeWallet = function () {
 
 Wallet.prototype.fetchHistory = function () {
   var processAddress = function (addressHistory) {
-    var addr = this.key(addressHistory.address);
-    addr.nTx            = addressHistory.n_tx;
-    addr.totalReceived  = addressHistory.total_received;
-    addr.totalSent      = addressHistory.total_sent;
-    addr.finalBalance   = addressHistory.final_balance;
+    var addr = this.address(addressHistory.address);
+    addr.n_tx           = addressHistory.n_tx;
+    addr.total_received = addressHistory.total_received;
+    addr.total_sent     = addressHistory.total_sent;
+    addr.final_balance  = addressHistory.final_balance;
   }.bind(this);
   var processHistory = function (history) {
-    this.nTx            = history.wallet.n_tx;
-    this.totalReceived  = history.wallet.total_received;
-    this.totalSent      = history.wallet.total_sent;
-    this.finalBalance   = history.wallet.final_balance;
+    this.n_tx           = history.wallet.n_tx;
+    this.total_received = history.wallet.total_received;
+    this.total_sent     = history.wallet.total_sent;
+    this.final_balance  = history.wallet.final_balance;
     history.addresses.forEach(processAddress);
   }.bind(this);
-  var requestP = bcAPI.fetchWalletHistory(this.addresses, {api_code: this.api_code});
+  var requestP = bcAPI.fetchWalletHistory(this.keys, {api_code: this.api_code});
   return requestP.then(processHistory);
 };
 
