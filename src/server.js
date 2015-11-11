@@ -2,7 +2,7 @@
 
 var express     = require('express')
   , bodyParser  = require('body-parser')
-  , errCodes    = require('./error-codes')
+  , ecodes      = require('./error-codes')
   , api         = require('./api');
 
 module.exports = {
@@ -36,7 +36,7 @@ function handleResponse(res) {
 }
 
 function handleError(res) {
-  return function (errId) { res.status(500).json({ error: errCodes[errId] }); };
+  return function (err) { res.status(500).json({ error: ecodes[err] }); };
 }
 
 function start(port) {
@@ -54,7 +54,6 @@ function parseOptions() {
       password  : _q.password || _b.password,
       api_code  : _q.api_code || _b.api_code
     };
-    console.log(req.bc_options);
     next();
   };
 }

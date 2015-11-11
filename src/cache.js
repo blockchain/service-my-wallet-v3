@@ -15,7 +15,7 @@ Object.defineProperties(Cache.prototype, {
     configurable: false,
     value: function (guid) {
       return this._wallets[guid] != null ?
-        this._wallets[guid] : { walletReady: q.reject(9) };
+        this._wallets[guid] : { walletReady: q.reject('ERR_WALLET_ID') };
     }
   }
 });
