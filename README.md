@@ -231,7 +231,7 @@ Sample Response:
 [`npm`](https://npmjs.com) is required for installing this API service. Installation:
 
 ```sh
-$ npm install -g blockchain-wallet-service
+$ npm install -g http://github.com/blockchain/service-my-wallet-v3.git
 ```
 
 ## Usage
