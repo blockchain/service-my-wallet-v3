@@ -234,6 +234,8 @@ Sample Response:
 $ npm install -g http://github.com/blockchain/service-my-wallet-v3.git
 ```
 
+IMPORTANT: If you are having trouble installing, check your npm version using `npm --version`. If the version number is above 3.0.0, this may be the cause of the issue. To downgrade npm, execute: `npm install -g npm@2.12.0`. Once this is done, retry the install.
+
 ## Usage
 
 After installing the service, the command `blockchain-wallet-service` will be available for use.
