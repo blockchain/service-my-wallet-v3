@@ -30,7 +30,7 @@ describe('service-live-testing', function () {
       });
 
       it('should get the balance', function (done) {
-        makeRequest('/balance', {})
+        makeRequest('/balance', { password: wallet.password })
           .then(function (result) {
             expect(result.balance).to.be.at.least(0);
             done();
@@ -38,7 +38,7 @@ describe('service-live-testing', function () {
       });
 
       it('should list the addresses', function (done) {
-        makeRequest('/list', {})
+        makeRequest('/list', { password: wallet.password })
           .then(function (result) {
             console.log(result);
             expect(result.addresses).to.have.length.above(0);
@@ -48,7 +48,7 @@ describe('service-live-testing', function () {
       });
 
       it('should get the balance of an address', function (done) {
-        makeRequest('/address_balance', { address: address })
+        makeRequest('/address_balance', { password: wallet.password, address: address })
           .then(function (result) {
             expect(result.balance).to.be.at.least(0);
             expect(result.total_received).to.be.at.least(0);
@@ -58,7 +58,7 @@ describe('service-live-testing', function () {
       });
 
       it('should generate a new address', function (done) {
-        makeRequest('/new_address', { label: 'new_address_label' })
+        makeRequest('/new_address', { password: wallet.password, label: 'new_address_label' })
           .then(function (result) {
             console.log(result);
             expect(result.address).to.not.be.undefined;
@@ -68,7 +68,7 @@ describe('service-live-testing', function () {
       });
 
       it('should archive an address', function (done) {
-        makeRequest('/archive_address', { address: address })
+        makeRequest('/archive_address', { password: wallet.password, address: address })
           .then(function (result) {
             expect(result.archived).to.not.be.undefined;
             done();
@@ -76,7 +76,7 @@ describe('service-live-testing', function () {
       });
 
       it('should unarchive an address', function (done) {
-        makeRequest('/unarchive_address', { address: address })
+        makeRequest('/unarchive_address', { password: wallet.password, address: address })
           .then(function (result) {
             expect(result.active).to.not.be.undefined;
             done();
