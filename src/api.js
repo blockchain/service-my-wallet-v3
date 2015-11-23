@@ -121,14 +121,14 @@ MerchantAPI.prototype.archiveAddress = function (guid, options) {
   return this.getWallet(guid, options).then(function (wallet) {
     wallet.key(options.address).archived = true;
     return { archived: options.address };
-  }).catch(function () { throw 'ERR_ADDRESS'; });
+  }).catch(function (e) { throw e || 'ERR_ADDRESS'; });
 };
 
 MerchantAPI.prototype.unarchiveAddress = function (guid, options) {
   return this.getWallet(guid, options).then(function (wallet) {
     wallet.key(options.address).archived = false;
     return { active: options.address };
-  }).catch(function () { throw 'ERR_ADDRESS'; });
+  }).catch(function (e) { throw e || 'ERR_ADDRESS'; });
 };
 
 MerchantAPI.prototype.getWallet = function (guid, options) {
