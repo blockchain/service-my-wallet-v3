@@ -231,7 +231,7 @@ Sample Response:
 [`npm`](https://npmjs.com) is required for installing this API service. Installation:
 
 ```sh
-$ npm install -g https://github.com/blockchain/service-my-wallet-v3.git
+$ npm install -g http://github.com/blockchain/service-my-wallet-v3.git
 ```
 
 If you are having trouble installing, check your npm version using `npm --version`. If the version number is above 3.0.0, this may be the cause of the issue. To downgrade npm, execute: `npm install -g npm@2.12.0`. Once this is done, retry the install. Similarly, if you see the install failing with a status code of `406`, it's possible you are using an outdated version. In this case, upgrade npm like so: `npm install -g npm@2.12.0`.
