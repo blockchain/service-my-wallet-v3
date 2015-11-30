@@ -1,0 +1,31 @@
+{
+  "name": "service-my-wallet-v3",
+  "version": "0.9.0",
+  "description": "Blockchain.info wallet api service",
+  "main": "index.js",
+  "bin": {
+    "blockchain-wallet-service": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node_modules/nodemon/bin/nodemon.js scripts/start.js",
+    "test": "node_modules/mocha/bin/mocha test/spec.js",
+    "test:live": "node_modules/mocha/bin/mocha test/live.spec.js"
+  },
+  "author": "Justin Tormey <justin@blockchain.info>",
+  "dependencies": {
+    "bcrypt": "^0.8.5",
+    "blockchain-wallet-client": "https://github.com/blockchain/my-wallet-v3.git#node",
+    "body-parser": "^1.14.1",
+    "commander": "^2.9.0",
+    "express": "^4.13.3",
+    "q": "^1.4.1",
+    "request-promise": "^1.0.2"
+  },
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "chai-spies": "^0.7.1",
+    "mocha": "^2.3.4",
+    "node-env-file": "^0.1.8",
+    "nodemon": "^1.8.1"
+  }
+}
