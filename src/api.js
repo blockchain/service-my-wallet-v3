@@ -14,7 +14,7 @@ MerchantAPI.prototype.login = function (guid, options) {
   function success() {
     var resolve = deferred.resolve.bind(null, { guid: guid, success: true })
       , reject  = deferred.reject.bind(null, 'ERR_HISTORY')
-      , pwHash  = bcrypt.hashSync(options.password, 13);
+      , pwHash  = bcrypt.hashSync(options.password, 5);
     validatePassword = function (p) { return bcrypt.compareSync(p, pwHash); };
     bc.API.API_CODE = options.api_code;
     bc.WalletStore.setAPICode(options.api_code);
