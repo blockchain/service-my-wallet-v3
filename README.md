@@ -53,7 +53,7 @@ Query Parameters:
   * `password` - main wallet password (required)
   * `api_code` - blockchain.info wallet api code (required)
 
-Get an API code [here](https://blockchain.info/api/api_create_code).
+Get an API code [here](https://blockchain.info/api/api_create_code). **Note**: You must check the "Create Wallets" checkbox under "Permissions" when requesting an API code in order for it to be compatible with this app.
 
 The `api_code` parameter is only required for the call to `/login`. Subsequent API calls for this wallet will not require the api code.
 
