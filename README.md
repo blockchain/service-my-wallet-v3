@@ -1,7 +1,7 @@
 
 # Blockchain Wallet API V2
 
-Programmatically interface with your Blockchain.info wallet. 
+Programmatically interface with your Blockchain.info wallet.
 
 ## Contents
 
@@ -233,10 +233,6 @@ Sample Response:
 ```sh
 $ npm install -g https://github.com/blockchain/service-my-wallet-v3.git
 ```
-
-If you are having trouble installing, check your npm version using `npm --version`. If the version number is above 3.0.0, this may be the cause of the issue. To downgrade npm, execute: `npm install -g npm@2.12.0`. Once this is done, retry the install. Similarly, if you see the install failing with a status code of `406`, it's possible you are using an outdated version. In this case, upgrade npm like so: `npm install -g npm@2.12.0`. 
-
-After installing a different version of npm, if you have previously attempted to install this module, you may need to first clean up the prior install files by running `rf -rm node-modules` from this module's directory before running `npm install` again. Error messages during installation about the bcrypt dependency may indicate that this cleanup needs to be done.
 
 If you see an alert message during the install process that says: `To use the Java command line tool you need to install a jdk`, it's possible that you do not have Java installed, which is required by a dependency of the my-wallet-v3 module. Not having Java installed during the npm install process could result in the inability to decrypt wallets. Download the JDK from [here for Mac](https://support.apple.com/kb/DL1572) or from [java.com](http://java.com).
 

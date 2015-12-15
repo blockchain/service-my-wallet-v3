@@ -14,7 +14,7 @@
   "author": "Justin Tormey <justin@blockchain.info>",
   "dependencies": {
     "bcrypt": "^0.8.5",
-    "blockchain-wallet-client": "https://github.com/blockchain/my-wallet-v3.git#node",
+    "blockchain-wallet-client": "^3.3.1",
     "body-parser": "^1.14.1",
     "commander": "^2.9.0",
     "express": "^4.13.3",
