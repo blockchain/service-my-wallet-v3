@@ -144,9 +144,10 @@ function interpretError(code, bindings) {
 
 function start(options) {
   var deferred = q.defer();
-  app.listen(options.port, '127.0.0.1', function () {
-    console.log('blockchain.info wallet service running on port %d', options.port);
+  app.listen(options.port, options.listen, function () {
+    console.log('blockchain.info wallet service running on %s - port %d', options.listen, options.port);
     deferred.resolve(options.port);
+    deferred.resolve(options.listen);
   });
   return deferred.promise;
 }

@@ -15,7 +15,8 @@ program
 program
   .command('start')
   .description('start a wallet api service server')
-  .option('-p, --port <n>', 'port number', parseInt)
+  .option('-p, --port <n>', 'port number - defaults to 3000', parseInt)
+  .option('-l, --listen [ip]', 'listen on specific ip - defaults to 127.0.0.1')
   .action(postpone(start));
 
 program.parse(process.argv);
@@ -25,7 +26,8 @@ var wallet = require(program.cwd ? process.cwd() : '..');
 // Command functions
 function start(options) {
   var startOptions = {
-    port: options.port
+    port: options.port || 3000,
+    listen: options.listen || '127.0.0.1'
   };
   wallet.start(startOptions);
 }
