@@ -231,7 +231,7 @@ Sample Response:
 [`npm`](https://npmjs.com) is required for installing this API service. Installation:
 
 ```sh
-$ npm install -g https://github.com/blockchain/service-my-wallet-v3.git
+$ npm install -g git+https://github.com/blockchain/service-my-wallet-v3.git
 ```
 
 If you see an alert message during the install process that says: `To use the Java command line tool you need to install a jdk`, it's possible that you do not have Java installed, which is required by a dependency of the my-wallet-v3 module. Not having Java installed during the npm install process could result in the inability to decrypt wallets. Download the JDK from [here for Mac](https://support.apple.com/kb/DL1572) or from [java.com](http://java.com).
