@@ -13,13 +13,12 @@ MerchantAPI.prototype.login = function (guid, options) {
     , error     = deferred.reject;
   function success() {
     var resolve = deferred.resolve.bind(null, { guid: guid, success: true })
-      , reject  = deferred.reject.bind(null, 'ERR_HISTORY')
       , pwHash  = bcrypt.hashSync(options.password, 13);
     validatePassword = function (p) { return bcrypt.compareSync(p, pwHash); };
     bc.API.API_CODE = options.api_code;
     bc.WalletStore.setAPICode(options.api_code);
     bc.WalletStore.isLogoutDisabled = function () { return true; };
-    bc.MyWallet.wallet.getHistory().then(resolve).catch(reject);
+    bc.MyWallet.wallet.getHistory().then(resolve).catch(deferred.reject);
   }
   safeReset().then(function () {
     bc.MyWallet.login(guid, null, options.password, null, success, needs2FA, null, null, error);
