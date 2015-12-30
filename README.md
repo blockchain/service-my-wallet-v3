@@ -257,7 +257,8 @@ This command will start the service, making Blockchain Wallet API V2 available o
 Command options:
 
   * `-h, --help` - output usage information
-  * `-p, --port` - port number to run the server on
+  * `-p, --port` - port number to run the server on (defaults to `3000`)
+  * `-b, --bind` - bind to a specific ip (defaults to `127.0.0.1`, note that binding to an ip other than this can lead to security vulnerabilities)
 
 ### Examples
 

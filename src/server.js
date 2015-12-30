@@ -144,10 +144,12 @@ function interpretError(code, bindings) {
 
 function start(options) {
   var deferred = q.defer();
-  app.listen(options.port, options.listen, function () {
-    console.log('blockchain.info wallet service running on %s - port %d', options.listen, options.port);
-    deferred.resolve(options.port);
-    deferred.resolve(options.listen);
+  app.listen(options.port, options.bind, function () {
+    var msg   = 'blockchain.info wallet service running on %s:%d'
+      , warn  = 'WARNING - Binding this service to any ip other than localhost (127.0.0.1) can lead to security vulnerabilities!';
+    if (options.bind !== '127.0.0.1') console.log(warn);
+    console.log(msg, options.bind, options.port);
+    deferred.resolve(true);
   });
   return deferred.promise;
 }

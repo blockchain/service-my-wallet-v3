@@ -7,6 +7,11 @@ var pkg     = require('../package.json')
   , path    = require('path')
   , timers  = require('timers');
 
+var defaults = {
+  port: 3000,
+  bind: '127.0.0.1'
+};
+
 program
   .version(pkg.version)
   .usage('[command] [options]')
@@ -16,7 +21,7 @@ program
   .command('start')
   .description('start a wallet api service server')
   .option('-p, --port <n>', 'port number - defaults to 3000', parseInt)
-  .option('-l, --listen [ip]', 'listen on specific ip - defaults to 127.0.0.1')
+  .option('-b, --bind [ip]', 'bind to a specific ip - defaults to 127.0.0.1')
   .action(postpone(start));
 
 program.parse(process.argv);
@@ -26,8 +31,8 @@ var wallet = require(program.cwd ? process.cwd() : '..');
 // Command functions
 function start(options) {
   var startOptions = {
-    port: options.port || 3000,
-    listen: options.listen || '127.0.0.1'
+    port: options.port || defaults.port,
+    bind: options.bind || defaults.bind
   };
   wallet.start(startOptions);
 }
