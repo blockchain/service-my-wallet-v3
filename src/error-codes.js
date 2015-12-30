@@ -11,7 +11,7 @@ module.exports = {
   ERR_LABEL     : 'Label must be between 0 & 255 characters',
   ERR_SAVING    : 'Error saving wallet',
   ERR_TX_LIMIT  : 'Wallets are currently restricted to 5000 transactions',
-  ERR_WALLET_ID : 'Wallet identifier not found',
+  ERR_WALLET_ID : 'Wallet identifier not found, be sure to call /login before trying to access a wallet',
   ERR_UNKNOWN   : 'Uknown method',
   ERR_ACCESS    : 'Api access is disabled. Enable it in Account Settings',
   // Custom error messages
