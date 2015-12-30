@@ -9,6 +9,7 @@ Programmatically interface with your Blockchain.info wallet.
   * [Upgrading](#upgrading)
   * [API Documentation](#api-documentation)
   * [Installation](#installation)
+  * [Troubleshooting](#troubleshooting)
   * [Usage](#usage)
   * [Development](#development)
 
@@ -234,7 +235,23 @@ Sample Response:
 $ npm install -g git+https://github.com/blockchain/service-my-wallet-v3.git
 ```
 
-If you see an alert message during the install process that says: `To use the Java command line tool you need to install a jdk`, it's possible that you do not have Java installed, which is required by a dependency of the my-wallet-v3 module. Not having Java installed during the npm install process could result in the inability to decrypt wallets. Download the JDK from [here for Mac](https://support.apple.com/kb/DL1572) or from [java.com](http://java.com).
+If you have issues with the installation process, see the troubleshooting section below.
+
+## Troubleshooting
+
+If installation fails:
+
+  * Make sure you have `git` installed. To check for `git`, run `git --version`.
+
+  * Make sure you have `g++` installed, as this is required by `node-gyp`. This is a common problem among some linux distributions, or newly created servers. To check that it is installed, run `g++ -v`.
+
+  * If you are getting `EACCESS` or permissions-related errors, it might be necessary to run the install as root, using the `sudo` command.
+
+Runtime errors:
+
+  * Seeing `ReferenceError`s during startup is ok, they are fine to ignore.
+
+  * If you are getting wallet decryption errors despite having correct credentials, then it's possible that you do not have Java installed, which is required by a dependency of the my-wallet-v3 module. Not having Java installed during the `npm install` process can result in the inability to decrypt wallets. Download the JDK from [here for Mac](https://support.apple.com/kb/DL1572) or by running `apt-get install default-jdk` on debian-based linux systems.
 
 ## Usage
 
@@ -259,6 +276,8 @@ Command options:
   * `-h, --help` - output usage information
   * `-p, --port` - port number to run the server on (defaults to `3000`)
   * `-b, --bind` - bind to a specific ip (defaults to `127.0.0.1`, note that binding to an ip other than this can lead to security vulnerabilities)
+
+To open the service to all incoming connections, bind to `0.0.0.0`.
 
 ### Examples
 
@@ -291,4 +310,5 @@ $ npm test
 
 Optional parameters can be configured in a `.env` file:
 
-  * `PORT` - port number for running dev server (default: `5000`)
+  * `PORT` - port number for running dev server (default: `3000`)
+  * `BIND` - ip address to bind the service to (default: `127.0.0.1`)
