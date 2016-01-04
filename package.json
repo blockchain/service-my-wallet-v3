@@ -1,6 +1,6 @@
 {
   "name": "service-my-wallet-v3",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "Blockchain.info wallet api service",
   "main": "index.js",
   "bin": {
