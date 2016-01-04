@@ -1,5 +1,7 @@
 'use strict';
 
+const BYTES_PER_HASH = 32;
+
 var crypto  = require('crypto')
   , q       = require('q')
   , request = require('request-promise');
@@ -7,7 +9,7 @@ var crypto  = require('crypto')
 var bc
   , loggingIn = false
   , validatePassword = function () { return false; }
-  , randomBytes = crypto.randomBytes(256);
+  , randomBytes = crypto.randomBytes(BYTES_PER_HASH);
 
 function WalletCache() {}
 
@@ -87,5 +89,6 @@ function safeReset() {
 }
 
 function generatePwHash(pw) {
-  return crypto.pbkdf2Sync(pw, randomBytes, 100, 512, 'sha256');
+    var iterations = 5000;
+  return crypto.pbkdf2Sync(pw, randomBytes, iterations, BYTES_PER_HASH, 'sha256');
 }
