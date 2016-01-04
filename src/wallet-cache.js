@@ -75,9 +75,9 @@ function safeReset() {
   }
   function refreshCache() {
     if (require.cache) {
-      Object.keys(require.cache).forEach(function (module) {
-        delete require.cache[module];
-      });
+      Object.keys(require.cache)
+        .filter(function (module) { return module.indexOf('blockchain-wallet-client/src') > -1; })
+        .forEach(function (module) { delete require.cache[module]; });
     }
     bc = require('blockchain-wallet-client');
     deferred.resolve(true);
