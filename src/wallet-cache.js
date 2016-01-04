@@ -76,7 +76,10 @@ function safeReset() {
   function refreshCache() {
     if (require.cache) {
       Object.keys(require.cache)
-        .filter(function (module) { return module.indexOf('blockchain-wallet-client/src') > -1; })
+        .filter(function (module) {
+          return (module.indexOf('blockchain-wallet-client/index') > -1 ||
+                  module.indexOf('blockchain-wallet-client/src') > -1);
+        })
         .forEach(function (module) { delete require.cache[module]; });
     }
     bc = require('blockchain-wallet-client');
