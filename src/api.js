@@ -11,14 +11,18 @@ MerchantAPI.prototype.login = function (guid, options) {
   return cache.login(guid, options);
 };
 
+MerchantAPI.prototype.getWallet = function (guid, options) {
+  return cache.getWallet(guid, options);
+};
+
 MerchantAPI.prototype.getBalance = function (guid, options) {
-  return cache.getWallet(guid, options).then(function (wallet) {
+  return this.getWallet(guid, options).then(function (wallet) {
     return { balance: wallet.finalBalance };
   });
 };
 
 MerchantAPI.prototype.listAddresses = function (guid, options) {
-  return cache.getWallet(guid, options).then(function (wallet) {
+  return this.getWallet(guid, options).then(function (wallet) {
     var addresses = wallet.activeKeys.map(addressFactory);
     return { addresses: addresses };
   });
@@ -28,7 +32,7 @@ MerchantAPI.prototype.listAddresses = function (guid, options) {
 };
 
 MerchantAPI.prototype.getAddressBalance = function (guid, options) {
-  return cache.getWallet(guid, options).then(function (wallet) {
+  return this.getWallet(guid, options).then(function (wallet) {
     var addr = wallet.key(options.address);
     return { balance: addr.balance, address: addr.address, total_received: addr.totalReceived };
   }).catch(function () { throw 'ERR_ADDRESS'; });
@@ -57,7 +61,7 @@ MerchantAPI.prototype.sendMany = function (guid, options) {
 };
 
 MerchantAPI.prototype.makePayment = function (guid, options) {
-  return cache.getWallet(guid, options)
+  return this.getWallet(guid, options)
     .then(requireSecondPassword(options))
     .then(function (wallet) {
       var payment = cache.walletPayment()
@@ -91,7 +95,7 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
 };
 
 MerchantAPI.prototype.generateAddress = function (guid, options) {
-  return cache.getWallet(guid, options)
+  return this.getWallet(guid, options)
     .then(requireSecondPassword(options))
     .then(function (wallet) {
       var a = wallet.newLegacyAddress(options.label, options.second_password);
@@ -102,14 +106,14 @@ MerchantAPI.prototype.generateAddress = function (guid, options) {
 };
 
 MerchantAPI.prototype.archiveAddress = function (guid, options) {
-  return cache.getWallet(guid, options).then(function (wallet) {
+  return this.getWallet(guid, options).then(function (wallet) {
     wallet.key(options.address).archived = true;
     return { archived: options.address };
   }).catch(function (e) { throw e || 'ERR_ADDRESS'; });
 };
 
 MerchantAPI.prototype.unarchiveAddress = function (guid, options) {
-  return cache.getWallet(guid, options).then(function (wallet) {
+  return this.getWallet(guid, options).then(function (wallet) {
     wallet.key(options.address).archived = false;
     return { active: options.address };
   }).catch(function (e) { throw e || 'ERR_ADDRESS'; });
