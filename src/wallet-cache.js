@@ -1,6 +1,6 @@
 'use strict';
 
-const BYTES_PER_HASH = 32;
+var BYTES_PER_HASH = 32;
 
 var crypto  = require('crypto')
   , q       = require('q')
