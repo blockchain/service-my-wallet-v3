@@ -1,12 +1,13 @@
 'use strict';
 
-var q       = require('q')
-  , request = require('request-promise')
-  , bcrypt  = require('bcrypt');
+var crypto  = require('crypto')
+  , q       = require('q')
+  , request = require('request-promise');
 
 var bc
   , loggingIn = false
-  , validatePassword = function () { return false; };
+  , validatePassword = function () { return false; }
+  , randomBytes = crypto.randomBytes(256);
 
 function WalletCache() {}
 
@@ -26,8 +27,8 @@ WalletCache.prototype.login = function (guid, options) {
 
   var success = function () {
     var fetchedHistory = finishThen(deferred.resolve.bind(null, { guid: guid, success: true }))
-      , pwHash = bcrypt.hashSync(options.password, 13);
-    validatePassword = function (p) { return bcrypt.compareSync(p, pwHash); };
+      , pwHash = generatePwHash(options.password);
+    validatePassword = function (p) { return generatePwHash(p).compare(pwHash) === 0; };
     bc.API.API_CODE = options.api_code;
     bc.WalletStore.setAPICode(options.api_code);
     bc.WalletStore.isLogoutDisabled = function () { return true; };
@@ -83,4 +84,8 @@ function safeReset() {
     deferred.resolve(true);
   }
   return deferred.promise;
+}
+
+function generatePwHash(pw) {
+  return crypto.pbkdf2Sync(pw, randomBytes, 100, 512, 'sha256');
 }
