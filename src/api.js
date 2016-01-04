@@ -89,8 +89,20 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
         throw e || 'ERR_PUSHTX';
       }
 
-      return payment.build().sign(password).publish()
-        .payment.then(success).catch(error);
+      var deferred = q.defer();
+
+      // NOTE: payment.buildbeta() does NOT return a promise
+      payment.buildbeta()
+        .then(function (p) {
+          deferred.resolve(payment.sign(password).publish().payment);
+          return p;
+        })
+        .catch(function (e) {
+          deferred.reject(e.error.message || e.error);
+        });
+
+      return deferred.promise
+        .then(success).catch(error);
     });
 };
 
