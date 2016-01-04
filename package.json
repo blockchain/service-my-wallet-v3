@@ -8,6 +8,7 @@
   },
   "scripts": {
     "start": "node_modules/nodemon/bin/nodemon.js scripts/start.js",
+    "start:debug": "node-debug scripts/start.js",
     "test": "node_modules/mocha/bin/mocha test/spec.js",
     "test:live": "node_modules/mocha/bin/mocha test/live.spec.js"
   },
