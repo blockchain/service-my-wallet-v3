@@ -21,5 +21,6 @@ module.exports = {
   ERR_PUSHTX    : 'Error creating and pushing transaction',
   ERR_JSON      : 'Invalid JSON',
   ERR_ADDRESS   : 'Address not found in this wallet',
-  ERR_PASSWORD  : 'Main wallet password incorrect'
+  ERR_PASSWORD  : 'Main wallet password incorrect',
+  ERR_LOGIN_BUSY: 'Already trying to login to a wallet. To change wallets, try again in a moment'
 };
