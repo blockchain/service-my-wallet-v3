@@ -13,7 +13,7 @@ before(function (done) {
   });
 });
 
-describe('service-live-testing', function () {
+describe('service-integration-testing', function () {
   config.testWallets.forEach(function (wallet) {
 
     var address;
