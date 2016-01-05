@@ -15,17 +15,17 @@
   "author": "Justin Tormey <justin@blockchain.info>",
   "dependencies": {
     "blockchain-wallet-client": "~3.4.0",
-    "body-parser": "^1.14.1",
-    "commander": "^2.9.0",
-    "express": "^4.13.3",
-    "q": "^1.4.1",
-    "request-promise": "^1.0.2"
+    "body-parser": "~1.14.1",
+    "commander": "~2.9.0",
+    "express": "~4.13.3",
+    "q": "~1.4.1",
+    "request-promise": "~1.0.2"
   },
   "devDependencies": {
-    "chai": "^3.4.1",
-    "chai-spies": "^0.7.1",
-    "mocha": "^2.3.4",
-    "node-env-file": "^0.1.8",
-    "nodemon": "^1.8.1"
+    "chai": "~3.4.1",
+    "chai-spies": "~0.7.1",
+    "mocha": "~2.3.4",
+    "node-env-file": "~0.1.8",
+    "nodemon": "~1.8.1"
   }
 }
