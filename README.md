@@ -232,7 +232,7 @@ Sample Response:
 [`npm`](https://npmjs.com) is required for installing this API service. Installation:
 
 ```sh
-$ npm install -g git+https://github.com/blockchain/service-my-wallet-v3.git
+$ npm install -g blockchain-wallet-service
 ```
 
 If you have issues with the installation process, see the troubleshooting section below.
@@ -241,17 +241,13 @@ If you have issues with the installation process, see the troubleshooting sectio
 
 If installation fails:
 
-  * Make sure you have `git` installed. To check for `git`, run `git --version`.
-
-  * Make sure you have `g++` installed, as this is required by `node-gyp`. This is a common problem among some linux distributions, or newly created servers. To check that it is installed, run `g++ -v`.
-
   * If you are getting `EACCESS` or permissions-related errors, it might be necessary to run the install as root, using the `sudo` command.
 
 Runtime errors:
 
-  * Seeing `ReferenceError`s during startup is ok, they are fine to ignore.
-
   * If you are getting wallet decryption errors despite having correct credentials, then it's possible that you do not have Java installed, which is required by a dependency of the my-wallet-v3 module. Not having Java installed during the `npm install` process can result in the inability to decrypt wallets. Download the JDK from [here for Mac](https://support.apple.com/kb/DL1572) or by running `apt-get install default-jdk` on debian-based linux systems.
+
+If this section did not help, please open a github issue or visit our [support center](https://blockchain.zendesk.com).
 
 ## Usage
 
@@ -292,7 +288,7 @@ $ blockchain-wallet-service start --port 3000
   1. Clone this repo
   2. Run `npm install`
   3. Run `npm start`
-  4. Dev server is now running on port 5000
+  4. Dev server is now running on port 3000
 
 If you are developing `blockchain-wallet-client` alongside this module, it is useful to create a symlink to `my-wallet-v3`:
 
