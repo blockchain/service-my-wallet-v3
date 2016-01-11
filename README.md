@@ -61,42 +61,6 @@ The `api_code` parameter is only required for the call to `/login`. Subsequent A
 
 Note: at the moment, only one wallet can be "logged into" at a time. To make api calls to different wallets, run separate instances of this service for each wallet, or just remember to call `/login` each time you want to switch wallets.
 
-### List Active HD Accounts
-
-Endpoint: `/merchant/:guid/accounts`
-
-### List HD xPubs
-
-Endpoint: `/merchant/:guid/accounts/xpubs`
-
-### Create New HD Account
-
-Endpoint: `/merchant/:guid/accounts/create`
-
-Query Parameters (optional):
-
-  * `label` - label to assign to the newly created account
-
-### Get Single HD Account
-
-Endpoint: `/merchant/:guid/accounts/:xpub_or_index`
-
-### Get HD Account Receiving Address
-
-Endpoint: `/merchant/:guid/accounts/:xpub_or_index/receiveAddress`
-
-### Check HD Account Balance
-
-Endpoint: `/merchant/:guid/accounts/:xpub_or_index/balance`
-
-### Archive HD Account
-
-Endpoint: `/merchant/:guid/accounts/:xpub_or_index/archive`
-
-### Archive HD Account
-
-Endpoint: `/merchant/:guid/accounts/:xpub_or_index/unarchive`
-
 ### Make Payment
 
 Endpoint: `/merchant/:guid/payment`
@@ -263,6 +227,42 @@ Sample Response:
 ```json
 { "active" : "18fyqiZzndTxdVo7g9ouRogB4uFj86JJiy" }
 ```
+
+### List Active HD Accounts
+
+Endpoint: `/merchant/:guid/accounts`
+
+### List HD xPubs
+
+Endpoint: `/merchant/:guid/accounts/xpubs`
+
+### Create New HD Account
+
+Endpoint: `/merchant/:guid/accounts/create`
+
+Query Parameters (optional):
+
+  * `label` - label to assign to the newly created account
+
+### Get Single HD Account
+
+Endpoint: `/merchant/:guid/accounts/:xpub_or_index`
+
+### Get HD Account Receiving Address
+
+Endpoint: `/merchant/:guid/accounts/:xpub_or_index/receiveAddress`
+
+### Check HD Account Balance
+
+Endpoint: `/merchant/:guid/accounts/:xpub_or_index/balance`
+
+### Archive HD Account
+
+Endpoint: `/merchant/:guid/accounts/:xpub_or_index/archive`
+
+### Archive HD Account
+
+Endpoint: `/merchant/:guid/accounts/:xpub_or_index/unarchive`
 
 ## Installation
 
