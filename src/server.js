@@ -11,16 +11,21 @@ module.exports = {
 };
 
 var app         = express()
-  , merchantAPI = express();
+  , merchantAPI = express()
+  , legacyAPI   = express();
 
 // Configuration
-app.use('/merchant', merchantAPI);
+app.use('/merchant/:guid', merchantAPI);
+merchantAPI.use('/', legacyAPI);
+
+app.param('guid', setParam('guid'));
+
 app.use(function (req, res) {
   res.status(404).json({ error: 'Not found' });
 });
 
-merchantAPI.use(bodyParser.json());
-merchantAPI.use(parseOptions({
+legacyAPI.use(bodyParser.json());
+legacyAPI.use(parseOptions({
   password        : String,
   api_code        : String,
   address         : String,
@@ -35,57 +40,57 @@ merchantAPI.use(parseOptions({
   unsafe          : Boolean
 }));
 
-// Routing
 merchantAPI.all(
-  '/:guid/login',
+  '/login',
   required(['password', 'api_code']),
   callApi('login')
 );
 
-merchantAPI.all(
-  '/:guid/balance',
+// Routing: Legacy Wallet API
+legacyAPI.all(
+  '/balance',
   required('password'),
   callApi('getBalance')
 );
 
-merchantAPI.all(
-  '/:guid/list',
+legacyAPI.all(
+  '/list',
   required('password'),
   callApi('listAddresses')
 );
 
-merchantAPI.all(
-  '/:guid/address_balance',
+legacyAPI.all(
+  '/address_balance',
   required(['address', 'password']),
   callApi('getAddressBalance')
 );
 
-merchantAPI.all(
-  '/:guid/sendmany',
+legacyAPI.all(
+  '/sendmany',
   required(['recipients', 'password']),
   callApi('sendMany')
 );
 
-merchantAPI.all(
-  '/:guid/payment',
+legacyAPI.all(
+  '/payment',
   required(['to', 'amount', 'password']),
   callApi('makePayment')
 );
 
-merchantAPI.all(
-  '/:guid/new_address',
+legacyAPI.all(
+  '/new_address',
   required('password'),
   callApi('generateAddress')
 );
 
-merchantAPI.all(
-  '/:guid/archive_address',
+legacyAPI.all(
+  '/archive_address',
   required(['address', 'password']),
   callApi('archiveAddress')
 );
 
-merchantAPI.all(
-  '/:guid/unarchive_address',
+legacyAPI.all(
+  '/unarchive_address',
   required(['address', 'password']),
   callApi('unarchiveAddress')
 );
@@ -93,7 +98,7 @@ merchantAPI.all(
 // Custom middleware
 function callApi(method) {
   return function (req, res) {
-    var apiAction = api[method](req.params.guid, req.bc_options);
+    var apiAction = api[method](req.guid, req.bc_options);
     handleResponse(apiAction, res);
   };
 }
@@ -117,6 +122,13 @@ function parseOptions(whitelist) {
       var value = whitelist[key](req.query[key] || req.body[key] || '') || undefined;
       if (value !== undefined) req.bc_options[key] = value;
     });
+    next();
+  };
+}
+
+function setParam(paramName) {
+  return function (req, res, next, value) {
+    req[paramName] = value;
     next();
   };
 }
