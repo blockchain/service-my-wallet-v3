@@ -163,12 +163,20 @@ MerchantAPI.prototype.listAccounts = function (guid, options) {
     };
     var notFound = q.reject('ERR_ACCT_IDX');
     return hdwallet.isValidAccountIndex(parseInt(options.account)) ?
-      (hdwallet.accounts.filter(byId)[0] || notFound):
+      (formatAcct(hdwallet.accounts.filter(byId)[0]) || notFound):
       (options.account ?
-        (hdwallet.account(options.account) || notFound):
-        (hdwallet.activeAccounts)
+        (formatAcct(hdwallet.account(options.account)) || notFound):
+        (hdwallet.activeAccounts.map(formatAcct))
       );
   });
+  function formatAcct(a) {
+    return !(a instanceof Object) ? undefined : {
+      label: a.label, index: a.index, archived: a.archived,
+      extendedPublicKey: a.extendedPublicKey, extendedPrivateKey: a.extendedPrivateKey,
+      receiveIndex: a.receiveIndex, lastUsedReceiveIndex: a.lastUsedReceiveIndex,
+      receivingAddressLabels: a.receivingAddressesLabels
+    };
+  }
 };
 
 MerchantAPI.prototype.getReceiveAddress = function (guid, options) {
