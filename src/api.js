@@ -3,16 +3,22 @@
 var WalletCache = require('./wallet-cache')
   , q           = require('q')
 
-var cache = new WalletCache();
-
-function MerchantAPI() {}
+function MerchantAPI() {
+  this.cache = new WalletCache();
+}
 
 MerchantAPI.prototype.login = function (guid, options) {
-  return cache.login(guid, options);
+  return this.cache.login(guid, options);
 };
 
 MerchantAPI.prototype.getWallet = function (guid, options) {
-  return cache.getWallet(guid, options);
+  return this.cache.getWallet(guid, options);
+};
+
+MerchantAPI.prototype.getWalletHD = function (guid, options) {
+  return this.cache.getWallet(guid, options).then(function (wallet) {
+    return wallet.isUpgradedToHD ? wallet.hdwallet : q.reject('ERR_NO_HD');
+  });
 };
 
 MerchantAPI.prototype.getBalance = function (guid, options) {
@@ -64,10 +70,13 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
   return this.getWallet(guid, options)
     .then(requireSecondPassword(options))
     .then(function (wallet) {
-      var payment = cache.walletPayment()
+      var from = isNaN(options.from) ?
+        options.from : parseInt(options.from);
+
+      var payment = this.cache.walletPayment()
         .to(options.to)
         .amount(options.amount)
-        .from(options.from);
+        .from(from);
 
       var password;
       if (wallet.isDoubleEncrypted) {
@@ -89,8 +98,7 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
       }
 
       function error(e) {
-        console.log(e);
-        throw e || 'ERR_PUSHTX';
+        return q.reject(e || 'ERR_PUSHTX');
       }
 
       var deferred = q.defer();
@@ -102,7 +110,8 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
           return p;
         })
         .catch(function (e) {
-          deferred.reject(e.error.message || e.error);
+          var errMsg = e.error ? (e.error.message || e.error) : 'ERR_BUILDTX';
+          deferred.reject(errMsg);
         });
 
       return deferred.promise
@@ -133,6 +142,59 @@ MerchantAPI.prototype.unarchiveAddress = function (guid, options) {
     wallet.key(options.address).archived = false;
     return { active: options.address };
   }).catch(function (e) { throw e || 'ERR_ADDRESS'; });
+};
+
+MerchantAPI.prototype.listxPubs = function (guid, options) {
+  return this.getWalletHD(guid, options).then(function (hdwallet) {
+    return hdwallet.xpubs;
+  });
+};
+
+MerchantAPI.prototype.createAccount = function (guid, options) {
+  return this.getWallet(guid, options).then(function (wallet) {
+    return wallet.newAccount(options.label, options.password);
+  });
+};
+
+MerchantAPI.prototype.listAccounts = function (guid, options) {
+  return this.getWalletHD(guid, options).then(function (hdwallet) {
+    var byId = function (acct) {
+      return acct.index === parseInt(options.account);
+    };
+    var notFound = q.reject('ERR_ACCT_IDX');
+    return hdwallet.isValidAccountIndex(parseInt(options.account)) ?
+      (hdwallet.accounts.filter(byId)[0] || notFound):
+      (options.account ?
+        (hdwallet.account(options.account) || notFound):
+        (hdwallet.activeAccounts)
+      );
+  });
+};
+
+MerchantAPI.prototype.getReceiveAddress = function (guid, options) {
+  return this.listAccounts(guid, options).then(function (account) {
+    return { address: account.receiveAddress };
+  });
+};
+
+MerchantAPI.prototype.getAccountBalance = function (guid, options) {
+  return this.listAccounts(guid, options).then(function (account) {
+    return { balance: account.balance };
+  });
+};
+
+MerchantAPI.prototype.archiveAccount = function (guid, options) {
+  return this.listAccounts(guid, options).then(function (account) {
+    account.archived = true;
+    return account;
+  });
+};
+
+MerchantAPI.prototype.unarchiveAccount = function (guid, options) {
+  return this.listAccounts(guid, options).then(function (account) {
+    account.archived = false;
+    return account;
+  });
 };
 
 module.exports = new MerchantAPI();

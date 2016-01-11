@@ -61,6 +61,42 @@ The `api_code` parameter is only required for the call to `/login`. Subsequent A
 
 Note: at the moment, only one wallet can be "logged into" at a time. To make api calls to different wallets, run separate instances of this service for each wallet, or just remember to call `/login` each time you want to switch wallets.
 
+### List Active HD Accounts
+
+Endpoint: `/merchant/:guid/accounts`
+
+### List HD xPubs
+
+Endpoint: `/merchant/:guid/accounts/xpubs`
+
+### Create New HD Account
+
+Endpoint: `/merchant/:guid/accounts/create`
+
+Query Parameters (optional):
+
+  * `label` - label to assign to the newly created account
+
+### Get Single HD Account
+
+Endpoint: `/merchant/:guid/accounts/:xpub_or_index`
+
+### Get HD Account Receiving Address
+
+Endpoint: `/merchant/:guid/accounts/:xpub_or_index/receiveAddress`
+
+### Check HD Account Balance
+
+Endpoint: `/merchant/:guid/accounts/:xpub_or_index/balance`
+
+### Archive HD Account
+
+Endpoint: `/merchant/:guid/accounts/:xpub_or_index/archive`
+
+### Archive HD Account
+
+Endpoint: `/merchant/:guid/accounts/:xpub_or_index/unarchive`
+
 ### Make Payment
 
 Endpoint: `/merchant/:guid/payment`
@@ -71,7 +107,7 @@ Query Parameters:
   * `amount` - amount **in satoshi** to send (required)
   * `password` - main wallet password (required)
   * `second_password` - second wallet password (required, only if second password is enabled)
-  * `from` - bitcoin address to send from (optional)
+  * `from` - bitcoin address or account index to send from (optional)
   * `fee` - specify transaction fee **in satoshi** (optional, otherwise fee is computed)
   * `note` - public note to include with the transaction (optional, limit 255 characters)
 
@@ -97,7 +133,7 @@ Query Parameters:
   * `recipients` - a *URI encoded* [JSON object](http://json.org/example.html), with bitcoin addresses as keys and the **satoshi** amounts as values (required, see example below)
   * `password` - main wallet password (required)
   * `second_password` - second wallet password (required, only if second password is enabled)
-  * `from` - bitcoin address to send from (optional)
+  * `from` - bitcoin address or account index to send from (optional)
   * `fee` - specify transaction fee **in satoshi** (optional, otherwise fee is computed)
   * `note` - public note to include with the transaction (optional, limit 255 characters)
 
