@@ -228,6 +228,12 @@ Sample Response:
 { "active" : "18fyqiZzndTxdVo7g9ouRogB4uFj86JJiy" }
 ```
 
+### Enable HD Functionality
+
+Endpoint: `/merchant/:guid/enableHD`
+
+This will upgrade a wallet to an HD (Hierarchical Deterministic) Wallet, which allows the use of accounts. See [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) for more information on HD wallets and accounts.
+
 ### List Active HD Accounts
 
 Endpoint: `/merchant/:guid/accounts`
