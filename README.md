@@ -266,7 +266,7 @@ Endpoint: `/merchant/:guid/accounts/:xpub_or_index/balance`
 
 Endpoint: `/merchant/:guid/accounts/:xpub_or_index/archive`
 
-### Archive HD Account
+### Unarchive HD Account
 
 Endpoint: `/merchant/:guid/accounts/:xpub_or_index/unarchive`
 
