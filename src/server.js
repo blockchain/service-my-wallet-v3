@@ -50,6 +50,12 @@ merchantAPI.all(
   callApi('login')
 );
 
+merchantAPI.all(
+  '/enableHD',
+  required(['password']),
+  callApi('upgradeWallet')
+);
+
 // Routing: Legacy Wallet API
 legacyAPI.all(
   '/balance',

@@ -54,7 +54,7 @@ WalletCache.prototype.login = function (guid, options) {
 };
 
 WalletCache.prototype.getWallet = function (guid, options) {
-  var exists  = bc && bc.MyWallet && bc.MyWallet.wallet
+  var exists  = bc && bc.MyWallet && bc.MyWallet.wallet && bc.MyWallet.wallet.guid === guid
     , validpw = validatePassword(options.password)
     , err     = !exists && 'ERR_WALLET_ID' || !validpw && 'ERR_PASSWORD';
   return err ? q.reject(err) : q(bc.MyWallet.wallet);
