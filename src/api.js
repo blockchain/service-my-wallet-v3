@@ -144,6 +144,17 @@ MerchantAPI.prototype.unarchiveAddress = function (guid, options) {
   }).catch(function (e) { throw e || 'ERR_ADDRESS'; });
 };
 
+MerchantAPI.prototype.upgradeWallet = function (guid, options) {
+  return this.getWallet(guid, options).then(function (wallet) {
+    if (wallet.isUpgradedToHD) return q.reject('ERR_IS_HD');
+    var deferred = q.defer();
+    var error = deferred.reject.bind(null, 'ERR_SYNC');
+    var hdwallet = wallet.newHDWallet(options.label, options.password, success, error);
+    function success(s) { deferred.resolve(formatAcct(hdwallet.accounts[0])); }
+    return deferred.promise;
+  });
+};
+
 MerchantAPI.prototype.listxPubs = function (guid, options) {
   return this.getWalletHD(guid, options).then(function (hdwallet) {
     return hdwallet.xpubs;
@@ -169,14 +180,6 @@ MerchantAPI.prototype.listAccounts = function (guid, options) {
         (hdwallet.activeAccounts.map(formatAcct))
       );
   });
-  function formatAcct(a) {
-    return !(a instanceof Object) ? undefined : {
-      label: a.label, index: a.index, archived: a.archived,
-      extendedPublicKey: a.extendedPublicKey, extendedPrivateKey: a.extendedPrivateKey,
-      receiveIndex: a.receiveIndex, lastUsedReceiveIndex: a.lastUsedReceiveIndex,
-      receivingAddressLabels: a.receivingAddressesLabels
-    };
-  }
 };
 
 MerchantAPI.prototype.getReceiveAddress = function (guid, options) {
@@ -213,5 +216,14 @@ function requireSecondPassword(options) {
     if (wallet.isDoubleEncrypted && !wallet.validateSecondPassword(options.second_password))
       throw 'ERR_SECPASS';
     return wallet;
+  };
+}
+
+function formatAcct(a) {
+  return !(a instanceof Object) ? undefined : {
+    label: a.label, index: a.index, archived: a.archived,
+    extendedPublicKey: a.extendedPublicKey, extendedPrivateKey: a.extendedPrivateKey,
+    receiveIndex: a.receiveIndex, lastUsedReceiveIndex: a.lastUsedReceiveIndex,
+    receivingAddressLabels: a.receivingAddressesLabels
   };
 }
