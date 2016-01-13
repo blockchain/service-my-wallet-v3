@@ -25,6 +25,7 @@ app.use(function (req, res) {
 });
 
 legacyAPI.use(bodyParser.json());
+legacyAPI.use(bodyParser.urlencoded({ extended: true }));
 legacyAPI.use(parseOptions({
   password        : String,
   api_code        : String,
