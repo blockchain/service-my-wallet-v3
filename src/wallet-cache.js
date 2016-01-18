@@ -1,6 +1,7 @@
 'use strict';
 
 var BYTES_PER_HASH = 32;
+var TIMEOUT_MS = 10000;
 
 var crypto  = require('crypto')
   , q       = require('q')
@@ -19,7 +20,8 @@ WalletCache.prototype.login = function (guid, options) {
 
   var deferred  = q.defer()
     , needs2FA  = deferred.reject.bind(null, 'ERR_2FA')
-    , error     = deferred.reject;
+    , error     = deferred.reject
+    , timeout   = setTimeout(deferred.reject.bind(null, 'ERR_TIMEOUT'), TIMEOUT_MS);
 
   var success = function () {
     var fetchedHistory = deferred.resolve.bind(null, { guid: guid, success: true })
@@ -39,6 +41,7 @@ WalletCache.prototype.login = function (guid, options) {
   }.bind(this);
 
   var done = function () {
+    clearTimeout(timeout);
     this.loggingIn = false;
   }.bind(this);
 
