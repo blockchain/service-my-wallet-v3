@@ -7,28 +7,22 @@ var crypto  = require('crypto')
   , request = require('request-promise');
 
 var bc
-  , loggingIn = false
   , validatePassword = function () { return false; }
   , randomBytes = crypto.randomBytes(BYTES_PER_HASH);
 
-function WalletCache() {}
+function WalletCache() {
+  this.loggingIn = false;
+}
 
 WalletCache.prototype.login = function (guid, options) {
-  if (loggingIn) return q.reject('ERR_LOGIN_BUSY');
-
-  var finishThen = function (cb) {
-    return function (res) {
-      loggingIn = false;
-      cb(res);
-    };
-  };
+  if (this.loggingIn) return q.reject('ERR_LOGIN_BUSY');
 
   var deferred  = q.defer()
-    , needs2FA  = finishThen(deferred.reject.bind(null, 'ERR_2FA'))
-    , error     = finishThen(deferred.reject);
+    , needs2FA  = deferred.reject.bind(null, 'ERR_2FA')
+    , error     = deferred.reject;
 
   var success = function () {
-    var fetchedHistory = finishThen(deferred.resolve.bind(null, { guid: guid, success: true }))
+    var fetchedHistory = deferred.resolve.bind(null, { guid: guid, success: true })
       , pwHash = generatePwHash(options.password);
     validatePassword = function (p) { return generatePwHash(p).compare(pwHash) === 0; };
     bc.API.API_CODE = options.api_code;
@@ -38,18 +32,22 @@ WalletCache.prototype.login = function (guid, options) {
   };
 
   var login = function () {
-    loggingIn = true;
+    this.loggingIn = true;
     safeReset().then(function () {
       bc.MyWallet.login(guid, null, options.password, null, success, needs2FA, null, null, error);
     });
-  };
+  }.bind(this);
+
+  var done = function () {
+    this.loggingIn = false;
+  }.bind(this);
 
   this.getWallet(guid, options).then(function (wallet) {
     var successMsg = { guid: guid, success: true };
     wallet.guid === guid ? deferred.resolve(successMsg) : login();
   }).catch(login);
 
-  return deferred.promise;
+  return deferred.promise.fin(done);
 };
 
 WalletCache.prototype.getWallet = function (guid, options) {
