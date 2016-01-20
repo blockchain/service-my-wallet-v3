@@ -12,6 +12,7 @@ Programmatically interface with your Blockchain.info wallet.
   * [Troubleshooting](#troubleshooting)
   * [Usage](#usage)
   * [Development](#development)
+  * [Deployment](#deployment)
 
 ## Getting Started
 
@@ -309,9 +310,9 @@ Optional parameters can be configured in a `.env` file:
   * `PORT` - port number for running dev server (default: `3000`)
   * `BIND` - ip address to bind the service to (default: `127.0.0.1`)
 
-### Deployment
+## Deployment
 
-If you want to use blockchain-wallet-service in your production server, you just have to run:
+If you want to use blockchain-wallet-service in your UNIX production server, you just have to run:
 
 ```sh
 $ nohup blockchain-wallet-service start --port 3000 &
