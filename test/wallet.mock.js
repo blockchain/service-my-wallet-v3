@@ -11,11 +11,27 @@ var newKey = {
   label: 'my new address'
 };
 
+var account = {
+  xpub: 'xpub123456'
+};
+
+var newAccount = {
+  xpub: 'xpubGenerated',
+  label: 'my new account'
+};
+
+var hdwallet = {
+  xpubs: [account.xpub]
+};
+
 var wallet = {
+  isUpgradedToHD: true,
   finalBalance: 9000,
   activeKeys: [key],
+  hdwallet: hdwallet,
   key: function () { return key; },
-  newLegacyAddress: function () { return newKey; }
+  newLegacyAddress: function () { return newKey; },
+  newAccount: function () { return newAccount; }
 };
 
 module.exports = wallet;
