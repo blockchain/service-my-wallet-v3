@@ -14,6 +14,10 @@ api.getWallet = function (guid, options) {
   return q(wallet);
 };
 
+api.getWalletHD = function (guid, options) {
+  return q(wallet.hdwallet);
+};
+
 describe('service-my-wallet-v3', function () {
 
   var guid = 'guidguid-guid-guid-guid-guidguidguid';
@@ -95,6 +99,24 @@ describe('service-my-wallet-v3', function () {
     it('should unarchive the address', function (done) {
       api.unarchiveAddress(guid, options).then(function (result) {
         expect(result.active).to.equal(options.address);
+        done();
+      });
+    });
+  });
+
+  describe('listxPubs', function () {
+    it('should list xpubs', function (done) {
+      api.listxPubs(guid, options).then(function (result) {
+        expect(result[0]).to.equal('xpub123456');
+        done();
+      });
+    });
+  });
+
+  describe('createAccount', function () {
+    it('should create an account', function (done) {
+      api.createAccount(guid, options).then(function (result) {
+        expect(result.label).to.equal('my new account');
         done();
       });
     });
