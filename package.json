@@ -18,7 +18,7 @@
   },
   "author": "Justin Tormey <justin@blockchain.info>",
   "dependencies": {
-    "blockchain-wallet-client-prebuilt": "~3.4.1",
+    "blockchain-wallet-client-prebuilt": "~3.6.0",
     "body-parser": "~1.14.1",
     "commander": "~2.9.0",
     "express": "~4.13.3",
