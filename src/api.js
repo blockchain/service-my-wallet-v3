@@ -78,7 +78,11 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
         .amount(options.amount)
         .from(from);
 
-      var password = options.second_password;
+      var password;
+      if (wallet.isDoubleEncrypted) {
+        password = options.second_password;
+      }
+
       if (options.fee) payment.fee(options.fee);
       if (options.note) payment.note(options.note);
 
