@@ -116,7 +116,7 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
 
       return deferred.promise
         .then(success).catch(error);
-    });
+    }.bind(this));
 };
 
 MerchantAPI.prototype.generateAddress = function (guid, options) {
