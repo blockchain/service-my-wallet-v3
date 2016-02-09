@@ -12,13 +12,16 @@ module.exports = {
 
 var app         = express()
   , merchantAPI = express()
-  , legacyAPI   = express();
+  , legacyAPI   = express()
+  , accountsAPI = express();
 
 // Configuration
 app.use('/merchant/:guid', merchantAPI);
 merchantAPI.use('/', legacyAPI);
+merchantAPI.use('/accounts', accountsAPI);
 
 app.param('guid', setParam('guid'));
+accountsAPI.param('account', setParam('account'));
 
 app.use(function (req, res) {
   res.status(404).json({ error: 'Not found' });
@@ -45,6 +48,12 @@ merchantAPI.all(
   '/login',
   required(['password', 'api_code']),
   callApi('login')
+);
+
+merchantAPI.all(
+  '/enableHD',
+  required(['password']),
+  callApi('upgradeWallet')
 );
 
 // Routing: Legacy Wallet API
@@ -96,10 +105,53 @@ legacyAPI.all(
   callApi('unarchiveAddress')
 );
 
+// Routing: HD Accounts API
+accountsAPI.all(
+  '/xpubs',
+  required('password'),
+  callApi('listxPubs')
+);
+
+accountsAPI.all(
+  '/create',
+  required('password'),
+  callApi('createAccount')
+);
+
+accountsAPI.all(
+  '/:account?',
+  required('password'),
+  callApi('listAccounts')
+);
+
+accountsAPI.all(
+  '/:account/receiveAddress',
+  required('password'),
+  callApi('getReceiveAddress')
+);
+
+accountsAPI.all(
+  '/:account/balance',
+  required('password'),
+  callApi('getAccountBalance')
+);
+
+accountsAPI.all(
+  '/:account/archive',
+  required('password'),
+  callApi('archiveAccount')
+);
+
+accountsAPI.all(
+  '/:account/unarchive',
+  required('password'),
+  callApi('unarchiveAccount')
+);
+
 // Custom middleware
 function callApi(method) {
   return function (req, res) {
-    var apiAction = api[method](req.guid, req.bc_options);
+    var apiAction = api[method](req.guid, req.options);
     handleResponse(apiAction, res);
   };
 }
@@ -108,7 +160,7 @@ function required(props) {
   props = props instanceof Array ? props : [props];
   return function (req, res, next) {
     for (var i = 0; i < props.length; i++) {
-      var propExists = req.bc_options[props[i]] != null;
+      var propExists = req.options[props[i]] != null;
       var err = interpretError('ERR_PARAM', { param: props[i] });
       if (!propExists) return handleResponse(q.reject(err), res, 400);
     }
@@ -118,17 +170,22 @@ function required(props) {
 
 function parseOptions(whitelist) {
   return function (req, res, next) {
-    req.bc_options = {};
+    req.options = {};
     Object.keys(whitelist).forEach(function (key) {
-      var value = whitelist[key](req.query[key] || req.body[key] || '') || undefined;
-      if (value !== undefined) req.bc_options[key] = value;
+      var value = getParam(req, key);
+      if (value !== undefined) value = whitelist[key](value);
+      if (value !== undefined) req.options[key] = value;
     });
     next();
   };
+  function getParam(req, key) {
+    return req.query[key] == undefined ? req.body[key] : req.query[key];
+  }
 }
 
 function setParam(paramName) {
   return function (req, res, next, value) {
+    if (req.options) req.options[paramName] = value;
     req[paramName] = value;
     next();
   };

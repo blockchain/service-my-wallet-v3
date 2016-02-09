@@ -71,7 +71,7 @@ Query Parameters:
   * `amount` - amount **in satoshi** to send (required)
   * `password` - main wallet password (required)
   * `second_password` - second wallet password (required, only if second password is enabled)
-  * `from` - bitcoin address to send from (optional)
+  * `from` - bitcoin address or account index to send from (optional)
   * `fee` - specify transaction fee **in satoshi** (optional, otherwise fee is computed)
   * `note` - public note to include with the transaction (optional, limit 255 characters)
 
@@ -97,7 +97,7 @@ Query Parameters:
   * `recipients` - a *URI encoded* [JSON object](http://json.org/example.html), with bitcoin addresses as keys and the **satoshi** amounts as values (required, see example below)
   * `password` - main wallet password (required)
   * `second_password` - second wallet password (required, only if second password is enabled)
-  * `from` - bitcoin address to send from (optional)
+  * `from` - bitcoin address or account index to send from (optional)
   * `fee` - specify transaction fee **in satoshi** (optional, otherwise fee is computed)
   * `note` - public note to include with the transaction (optional, limit 255 characters)
 
@@ -227,6 +227,48 @@ Sample Response:
 ```json
 { "active" : "18fyqiZzndTxdVo7g9ouRogB4uFj86JJiy" }
 ```
+
+### Enable HD Functionality
+
+Endpoint: `/merchant/:guid/enableHD`
+
+This will upgrade a wallet to an HD (Hierarchical Deterministic) Wallet, which allows the use of accounts. See [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) for more information on HD wallets and accounts.
+
+### List Active HD Accounts
+
+Endpoint: `/merchant/:guid/accounts`
+
+### List HD xPubs
+
+Endpoint: `/merchant/:guid/accounts/xpubs`
+
+### Create New HD Account
+
+Endpoint: `/merchant/:guid/accounts/create`
+
+Query Parameters (optional):
+
+  * `label` - label to assign to the newly created account
+
+### Get Single HD Account
+
+Endpoint: `/merchant/:guid/accounts/:xpub_or_index`
+
+### Get HD Account Receiving Address
+
+Endpoint: `/merchant/:guid/accounts/:xpub_or_index/receiveAddress`
+
+### Check HD Account Balance
+
+Endpoint: `/merchant/:guid/accounts/:xpub_or_index/balance`
+
+### Archive HD Account
+
+Endpoint: `/merchant/:guid/accounts/:xpub_or_index/archive`
+
+### Unarchive HD Account
+
+Endpoint: `/merchant/:guid/accounts/:xpub_or_index/unarchive`
 
 ## Installation
 

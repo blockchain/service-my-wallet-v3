@@ -18,10 +18,15 @@ module.exports = {
   ERR_PARAM     : 'Missing query parameter: {param}',
   ERR_HISTORY   : 'Experienced an error while fetching wallet history',
   ERR_UNEXPECT  : 'Unexpected error, please try again',
-  ERR_PUSHTX    : 'Error creating and pushing transaction',
+  ERR_BUILDTX   : 'Error building transaction',
+  ERR_PUSHTX    : 'Error signing and pushing transaction',
   ERR_JSON      : 'Invalid JSON',
   ERR_ADDRESS   : 'Address not found in this wallet',
   ERR_PASSWORD  : 'Main wallet password incorrect',
   ERR_LOGIN_BUSY: 'Already trying to login to a wallet. To change wallets, try again in a moment',
-  ERR_TIMEOUT   : 'Call to /login timed out, please try again'
+  ERR_TIMEOUT   : 'Call to /login timed out, please try again',
+  ERR_NO_HD     : 'Current wallet is not an HD wallet. To upgrade, call `/merchant/:guid/enableHD`',
+  ERR_IS_HD     : 'Current wallet is already an HD wallet. To see your accounts, call `/merchant/:guid/accounts`',
+  ERR_ACCT_IDX  : 'Account nonexistent, check that your account xpub or index is correct',
+  ERR_SYNC      : 'Attempt to save wallet to server failed'
 };
