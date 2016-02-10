@@ -1,7 +1,7 @@
 'use strict';
 
 var BYTES_PER_HASH = 32;
-var TIMEOUT_MS = 10000;
+var TIMEOUT_MS = 60000;
 
 var crypto  = require('crypto')
   , q       = require('q')
