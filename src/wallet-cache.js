@@ -46,8 +46,8 @@ WalletCache.prototype.login = function (guid, options) {
   }.bind(this);
 
   this.getWallet(guid, options).then(function (wallet) {
-    var successMsg = { guid: guid, success: true };
-    wallet.guid === guid ? deferred.resolve(successMsg) : login();
+    var fetchedHistory = deferred.resolve.bind(null, { guid: guid, success: true });
+    wallet.guid === guid ? wallet.getHistory().then(fetchedHistory) : login();
   }).catch(login);
 
   return deferred.promise.fin(done);
