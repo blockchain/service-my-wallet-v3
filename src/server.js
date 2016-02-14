@@ -11,12 +11,14 @@ module.exports = {
 };
 
 var app         = express()
+  , v2API       = express()
   , merchantAPI = express()
   , legacyAPI   = express()
   , accountsAPI = express();
 
 // Configuration
 app.use('/merchant/:guid', merchantAPI);
+app.use('/v2', v2API);
 merchantAPI.use('/', legacyAPI);
 merchantAPI.use('/accounts', accountsAPI);
 
@@ -148,6 +150,26 @@ accountsAPI.all(
   callApi('unarchiveAccount')
 );
 
+// v2 API
+v2API.use(bodyParser.json());
+v2API.use(bodyParser.urlencoded({ extended: true }));
+v2API.use(parseOptions({
+  password  : String,
+  api_code  : String,
+  priv      : String,
+  label     : MaybeString,
+  email     : MaybeString
+}));
+
+v2API.all(
+  '/create',
+  required(['password', 'api_code']),
+  function (req, res) {
+    var apiAction = api.createWallet(req.options);
+    handleResponse(apiAction, res);
+  }
+);
+
 // Custom middleware
 function callApi(method) {
   return function (req, res) {
@@ -193,6 +215,7 @@ function setParam(paramName) {
 
 // Helper functions
 function Identity(a) { return a; }
+function MaybeString(s) { return s ? String(s) : undefined; }
 
 function handleResponse(apiAction, res, errCode) {
   apiAction

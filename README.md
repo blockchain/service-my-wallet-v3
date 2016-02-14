@@ -44,6 +44,29 @@ All endpoints present in the API documentation above are supported in Blockchain
 
 All endpoints can be called with `GET` or `POST`, and can only be accessed from `localhost`.
 
+### Creating a new Blockchain Wallet
+
+Endpoint: `/v2/create`
+
+Query Parameters:
+
+  * `password` - main wallet password (required)
+  * `api_code` - blockchain.info wallet api code (required)
+  * `label` - label to give to the first address generated in the wallet (optional)
+  * `email` - email to associate with the newly created wallet (optional)
+
+Get an API code [here](https://blockchain.info/api/api_create_code). **Note**: You must check the "Create Wallets" checkbox under "Permissions" when requesting an API code in order for it to be compatible with this app.
+
+Sample Response:
+
+```json
+{
+  "guid": "05f290be-dbef-4636-a809-868893c51711",
+  "address": "13R9dBgKwBP29JKo11zhfi74YuBsMxJ4qY",
+  "label": "Main address"
+}
+```
+
 ### Logging into a Wallet
 
 Loads a blockchain.info wallet. A wallet must be loaded via this endpoint before any other api interactions can occur.

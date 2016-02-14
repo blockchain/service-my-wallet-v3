@@ -144,6 +144,16 @@ MerchantAPI.prototype.unarchiveAddress = function (guid, options) {
   }).catch(function (e) { throw e || 'ERR_ADDRESS'; });
 };
 
+MerchantAPI.prototype.createWallet = function (options) {
+  return this.cache.createWallet(options).then(function (guid) {
+    return this.getWallet(guid, options).then(function (wallet) {
+      var firstKey = wallet.keys[0];
+      return { guid: wallet.guid, address: firstKey.address, label: firstKey.label };
+    });
+  }.bind(this));
+};
+
+// HD Accounts API
 MerchantAPI.prototype.upgradeWallet = function (guid, options) {
   return this.getWallet(guid, options).then(function (wallet) {
     if (wallet.isUpgradedToHD) return q.reject('ERR_IS_HD');
