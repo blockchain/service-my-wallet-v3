@@ -52,6 +52,7 @@ Query Parameters:
 
   * `password` - main wallet password (required)
   * `api_code` - blockchain.info wallet api code (required)
+  * `priv` - private key to import into wallet as first address (optional)
   * `label` - label to give to the first address generated in the wallet (optional)
   * `email` - email to associate with the newly created wallet (optional)
 

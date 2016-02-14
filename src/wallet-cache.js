@@ -71,6 +71,12 @@ WalletCache.prototype.createWallet = function (options) {
     var fetchedHistory  = deferred.resolve.bind(null, guid)
       , errorHistory    = deferred.reject.bind(null, 'ERR_HISTORY')
       , pwHash = generatePwHash(password);
+
+    if (bc.MyWallet.detectPrivateKeyFormat(options.priv) !== null) {
+      bc.MyWallet.wallet.deleteLegacyAddress(bc.MyWallet.wallet.keys[0]);
+      bc.MyWallet.wallet.importLegacyAddress(options.priv, options.label);
+    }
+
     validatePassword = function (p) { return generatePwHash(p).compare(pwHash) === 0; };
     bc.MyWallet.wallet.getHistory().then(fetchedHistory).catch(errorHistory);
   };
