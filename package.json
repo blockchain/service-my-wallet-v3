@@ -18,10 +18,13 @@
   },
   "author": "Justin Tormey <justin@blockchain.info>",
   "dependencies": {
+    "basic-auth": "~1.0.3",
     "blockchain-wallet-client-prebuilt": "~3.6.0",
+    "blockchain.info": "~2.2.0",
     "body-parser": "~1.14.1",
     "commander": "~2.9.0",
     "express": "~4.13.3",
+    "json-rpc2": "~1.0.2",
     "q": "~1.4.1",
     "request-promise": "~1.0.2"
   },

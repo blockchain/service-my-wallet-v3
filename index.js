@@ -1,7 +1,9 @@
 'use strict';
 
-var server  = require('./src/server');
+var server  = require('./src/server')
+  , rpc     = require('./src/rpc-server');
 
 module.exports = {
-  start: server.start
+  start: server.start,
+  startRPC: rpc.start
 };
