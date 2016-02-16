@@ -5,7 +5,13 @@ var SATOSHI_PER_BTC = 100000000;
 var rpc   = require('json-rpc2')
   , auth  = require('basic-auth')
   , bci   = require('blockchain.info')
-  , api   = require('./api');
+  , api   = require('./api')
+  , bitcoin = require('bitcoinjs-lib')
+  , bitcore = require('bitcore-lib')
+  , Message = require('bitcore-message')
+  , helpers = require('../node_modules/blockchain-wallet-client-prebuilt/src/helpers')
+  , Wallet  = require('../node_modules/blockchain-wallet-client-prebuilt/src/wallet')
+  , wcrypto = require('../node_modules/blockchain-wallet-client-prebuilt/src/wallet-crypto');
 
 var api_code = '';
 var secondPasswordStore = new TimedStore();
@@ -40,7 +46,16 @@ function start(options) {
     gettransaction,
     listaccounts,
     listreceivedbyaccount,
-    listreceivedbyaddress
+    listreceivedbyaddress,
+    importprivkey,
+    move,
+    sendfrom,
+    sendmany,
+    sendtoaddress,
+    validateaddress,
+    getnewaddress,
+    signmessage,
+    verifymessage
   ];
 
   methods.forEach(function (f) {
@@ -102,6 +117,7 @@ getaccount.$params = ['bitcoinAddress'];
 function getaccount(params, wallet) {
   var key = wallet.key(params.bitcoinAddress);
   if (!key) throw 'Address not found';
+  if (!key.label) throw 'Address is not in an account';
   return key.label;
 }
 
@@ -110,8 +126,7 @@ function getaccountaddress(params, wallet) {
   var labelFilter = filterBy('label', params.label);
   var key = wallet.keys.filter(labelFilter)[0] || wallet.key(params.label);
   if (!key) {
-    var secondPassword = secondPasswordStore.get(wallet.guid);
-    if (wallet.isDoubleEncrypted && !secondPassword) throw 'Second Password Expired';
+    var secondPassword = getSecondPasswordForWallet(wallet);
     key = wallet.newLegacyAddress(params.label, secondPassword);
   }
   return key.address;
@@ -226,6 +241,112 @@ function listreceivedbyaddress(params, wallet) {
     .filter(function (key) { return key.amount !== 0 || params.includeempty; });
 }
 
+importprivkey.$params = ['privateKey'];
+function importprivkey(params, wallet) {
+  var pass = getSecondPasswordForWallet(wallet);
+  return wallet.importLegacyAddress(params.privateKey, null, pass)
+    .then(function (key) { return true; })
+    .catch(function (e) { return e === 'presentInWallet'; });
+}
+
+move.$params = ['fromAccount', 'toAccount', 'amount'];
+function move(params, wallet) {
+  var pass  = getSecondPasswordForWallet(wallet)
+    , from  = getAccountAddresses(wallet, params.fromAccount)
+    , to    = getAccountAddresses(wallet, params.toAccount)
+    , amt   = btcToSatoshi(params.amount);
+
+  var payment = api.cache.walletPayment().from(from).to(to).amount(amt);
+  return publishPayment(payment, pass);
+}
+
+sendfrom.$params = ['fromAccount', 'bitcoinAddress', 'amount'];
+function sendfrom(params, wallet) {
+  var pass  = getSecondPasswordForWallet(wallet)
+    , from  = getAccountAddresses(wallet, params.fromAccount)
+    , to    = params.bitcoinAddress
+    , amt   = btcToSatoshi(params.amount);
+
+  var payment = api.cache.walletPayment().from(from).to(to).amount(amt);
+  return publishPayment(payment, pass);
+}
+
+sendmany.$params = ['fromAccount', 'addressAmountPairs'];
+function sendmany(params, wallet) {
+  var pass  = getSecondPasswordForWallet(wallet)
+    , from  = getAccountAddresses(wallet, params.fromAccount)
+    , to    = [], amts = [];
+
+  Object.keys(params.addressAmountPairs).forEach(function (address) {
+    to.push(address);
+    amts.push(btcToSatoshi(params.addressAmountPairs[address]));
+  });
+
+  var payment = api.cache.walletPayment().from(from).to(to).amount(amts);
+  return publishPayment(payment, pass);
+}
+
+sendtoaddress.$params = ['bitcoinAddress', 'amount'];
+function sendtoaddress(params, wallet) {
+  var pass  = getSecondPasswordForWallet(wallet)
+    , from  = wallet.spendableActiveAddresses
+    , to    = params.bitcoinAddress
+    , amt   = btcToSatoshi(params.amount);
+
+  var payment = api.cache.walletPayment().from(from).to(to).amount(amt);
+  return publishPayment(payment, pass);
+}
+
+validateaddress.$params = ['bitcoinAddress'];
+function validateaddress(params, wallet) {
+  var pass = getSecondPasswordForWallet(wallet)
+    , decipher = wcrypto.cipherFunction(pass, wallet.sharedKey, wallet.pbkdf2_iterations, 'dec')
+    , key = wallet.key(params.bitcoinAddress);
+
+  var compressed  = false
+    , pubkey      = '';
+
+  if (key && key.priv) {
+    var priv = wallet.isDoubleEncrypted ? decipher(key.priv) : key.priv
+      , format = Wallet.detectPrivateKeyFormat(priv)
+      , keypair = bitcoin.ECPair.fromWIF(Wallet.privateKeyStringToKey(priv, format).toWIF());
+    compressed = keypair.compressed;
+    pubkey = keypair.getPublicKeyBuffer().toString('hex');
+  }
+
+  return {
+    address       : params.bitcoinAddress,
+    iscompressed  : compressed,
+    ismine        : !!key && !!key.priv,
+    isvalid       : helpers.isBitcoinAddress(params.bitcoinAddress),
+    account       : key ? key.label : null,
+    pubkey        : pubkey
+  };
+}
+
+getnewaddress.$params = ['label?'];
+function getnewaddress(params, wallet) {
+  var pass  = getSecondPasswordForWallet(wallet)
+    , key   = wallet.newLegacyAddress(params.label, pass);
+  return key.address;
+}
+
+signmessage.$params = ['bitcoinAddress', 'message'];
+function signmessage(params, wallet) {
+  var pass    = getSecondPasswordForWallet(wallet)
+    , dec     = wcrypto.cipherFunction(pass, wallet.sharedKey, wallet.pbkdf2_iterations, 'dec')
+    , key     = wallet.key(params.bitcoinAddress)
+    , priv    = wallet.isDoubleEncrypted ? dec(key.priv) : key.priv
+    , format  = Wallet.detectPrivateKeyFormat(priv)
+    , wif     = Wallet.privateKeyStringToKey(priv, format).toWIF();
+  return Message(params.message).sign(bitcore.PrivateKey.fromWIF(wif));
+}
+
+verifymessage.$params = ['bitcoinAddress', 'signature', 'message'];
+function verifymessage(params, wallet) {
+  return Message(params.message).verify(params.bitcoinAddress, params.signature);
+}
+
 // Helper functions
 function parseArgs(f) {
   return function (args, opts, callback) {
@@ -274,8 +395,44 @@ function filterBy(p, val) {
   return function (o) { return o[p] === val; };
 }
 
+function uniq(prop) {
+  var seen = {};
+  return function (item) {
+    if (prop) item = item[prop];
+    return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+  };
+}
+
 function add(a, b) {
   return a + b;
+}
+
+function getWalletAccounts(wallet) {
+  return wallet.keys.filter(uniq('label')).map(pluck('label'));
+}
+
+function getAccountAddresses(wallet, account) {
+  return wallet.keys.filter(filterBy('label', account)).map(pluck('address'));
+}
+
+function publishPayment(payment, password) {
+  return new Promise(function (resolve, reject) {
+    payment.buildbeta()
+      .then(function (p) {
+        resolve(payment.sign(password).publish().payment);
+        return p;
+      })
+      .catch(function (e) {
+        reject(e.error ? (e.error.message || e.error) : 'Failed to build transaction');
+        return e.payment;
+      });
+  }).then(pluck('txid'));
+}
+
+function getSecondPasswordForWallet(wallet) {
+  var pass = secondPasswordStore.get(wallet.guid);
+  if (wallet.isDoubleEncrypted && !pass) throw 'Second Password Expired';
+  return pass;
 }
 
 function TimedStore() {
