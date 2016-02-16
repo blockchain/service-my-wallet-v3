@@ -109,6 +109,7 @@ function walletpassphrase(params, wallet) {
 setaccount.$params = ['bitcoinAddress', 'label'];
 function setaccount(params, wallet) {
   var key = wallet.key(params.bitcoinAddress);
+  if (!key) throw 'Address not found';
   key.label = params.label;
   return key.label === params.label;
 }
@@ -335,10 +336,14 @@ signmessage.$params = ['bitcoinAddress', 'message'];
 function signmessage(params, wallet) {
   var pass    = getSecondPasswordForWallet(wallet)
     , dec     = wcrypto.cipherFunction(pass, wallet.sharedKey, wallet.pbkdf2_iterations, 'dec')
-    , key     = wallet.key(params.bitcoinAddress)
-    , priv    = wallet.isDoubleEncrypted ? dec(key.priv) : key.priv
+    , key     = wallet.key(params.bitcoinAddress);
+
+  if (!key) throw 'Private key is not known';
+
+  var priv    = wallet.isDoubleEncrypted ? dec(key.priv) : key.priv
     , format  = Wallet.detectPrivateKeyFormat(priv)
     , wif     = Wallet.privateKeyStringToKey(priv, format).toWIF();
+
   return Message(params.message).sign(bitcore.PrivateKey.fromWIF(wif));
 }
 
