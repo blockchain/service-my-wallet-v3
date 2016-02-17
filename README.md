@@ -8,6 +8,7 @@ Programmatically interface with your Blockchain.info wallet.
   * [Getting Started](#getting-started)
   * [Upgrading](#upgrading)
   * [API Documentation](#api-documentation)
+  * [RPC API](#rpc)
   * [Installation](#installation)
   * [Troubleshooting](#troubleshooting)
   * [Usage](#usage)
@@ -270,6 +271,27 @@ Endpoint: `/merchant/:guid/accounts/:xpub_or_index/archive`
 
 Endpoint: `/merchant/:guid/accounts/:xpub_or_index/unarchive`
 
+## RPC
+
+Bitcoind compatible RPC API. Full documentation available [here](https://blockchain.info/api/json_rpc_api).
+
+Starting the RPC server:
+
+```
+$ blockchain-wallet-service start-rpc [options]
+```
+
+View additional options and instructions under [Usage](#usage).
+
+Differences from server API:
+
+  * Method `listsinceblock` is not supported
+  * Method `getconnectioncount` is not supported
+  * Param `minConfimations` is not supported for methods `listreceivedbyaccount` and `listreceivedbyaddress`
+  * Param `minimumConfirmations` is not supported for method `getbalance`
+  * Param `confirmations` is not supported for method `listaccounts`
+  * Responses representing transactions have a different format
+
 ## Installation
 
 [`npm`](https://npmjs.com) is required for installing this API service. Installation:
@@ -317,6 +339,20 @@ Command options:
   * `-b, --bind` - bind to a specific ip (defaults to `127.0.0.1`, note that binding to an ip other than this can lead to security vulnerabilities)
 
 To open the service to all incoming connections, bind to `0.0.0.0`.
+
+#### start-rpc
+
+Usage: `blockchain-wallet-service start-rpc [options]`
+
+This command will start the JSON RPC server.
+
+Options:
+
+  * `-k, --key` - api code to use for server requests (required option)
+  * `-p, --rpcport` - rpc server port (default: 8000)
+  * `-b, --bind` - bind to a specific ip (defaults to `127.0.0.1`, note that binding to an ip other than this can lead to security vulnerabilities)
+
+Get an API code [here](https://blockchain.info/api/api_create_code).
 
 ### Examples
 

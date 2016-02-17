@@ -6,6 +6,7 @@ var rpc   = require('json-rpc2')
   , auth  = require('basic-auth')
   , bci   = require('blockchain.info')
   , api   = require('./api')
+  , pkg   = require('../package')
   , bitcoin = require('bitcoinjs-lib')
   , bitcore = require('bitcore-lib')
   , Message = require('bitcore-message')
@@ -23,6 +24,7 @@ module.exports = {
 function start(options) {
   options = options || {};
   options.rpcport = options.rpcport || 8000;
+  options.bind = options.bind || '127.0.0.1';
   api_code = options.api_code;
 
   var server = rpc.Server.$create();
@@ -40,6 +42,7 @@ function start(options) {
     getblock,
     getblockcount,
     getblockhash,
+    getconnectioncount,
     getdifficulty,
     getgenerate,
     gethashespersec,
@@ -47,6 +50,7 @@ function start(options) {
     listaccounts,
     listreceivedbyaccount,
     listreceivedbyaddress,
+    listsinceblock,
     listtransactions,
     importprivkey,
     move,
@@ -63,10 +67,11 @@ function start(options) {
     server.expose(f.name, parseArgs(f));
   });
 
-  server.listen(options.rpcport, function () {
-    var msg = 'blockchain.info rpc server running on %d';
-    console.log(msg, options.rpcport);
-  });
+  server.listen(options.rpcport, options.bind);
+  var msg = 'blockchain.info rpc server v%s running on %s:%d'
+    , warn  = 'WARNING - Binding this service to any ip other than localhost (127.0.0.1) can lead to security vulnerabilities!';
+  if (options.bind !== '127.0.0.1') console.log(warn);
+  console.log(msg, pkg.version, options.bind, options.rpcport);
 }
 
 // RPC methods
@@ -181,6 +186,12 @@ function getblockhash(params) {
   });
 }
 
+getconnectioncount.$params = [];
+getconnectioncount.$nowallet = true;
+function getconnectioncount(params) {
+  throw 'Unsupported method';
+}
+
 getdifficulty.$params = [];
 getdifficulty.$nowallet = true;
 function getdifficulty(params) {
@@ -241,6 +252,12 @@ function listreceivedbyaddress(params, wallet) {
   return wallet.keys
     .map(function (key) { return { amount: key.totalReceived, address: key.address, account: key.label }; })
     .filter(function (key) { return key.amount !== 0 || params.includeempty; });
+}
+
+listsinceblock.$params = [];
+listsinceblock.$nowallet = true;
+function listsinceblock(params) {
+  throw 'Unsupported method';
 }
 
 listtransactions.$params = ['account?', 'limit?', 'offset?'];
