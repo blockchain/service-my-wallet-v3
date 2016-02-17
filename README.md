@@ -296,11 +296,16 @@ Endpoint: `/merchant/:guid/accounts/:xpub_or_index/unarchive`
 
 ## Installation
 
-[`npm`](https://npmjs.com) is required for installing this API service. Installation:
+[`nodejs`](https://nodejs.org) and [`npm`](https://npmjs.com) are required to install and use this API service. Installation:
 
 ```sh
 $ npm install -g blockchain-wallet-service
 ```
+
+Required versions:
+
+  * nodejs >= 0.12.0
+  * npm >= 2.12.0, < 3.0.0
 
 If you have issues with the installation process, see the troubleshooting section below.
 
