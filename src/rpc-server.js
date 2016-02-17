@@ -1,0 +1,488 @@
+'use strict';
+
+var SATOSHI_PER_BTC = 100000000;
+
+var rpc   = require('json-rpc2')
+  , auth  = require('basic-auth')
+  , bci   = require('blockchain.info')
+  , api   = require('./api')
+  , pkg   = require('../package')
+  , bitcoin = require('bitcoinjs-lib')
+  , bitcore = require('bitcore-lib')
+  , Message = require('bitcore-message')
+  , helpers = require('../node_modules/blockchain-wallet-client-prebuilt/src/helpers')
+  , Wallet  = require('../node_modules/blockchain-wallet-client-prebuilt/src/wallet')
+  , wcrypto = require('../node_modules/blockchain-wallet-client-prebuilt/src/wallet-crypto');
+
+var api_code = '';
+var secondPasswordStore = new TimedStore();
+
+module.exports = {
+  start: start
+};
+
+function start(options) {
+  options = options || {};
+  options.rpcport = options.rpcport || 8000;
+  options.bind = options.bind || '127.0.0.1';
+  api_code = options.api_code;
+
+  var server = rpc.Server.$create();
+
+  var methods = [
+    getinfo,
+    walletlock,
+    settxfee,
+    walletpassphrase,
+    setaccount,
+    getaccount,
+    getaccountaddress,
+    getaddressesbyaccount,
+    getbalance,
+    getblock,
+    getblockcount,
+    getblockhash,
+    getconnectioncount,
+    getdifficulty,
+    getgenerate,
+    gethashespersec,
+    gettransaction,
+    listaccounts,
+    listreceivedbyaccount,
+    listreceivedbyaddress,
+    listsinceblock,
+    listtransactions,
+    importprivkey,
+    move,
+    sendfrom,
+    sendmany,
+    sendtoaddress,
+    validateaddress,
+    getnewaddress,
+    signmessage,
+    verifymessage
+  ];
+
+  methods.forEach(function (f) {
+    server.expose(f.name, parseArgs(f));
+  });
+
+  server.listen(options.rpcport, options.bind);
+  var msg = 'blockchain.info rpc server v%s running on %s:%d'
+    , warn  = 'WARNING - Binding this service to any ip other than localhost (127.0.0.1) can lead to security vulnerabilities!';
+  if (options.bind !== '127.0.0.1') console.log(warn);
+  console.log(msg, pkg.version, options.bind, options.rpcport);
+}
+
+// RPC methods
+getinfo.$params = [];
+function getinfo(params, wallet) {
+  return bci.statistics.get().then(function (stats) {
+    return {
+      difficulty: stats.difficulty,
+      proxy: '',
+      balance: satoshiToBTC(wallet.finalBalance),
+      blocks: stats.n_blocks_total,
+      testnet: false,
+      errors: '',
+      paytxfee: satoshiToBTC(wallet.fee_per_kb)
+    };
+  });
+}
+
+walletlock.$params = [];
+function walletlock(params, wallet) {
+  secondPasswordStore.remove(wallet.guid);
+  return true;
+}
+
+settxfee.$params = ['amount'];
+function settxfee(params, wallet) {
+  wallet.fee_per_kb = btcToSatoshi(params.amount);
+  return true;
+}
+
+walletpassphrase.$params = ['password', 'timeout'];
+function walletpassphrase(params, wallet) {
+  if(!wallet.isDoubleEncrypted)
+    throw 'Error: running with an unencrypted wallet, but walletpassphrase was used';
+  if(!wallet.validateSecondPassword(params.password))
+    throw 'The wallet passphrase entered was incorrect.';
+  secondPasswordStore.set(wallet.guid, params.password, params.timeout);
+  return true;
+}
+
+setaccount.$params = ['bitcoinAddress', 'label'];
+function setaccount(params, wallet) {
+  var key = wallet.key(params.bitcoinAddress);
+  if (!key) throw 'Address not found';
+  key.label = params.label;
+  return key.label === params.label;
+}
+
+getaccount.$params = ['bitcoinAddress'];
+function getaccount(params, wallet) {
+  var key = wallet.key(params.bitcoinAddress);
+  if (!key) throw 'Address not found';
+  if (!key.label) throw 'Address is not in an account';
+  return key.label;
+}
+
+getaccountaddress.$params = ['label'];
+function getaccountaddress(params, wallet) {
+  var labelFilter = filterBy('label', params.label);
+  var key = wallet.keys.filter(labelFilter)[0] || wallet.key(params.label);
+  if (!key) {
+    var secondPassword = getSecondPasswordForWallet(wallet);
+    key = wallet.newLegacyAddress(params.label, secondPassword);
+  }
+  return key.address;
+}
+
+getaddressesbyaccount.$params = ['label'];
+function getaddressesbyaccount(params, wallet) {
+  var labelFilter = filterBy('label', params.label);
+  return wallet.keys.filter(labelFilter).map(pluck('address'));
+}
+
+getbalance.$params = ['account?'];
+function getbalance(params, wallet) {
+  var labelFilter = filterBy('label', params.account);
+  var balance = params.account ?
+    wallet.keys.filter(labelFilter).map(pluck('balance')).reduce(add, 0):
+    wallet.finalBalance;
+  return satoshiToBTC(balance);
+}
+
+getblock.$params = ['blockHash'];
+getblock.$nowallet = true;
+function getblock(params) {
+  return bci.blockexplorer.getBlock(params.blockHash).then(function (block) {
+    return {
+      tx: block.tx.map(pluck('hash')),
+      time: block.time,
+      height: block.height,
+      nonce: block.nonce,
+      hash: block.hash,
+      bits: block.bits,
+      merkleroot: block.mrkl_root,
+      version: block.ver,
+      size: block.size
+    };
+  });
+}
+
+getblockcount.$params = [];
+getblockcount.$nowallet = true;
+function getblockcount(params) {
+  return bci.statistics.get({ stat: 'n_blocks_total' });
+}
+
+getblockhash.$params = ['blockHeight'];
+getblockhash.$nowallet = true;
+function getblockhash(params) {
+  return bci.blockexplorer.getBlockHeight(params.blockHeight).then(function (r) {
+    return r.blocks[0].hash;
+  });
+}
+
+getconnectioncount.$params = [];
+getconnectioncount.$nowallet = true;
+function getconnectioncount(params) {
+  throw 'Unsupported method';
+}
+
+getdifficulty.$params = [];
+getdifficulty.$nowallet = true;
+function getdifficulty(params) {
+  return bci.statistics.get({ stat: 'difficulty' });
+}
+
+getgenerate.$params = [];
+getgenerate.$nowallet = true;
+function getgenerate(params) {
+  return false;
+}
+
+gethashespersec.$params = [];
+gethashespersec.$nowallet = true;
+function gethashespersec(params) {
+  return 0;
+}
+
+gettransaction.$params = ['hash'];
+gettransaction.$nowallet = true;
+function gettransaction(params) {
+  return bci.blockexplorer.getTx(params.hash);
+}
+
+listaccounts.$params = [];
+function listaccounts(params, wallet) {
+  return wallet.keys.reduce(function (acc, key) {
+    acc[key.address] = satoshiToBTC(key.balance);
+    return acc;
+  }, {});
+}
+
+listreceivedbyaccount.$params = ['includeempty?'];
+function listreceivedbyaccount(params, wallet) {
+  var accountMap = wallet.keys
+    .map(function (key) {
+      return { amount: key.totalReceived, address: key.address, account: key.label };
+    })
+    .reduce(function (acc, key) {
+      var account = acc[key.account] || { amount: 0, addresses: [], label: key.account, account: key.account };
+      account.addresses.push(key.address);
+      account.amount += key.amount;
+      acc[key.account] = account;
+      return acc;
+    }, {});
+  return Object.keys(accountMap)
+    .map(function (key) {
+      var keyObj = accountMap[key];
+      keyObj.addresses = '[' + keyObj.addresses.join(', ') + ']';
+      keyObj.amount = satoshiToBTC(keyObj.amount);
+      return keyObj;
+    })
+    .filter(function (key) { return key.amount !== 0 || params.includeempty; });
+}
+
+listreceivedbyaddress.$params = ['includeempty?'];
+function listreceivedbyaddress(params, wallet) {
+  return wallet.keys
+    .map(function (key) { return { amount: key.totalReceived, address: key.address, account: key.label }; })
+    .filter(function (key) { return key.amount !== 0 || params.includeempty; });
+}
+
+listsinceblock.$params = [];
+listsinceblock.$nowallet = true;
+function listsinceblock(params) {
+  throw 'Unsupported method';
+}
+
+listtransactions.$params = ['account?', 'limit?', 'offset?'];
+function listtransactions(params, wallet) {
+  if (!params.limit || params.limit > 25) params.limit = 25;
+  var addresses = params.account ?
+    getAccountAddresses(wallet, params.account) : wallet.activeAddresses;
+  return bci.blockexplorer.getMultiAddress(addresses, params)
+    .then(function (result) {
+      return {
+        lastblock: result.info.latest_block.hash,
+        transactions: result.txs
+      };
+    });
+}
+
+importprivkey.$params = ['privateKey'];
+function importprivkey(params, wallet) {
+  var pass = getSecondPasswordForWallet(wallet);
+  return wallet.importLegacyAddress(params.privateKey, null, pass)
+    .then(function (key) { return true; })
+    .catch(function (e) { return e === 'presentInWallet'; });
+}
+
+move.$params = ['fromAccount', 'toAccount', 'amount'];
+function move(params, wallet) {
+  var pass  = getSecondPasswordForWallet(wallet)
+    , from  = getAccountAddresses(wallet, params.fromAccount)
+    , to    = getAccountAddresses(wallet, params.toAccount)
+    , amt   = btcToSatoshi(params.amount);
+
+  var payment = api.cache.walletPayment().from(from).to(to).amount(amt);
+  return publishPayment(payment, pass);
+}
+
+sendfrom.$params = ['fromAccount', 'bitcoinAddress', 'amount'];
+function sendfrom(params, wallet) {
+  var pass  = getSecondPasswordForWallet(wallet)
+    , from  = getAccountAddresses(wallet, params.fromAccount)
+    , to    = params.bitcoinAddress
+    , amt   = btcToSatoshi(params.amount);
+
+  var payment = api.cache.walletPayment().from(from).to(to).amount(amt);
+  return publishPayment(payment, pass);
+}
+
+sendmany.$params = ['fromAccount', 'addressAmountPairs'];
+function sendmany(params, wallet) {
+  var pass  = getSecondPasswordForWallet(wallet)
+    , from  = getAccountAddresses(wallet, params.fromAccount)
+    , to    = [], amts = [];
+
+  Object.keys(params.addressAmountPairs).forEach(function (address) {
+    to.push(address);
+    amts.push(btcToSatoshi(params.addressAmountPairs[address]));
+  });
+
+  var payment = api.cache.walletPayment().from(from).to(to).amount(amts);
+  return publishPayment(payment, pass);
+}
+
+sendtoaddress.$params = ['bitcoinAddress', 'amount'];
+function sendtoaddress(params, wallet) {
+  var pass  = getSecondPasswordForWallet(wallet)
+    , from  = wallet.spendableActiveAddresses
+    , to    = params.bitcoinAddress
+    , amt   = btcToSatoshi(params.amount);
+
+  var payment = api.cache.walletPayment().from(from).to(to).amount(amt);
+  return publishPayment(payment, pass);
+}
+
+validateaddress.$params = ['bitcoinAddress'];
+function validateaddress(params, wallet) {
+  var pass = getSecondPasswordForWallet(wallet)
+    , decipher = wcrypto.cipherFunction(pass, wallet.sharedKey, wallet.pbkdf2_iterations, 'dec')
+    , key = wallet.key(params.bitcoinAddress);
+
+  var compressed  = false
+    , pubkey      = '';
+
+  if (key && key.priv) {
+    var priv = wallet.isDoubleEncrypted ? decipher(key.priv) : key.priv
+      , format = Wallet.detectPrivateKeyFormat(priv)
+      , keypair = bitcoin.ECPair.fromWIF(Wallet.privateKeyStringToKey(priv, format).toWIF());
+    compressed = keypair.compressed;
+    pubkey = keypair.getPublicKeyBuffer().toString('hex');
+  }
+
+  return {
+    address       : params.bitcoinAddress,
+    iscompressed  : compressed,
+    ismine        : !!key && !!key.priv,
+    isvalid       : helpers.isBitcoinAddress(params.bitcoinAddress),
+    account       : key ? key.label : null,
+    pubkey        : pubkey
+  };
+}
+
+getnewaddress.$params = ['label?'];
+function getnewaddress(params, wallet) {
+  var pass  = getSecondPasswordForWallet(wallet)
+    , key   = wallet.newLegacyAddress(params.label, pass);
+  return key.address;
+}
+
+signmessage.$params = ['bitcoinAddress', 'message'];
+function signmessage(params, wallet) {
+  var pass    = getSecondPasswordForWallet(wallet)
+    , dec     = wcrypto.cipherFunction(pass, wallet.sharedKey, wallet.pbkdf2_iterations, 'dec')
+    , key     = wallet.key(params.bitcoinAddress);
+
+  if (!key) throw 'Private key is not known';
+
+  var priv    = wallet.isDoubleEncrypted ? dec(key.priv) : key.priv
+    , format  = Wallet.detectPrivateKeyFormat(priv)
+    , wif     = Wallet.privateKeyStringToKey(priv, format).toWIF();
+
+  return Message(params.message).sign(bitcore.PrivateKey.fromWIF(wif));
+}
+
+verifymessage.$params = ['bitcoinAddress', 'signature', 'message'];
+function verifymessage(params, wallet) {
+  return Message(params.message).verify(params.bitcoinAddress, params.signature);
+}
+
+// Helper functions
+function parseArgs(f) {
+  return function (args, opts, callback) {
+    var credentials = auth(opts.req)
+      , guid        = credentials.name
+      , walletOpts  = { password: credentials.pass, api_code: api_code };
+
+    if (args.length > f.$params.length)
+      throw 'Expected max of ' + f.$params.length + ' parameters, received ' + args.length;
+
+    var params = f.$params
+      .map(function (param, i) {
+        return  { name      : param.split('?')[0]
+                , value     : args[i]
+                , required  : !~param.indexOf('?')  };
+      })
+      .reduce(function (acc, param) {
+        if(param.value == null && param.required) throw 'Missing parameter: ' + param.name;
+        acc[param.name] = param.value;
+        return acc;
+      }, {});
+
+    (f.$nowallet ?
+      Promise.resolve(f(params)):
+      api.login(guid, walletOpts)
+        .then(api.getWallet.bind(api, guid, walletOpts))
+        .then(f.bind(f, params)))
+      .then(callback.bind(null, null))
+      .catch(callback);
+  };
+}
+
+function satoshiToBTC(satoshi) {
+  return parseFloat((satoshi / SATOSHI_PER_BTC).toFixed(8));
+}
+
+function btcToSatoshi(btc) {
+  return parseInt(btc * SATOSHI_PER_BTC);
+}
+
+function pluck(p) {
+  return function (o) { return o[p]; };
+}
+
+function filterBy(p, val) {
+  return function (o) { return o[p] === val; };
+}
+
+function uniq(prop) {
+  var seen = {};
+  return function (item) {
+    if (prop) item = item[prop];
+    return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+  };
+}
+
+function add(a, b) {
+  return a + b;
+}
+
+function getWalletAccounts(wallet) {
+  return wallet.keys.filter(uniq('label')).map(pluck('label'));
+}
+
+function getAccountAddresses(wallet, account) {
+  return wallet.keys.filter(filterBy('label', account)).map(pluck('address'));
+}
+
+function publishPayment(payment, password) {
+  return new Promise(function (resolve, reject) {
+    payment.buildbeta()
+      .then(function (p) {
+        resolve(payment.sign(password).publish().payment);
+        return p;
+      })
+      .catch(function (e) {
+        reject(e.error ? (e.error.message || e.error) : 'Failed to build transaction');
+        return e.payment;
+      });
+  }).then(pluck('txid'));
+}
+
+function getSecondPasswordForWallet(wallet) {
+  var pass = secondPasswordStore.get(wallet.guid);
+  if (wallet.isDoubleEncrypted && !pass) throw 'Second Password Expired';
+  return pass;
+}
+
+function TimedStore() {
+  var store = {};
+  this.set = function (key, val, seconds) {
+    var unsetTimer = setTimeout(this.remove.bind(this, key), seconds * 1000);
+    store[key] = { value: val, timer: unsetTimer };
+  };
+  this.get = function (key) {
+    return store[key] && store[key].value;
+  };
+  this.remove = function (key) {
+    if (store[key] && store[key].timer) clearTimeout(store[key].timer);
+    store[key] = undefined;
+  };
+}
