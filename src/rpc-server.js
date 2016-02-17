@@ -47,6 +47,7 @@ function start(options) {
     listaccounts,
     listreceivedbyaccount,
     listreceivedbyaddress,
+    listtransactions,
     importprivkey,
     move,
     sendfrom,
@@ -240,6 +241,20 @@ function listreceivedbyaddress(params, wallet) {
   return wallet.keys
     .map(function (key) { return { amount: key.totalReceived, address: key.address, account: key.label }; })
     .filter(function (key) { return key.amount !== 0 || params.includeempty; });
+}
+
+listtransactions.$params = ['account?', 'limit?', 'offset?'];
+function listtransactions(params, wallet) {
+  if (!params.limit || params.limit > 25) params.limit = 25;
+  var addresses = params.account ?
+    getAccountAddresses(wallet, params.account) : wallet.activeAddresses;
+  return bci.blockexplorer.getMultiAddress(addresses, params)
+    .then(function (result) {
+      return {
+        lastblock: result.info.latest_block.hash,
+        transactions: result.txs
+      };
+    });
 }
 
 importprivkey.$params = ['privateKey'];
