@@ -292,7 +292,7 @@ function move(params, wallet) {
     , to    = getAccountAddresses(wallet, params.toAccount)[0]
     , amt   = btcToSatoshi(params.amount);
 
-  var payment = api.cache.walletPayment().from(from).to(to).amount(amt);
+  var payment = api.cache.walletPayment(wallet.guid).from(from).to(to).amount(amt);
   return publishPayment(payment, pass);
 }
 
@@ -303,7 +303,7 @@ function sendfrom(params, wallet) {
     , to    = params.bitcoinAddress
     , amt   = btcToSatoshi(params.amount);
 
-  var payment = api.cache.walletPayment().from(from).to(to).amount(amt);
+  var payment = api.cache.walletPayment(wallet.guid).from(from).to(to).amount(amt);
   return publishPayment(payment, pass);
 }
 
@@ -318,7 +318,7 @@ function sendmany(params, wallet) {
     amts.push(btcToSatoshi(params.addressAmountPairs[address]));
   });
 
-  var payment = api.cache.walletPayment().from(from).to(to).amount(amts);
+  var payment = api.cache.walletPayment(wallet.guid).from(from).to(to).amount(amts);
   return publishPayment(payment, pass);
 }
 
@@ -329,7 +329,7 @@ function sendtoaddress(params, wallet) {
     , to    = params.bitcoinAddress
     , amt   = btcToSatoshi(params.amount);
 
-  var payment = api.cache.walletPayment().from(from).to(to).amount(amt);
+  var payment = api.cache.walletPayment(wallet.guid).from(from).to(to).amount(amt);
   return publishPayment(payment, pass);
 }
 

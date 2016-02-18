@@ -10,56 +10,53 @@ var crypto  = require('crypto')
   , q       = require('q')
   , request = require('request-promise');
 
-var bc
-  , validatePassword = function () { return false; }
-  , randomBytes = crypto.randomBytes(BYTES_PER_HASH);
+var randomBytes = crypto.randomBytes(BYTES_PER_HASH);
 
 function WalletCache() {
-  this.loggingIn = false;
+  this.loggingIn = {};
+  this.instanceStore = {};
+  this.pwHashStore = {};
 }
 
 WalletCache.prototype.login = function (guid, options) {
-  if (this.loggingIn) return q.reject('ERR_LOGIN_BUSY');
+  if (this.loggingIn[guid]) return q.reject('ERR_LOGIN_BUSY');
 
   var deferred  = q.defer()
     , needs2FA  = deferred.reject.bind(null, 'ERR_2FA')
     , needsAuth = deferred.reject.bind(null, 'ERR_AUTH')
     , error     = deferred.reject
+    , fetched   = deferred.resolve.bind(null, { guid: guid, success: true })
     , timeout   = setTimeout(deferred.reject.bind(null, 'ERR_TIMEOUT'), TIMEOUT_MS);
 
   var success = function () {
-    var fetchedHistory = deferred.resolve.bind(null, { guid: guid, success: true })
-      , pwHash = generatePwHash(options.password);
-    validatePassword = function (p) { return generatePwHash(p).compare(pwHash) === 0; };
-    bc.MyWallet.wallet.getHistory().then(fetchedHistory).catch(error);
-  };
+    var pwHash = generatePwHash(options.password);
+    this.pwHashStore[guid] = pwHash;
+    this.instanceStore[guid].MyWallet.wallet.getHistory().then(fetched).catch(error);
+  }.bind(this);
 
   var login = function () {
-    this.loggingIn = true;
-    safeReset().then(function () {
-      bc.API.API_CODE = options.api_code;
-      bc.WalletStore.setAPICode(options.api_code);
-      bc.WalletStore.isLogoutDisabled = function () { return true; };
-      bc.MyWallet.login(guid, null, options.password, null, success, needs2FA, null, needsAuth, error);
-    });
+    this.loggingIn[guid] = true;
+    var instance = generateInstance();
+    instance.API.API_CODE = options.api_code;
+    instance.WalletStore.setAPICode(options.api_code);
+    instance.WalletStore.isLogoutDisabled = function () { return true; };
+    instance.MyWallet.login(guid, null, options.password, null, success, needs2FA, null, needsAuth, error);
+    this.instanceStore[guid] = instance;
   }.bind(this);
 
   var done = function () {
     clearTimeout(timeout);
-    this.loggingIn = false;
+    this.loggingIn[guid] = false;
   }.bind(this);
 
   this.getWallet(guid, options).then(function (wallet) {
-    var fetchedHistory = deferred.resolve.bind(null, { guid: guid, success: true });
-    wallet.guid === guid ? wallet.getHistory().then(fetchedHistory) : login();
+    wallet.guid === guid ? wallet.getHistory().then(fetched) : login();
   }).catch(login);
 
   return deferred.promise.fin(done);
 };
 
 WalletCache.prototype.createWallet = function (options) {
-  if (this.loggingIn) return q.reject('ERR_LOGIN_BUSY');
-
   var lang, currency
     , email = options.email || ''
     , pass  = options.password
@@ -68,76 +65,65 @@ WalletCache.prototype.createWallet = function (options) {
     , deferred  = q.defer()
     , timeout   = setTimeout(deferred.reject.bind(null, 'ERR_TIMEOUT'), TIMEOUT_MS);
 
-  var success = function (guid, sharedKey, password) {
-    var fetchedHistory  = deferred.resolve.bind(null, guid)
-      , errorHistory    = deferred.reject.bind(null, 'ERR_HISTORY')
-      , pwHash = generatePwHash(password);
+  var instance = generateInstance();
+  instance.API.API_CODE = options.api_code;
+  instance.WalletStore.setAPICode(options.api_code);
+  instance.WalletStore.isLogoutDisabled = function () { return true; };
 
-    if (bc.MyWallet.detectPrivateKeyFormat(options.priv) !== null) {
-      bc.MyWallet.wallet.deleteLegacyAddress(bc.MyWallet.wallet.keys[0]);
-      bc.MyWallet.wallet.importLegacyAddress(options.priv, options.label);
+  var success = function (guid, sharedKey, password) {
+    var fetched = deferred.resolve.bind(null, guid)
+      , error   = deferred.reject.bind(null, 'ERR_HISTORY')
+      , pwHash  = generatePwHash(password);
+
+    this.pwHashStore[guid] = pwHash;
+    this.instanceStore[guid] = instance;
+
+    if (instance.MyWallet.detectPrivateKeyFormat(options.priv) !== null) {
+      instance.MyWallet.wallet.deleteLegacyAddress(instance.MyWallet.wallet.keys[0]);
+      instance.MyWallet.wallet.importLegacyAddress(options.priv, options.label);
     }
 
-    validatePassword = function (p) { return generatePwHash(p).compare(pwHash) === 0; };
-    bc.MyWallet.wallet.getHistory().then(fetchedHistory).catch(errorHistory);
-  };
-
-  var done = function () {
-    clearTimeout(timeout);
-    this.loggingIn = false;
+    instance.MyWallet.wallet.getHistory().then(fetched).catch(error);
   }.bind(this);
 
-  safeReset().then(function () {
-    this.loggingIn = true;
-    bc.API.API_CODE = options.api_code;
-    bc.WalletStore.setAPICode(options.api_code);
-    bc.WalletStore.isLogoutDisabled = function () { return true; };
-    bc.MyWallet.createNewWallet(email, pass, label, lang, currency, success, deferred.reject, isHD);
-  }.bind(this));
+  instance.MyWallet.createNewWallet(
+    email, pass, label, lang, currency, success, deferred.reject, isHD);
 
-  return deferred.promise.fin(done);
+  return deferred.promise.fin(clearTimeout.bind(null, timeout));
 };
 
 WalletCache.prototype.getWallet = function (guid, options) {
-  var exists  = bc && bc.MyWallet && bc.MyWallet.wallet && bc.MyWallet.wallet.guid === guid
-    , validpw = validatePassword(options.password)
+  var inst    = this.instanceStore[guid]
+    , exists  = inst && inst.MyWallet.wallet && inst.MyWallet.wallet.guid === guid
+    , validpw = validatePassword(this.pwHashStore[guid], options.password)
     , err     = !exists && 'ERR_WALLET_ID' || !validpw && 'ERR_PASSWORD';
-  return err ? q.reject(err) : q(bc.MyWallet.wallet);
+  return err ? q.reject(err) : q(inst.MyWallet.wallet);
 };
 
-WalletCache.prototype.walletPayment = function () {
-  return new bc.Payment();
+WalletCache.prototype.walletPayment = function (guid) {
+  var instance = this.instanceStore[guid];
+  if (!instance || !instance.Payment) throw 'ERR_PAYMENT';
+  return new instance.Payment();
 };
 
 module.exports = WalletCache;
 
-function safeReset() {
-  var deferred = q.defer();
-  if (bc && bc.MyWallet && bc.MyWallet.wallet) {
-    if (!bc.WalletStore.isSynchronizedWithServer()) {
-      bc.MyWallet.syncWallet(refreshCache, deferred.reject);
-    } else {
-      refreshCache();
-    }
-  } else {
-    refreshCache();
-  }
-  function refreshCache() {
-    if (require.cache) {
-      Object.keys(require.cache)
-        .filter(function (module) {
-          return (module.indexOf('blockchain-wallet-client-prebuilt/index') > -1 ||
-                  module.indexOf('blockchain-wallet-client-prebuilt/src') > -1);
-        })
-        .forEach(function (module) { delete require.cache[module]; });
-    }
-    bc = require('blockchain-wallet-client-prebuilt');
-    deferred.resolve(true);
-  }
-  return deferred.promise;
+function generateInstance() {
+  Object.keys(require.cache)
+    .filter(function (module) {
+      return (module.indexOf('blockchain-wallet-client-prebuilt/index') > -1 ||
+              module.indexOf('blockchain-wallet-client-prebuilt/src') > -1);
+    })
+    .forEach(function (module) { require.cache[module] = undefined; });
+  return require('blockchain-wallet-client-prebuilt');
 }
 
 function generatePwHash(pw) {
   var iterations = 5000;
   return crypto.pbkdf2Sync(pw, randomBytes, iterations, BYTES_PER_HASH, 'sha256');
+}
+
+function validatePassword(hash, maybePw) {
+  if (!Buffer.isBuffer(hash) || !maybePw) return false;
+  return generatePwHash(maybePw).compare(hash) === 0;
 }

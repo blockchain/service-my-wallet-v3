@@ -19,6 +19,7 @@ module.exports = {
   ERR_HISTORY   : 'Experienced an error while fetching wallet history',
   ERR_UNEXPECT  : 'Unexpected error, please try again',
   ERR_BUILDTX   : 'Error building transaction',
+  ERR_PAYMENT   : 'Failed to create wallet payment',
   ERR_PUSHTX    : 'Error signing and pushing transaction',
   ERR_JSON      : 'Invalid JSON',
   ERR_ADDRESS   : 'Address not found in this wallet',
