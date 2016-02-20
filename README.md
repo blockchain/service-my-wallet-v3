@@ -341,6 +341,10 @@ Runtime errors:
 
   * If you are getting wallet decryption errors despite having correct credentials, then it's possible that you do not have Java installed, which is required by a dependency of the my-wallet-v3 module. Not having Java installed during the `npm install` process can result in the inability to decrypt wallets. Download the JDK from [here for Mac](https://support.apple.com/kb/DL1572) or by running `apt-get install default-jdk` on debian-based linux systems.
 
+Timeout Errors:
+
+  * If you are getting a timeout response when attempting to [`/login`](#logging-into-a-wallet) additional authorization from your blockchain wallet may be required. This can occur when using an unrecognized broswer or IP address. An email authorizing the API access attempt will be sent to the registered user that will require action in order to authorize future requests. 
+
 If this section did not help, please open a github issue or visit our [support center](https://blockchain.zendesk.com).
 
 ## Usage
