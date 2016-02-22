@@ -7,6 +7,7 @@ var rpc   = require('json-rpc2')
   , bci   = require('blockchain.info')
   , api   = require('./api')
   , pkg   = require('../package')
+  , request = require('request-promise')
   , bitcoin = require('bitcoinjs-lib')
   , bitcore = require('bitcore-lib')
   , Message = require('bitcore-message')
@@ -189,7 +190,7 @@ function getblockhash(params) {
 getconnectioncount.$params = [];
 getconnectioncount.$nowallet = true;
 function getconnectioncount(params) {
-  throw 'Unsupported method';
+  return request('https://blockchain.info/q/nconnected');
 }
 
 getdifficulty.$params = [];

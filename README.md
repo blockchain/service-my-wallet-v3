@@ -311,7 +311,6 @@ Differences from server API:
 
   * Option `-rpcssl` is not supported
   * Method `listsinceblock` is not supported
-  * Method `getconnectioncount` is not supported
   * Param `minConfimations` is not supported for methods `listreceivedbyaccount` and `listreceivedbyaddress`
   * Param `minimumConfirmations` is not supported for method `getbalance`
   * Param `confirmations` is not supported for method `listaccounts`
