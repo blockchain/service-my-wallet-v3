@@ -309,6 +309,7 @@ View additional options and instructions under [Usage](#usage).
 
 Differences from server API:
 
+  * Option `-rpcssl` is not supported
   * Method `listsinceblock` is not supported
   * Method `getconnectioncount` is not supported
   * Param `minConfimations` is not supported for methods `listreceivedbyaccount` and `listreceivedbyaddress`
@@ -343,7 +344,7 @@ Runtime errors:
 
 Timeout Errors:
 
-  * If you are getting a timeout response when attempting to [`/login`](#logging-into-a-wallet) additional authorization from your blockchain wallet may be required. This can occur when using an unrecognized broswer or IP address. An email authorizing the API access attempt will be sent to the registered user that will require action in order to authorize future requests. 
+  * If you are getting a timeout response when attempting to [`/login`](#logging-into-a-wallet) additional authorization from your blockchain wallet may be required. This can occur when using an unrecognized broswer or IP address. An email authorizing the API access attempt will be sent to the registered user that will require action in order to authorize future requests.
 
 If this section did not help, please open a github issue or visit our [support center](https://blockchain.zendesk.com).
 
