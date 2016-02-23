@@ -79,15 +79,18 @@ function start(options) {
 getinfo.$params = [];
 function getinfo(params, wallet) {
   return bci.statistics.get().then(function (stats) {
-    return {
-      difficulty: stats.difficulty,
-      proxy: '',
-      balance: satoshiToBTC(wallet.finalBalance),
-      blocks: stats.n_blocks_total,
-      testnet: false,
-      errors: '',
-      paytxfee: satoshiToBTC(wallet.fee_per_kb)
-    };
+    return request('https://blockchain.info/q/nconnected').then(function (connected) {
+      return {
+        connected: parseInt(connected),
+        difficulty: stats.difficulty,
+        proxy: '',
+        balance: satoshiToBTC(wallet.finalBalance),
+        blocks: stats.n_blocks_total,
+        testnet: false,
+        errors: '',
+        paytxfee: satoshiToBTC(wallet.fee_per_kb)
+      };
+    });
   });
 }
 
