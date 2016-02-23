@@ -142,15 +142,14 @@ function getaccountaddress(params, wallet) {
 
 getaddressesbyaccount.$params = ['label'];
 function getaddressesbyaccount(params, wallet) {
-  var labelFilter = filterBy('label', params.label);
-  return wallet.keys.filter(labelFilter).map(pluck('address'));
+  return getAccountKeys(wallet, params.label).map(pluck('address'));
 }
 
 getbalance.$params = ['account?'];
 function getbalance(params, wallet) {
   var labelFilter = filterBy('label', params.account);
   var balance = params.account ?
-    wallet.keys.filter(labelFilter).map(pluck('balance')).reduce(add, 0):
+    getAccountKeys(wallet, params.account).map(pluck('balance')).reduce(add, 0):
     wallet.finalBalance;
   return satoshiToBTC(balance);
 }
@@ -287,7 +286,7 @@ move.$params = ['fromAccount', 'toAccount', 'amount'];
 function move(params, wallet) {
   var pass  = getSecondPasswordForWallet(wallet)
     , from  = getAccountAddresses(wallet, params.fromAccount)
-    , to    = getAccountAddresses(wallet, params.toAccount)
+    , to    = getAccountAddresses(wallet, params.toAccount)[0]
     , amt   = btcToSatoshi(params.amount);
 
   var payment = api.cache.walletPayment().from(from).to(to).amount(amt);
@@ -449,8 +448,14 @@ function getWalletAccounts(wallet) {
   return wallet.keys.filter(uniq('label')).map(pluck('label'));
 }
 
+function getAccountKeys(wallet, account) {
+  return helpers.isBitcoinAddress(account) ?
+    [wallet.key(account)] : wallet.keys.filter(filterBy('label', account));
+}
+
 function getAccountAddresses(wallet, account) {
-  return wallet.keys.filter(filterBy('label', account)).map(pluck('address'));
+  return helpers.isBitcoinAddress(account) ?
+    [account] : wallet.keys.filter(filterBy('label', account)).map(pluck('address'));
 }
 
 function publishPayment(payment, password) {
