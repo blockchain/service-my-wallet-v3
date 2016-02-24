@@ -23,6 +23,7 @@ WalletCache.prototype.login = function (guid, options) {
 
   var deferred  = q.defer()
     , needs2FA  = deferred.reject.bind(null, 'ERR_2FA')
+    , needsAuth = deferred.reject.bind(null, 'ERR_AUTH')
     , error     = deferred.reject
     , timeout   = setTimeout(deferred.reject.bind(null, 'ERR_TIMEOUT'), TIMEOUT_MS);
 
@@ -39,7 +40,7 @@ WalletCache.prototype.login = function (guid, options) {
       bc.API.API_CODE = options.api_code;
       bc.WalletStore.setAPICode(options.api_code);
       bc.WalletStore.isLogoutDisabled = function () { return true; };
-      bc.MyWallet.login(guid, null, options.password, null, success, needs2FA, null, null, error);
+      bc.MyWallet.login(guid, null, options.password, null, success, needs2FA, null, needsAuth, error);
     });
   }.bind(this);
 
