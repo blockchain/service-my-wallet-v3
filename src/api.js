@@ -177,6 +177,7 @@ MerchantAPI.prototype.createAccount = function (guid, options) {
   return this.getWallet(guid, options)
     .then(requireSecondPassword(options))
     .then(function (wallet) {
+      if (!wallet.isUpgradedToHD) return q.reject('ERR_NO_HD');
       return wallet.newAccount(options.label, options.second_password);
     });
 };
