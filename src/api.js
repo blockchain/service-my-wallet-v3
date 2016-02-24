@@ -155,14 +155,16 @@ MerchantAPI.prototype.createWallet = function (options) {
 
 // HD Accounts API
 MerchantAPI.prototype.upgradeWallet = function (guid, options) {
-  return this.getWallet(guid, options).then(function (wallet) {
-    if (wallet.isUpgradedToHD) return q.reject('ERR_IS_HD');
-    var deferred = q.defer();
-    var error = deferred.reject.bind(null, 'ERR_SYNC');
-    var hdwallet = wallet.newHDWallet(options.label, options.password, success, error);
-    function success(s) { deferred.resolve(formatAcct(hdwallet.accounts[0])); }
-    return deferred.promise;
-  });
+  return this.getWallet(guid, options)
+    .then(requireSecondPassword(options))
+    .then(function (wallet) {
+      if (wallet.isUpgradedToHD) return q.reject('ERR_IS_HD');
+      var deferred  = q.defer()
+        , error     = deferred.reject.bind(null, 'ERR_SYNC')
+        , hdwallet  = wallet.newHDWallet(options.label, options.second_password, success, error);
+      function success(s) { deferred.resolve(formatAcct(hdwallet.accounts[0])); }
+      return deferred.promise;
+    });
 };
 
 MerchantAPI.prototype.listxPubs = function (guid, options) {
@@ -172,9 +174,11 @@ MerchantAPI.prototype.listxPubs = function (guid, options) {
 };
 
 MerchantAPI.prototype.createAccount = function (guid, options) {
-  return this.getWallet(guid, options).then(function (wallet) {
-    return wallet.newAccount(options.label, options.password);
-  });
+  return this.getWallet(guid, options)
+    .then(requireSecondPassword(options))
+    .then(function (wallet) {
+      return wallet.newAccount(options.label, options.second_password);
+    });
 };
 
 MerchantAPI.prototype.listAccounts = function (guid, options) {
