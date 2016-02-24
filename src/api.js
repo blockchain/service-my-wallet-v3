@@ -73,7 +73,7 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
       var from = isNaN(options.from) ?
         options.from : parseInt(options.from);
 
-      var payment = this.cache.walletPayment()
+      var payment = this.cache.walletPayment(wallet.guid)
         .to(options.to)
         .amount(options.amount)
         .from(from);

@@ -3,4 +3,5 @@ dev/
 
 npm-debug.log
 spec.config.js
+artillery*
 .env
