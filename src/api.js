@@ -93,6 +93,8 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
           from    : tx.from,
           fee     : tx.fee,
           txid    : tx.txid,
+          tx_hash : tx.txid,
+          message : 'Sent to Multiple Recipients',
           success : true
         };
       }
