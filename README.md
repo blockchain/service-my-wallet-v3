@@ -327,7 +327,7 @@ $ npm install -g blockchain-wallet-service
 Required versions:
 
   * nodejs >= 0.12.0
-  * npm >= 2.12.0, < 3.0.0
+  * npm >= 2.12.0
 
 If you have issues with the installation process, see the troubleshooting section below.
 
@@ -339,7 +339,7 @@ If installation fails:
 
 Runtime errors:
 
-  * If you are getting wallet decryption errors despite having correct credentials, then it's possible that you do not have Java installed, which is required by a dependency of the my-wallet-v3 module. Not having Java installed during the `npm install` process can result in the inability to decrypt wallets. Download the JDK from [here for Mac](https://support.apple.com/kb/DL1572) or by running `apt-get install default-jdk` on debian-based linux systems.
+  * If you are getting wallet decryption errors despite having correct credentials, then it's possible that you do not have Java installed, which is required by a dependency of the my-wallet-v3 module. Not having Java installed during the `npm install` process can result in the inability to decrypt wallets. Download the JDK from [here for Mac](https://support.apple.com/kb/DL1572) or by running `sudo apt-get install default-jre-headless` on debian-based linux systems.
 
 Timeout Errors:
 
