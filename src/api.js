@@ -151,12 +151,7 @@ MerchantAPI.prototype.unarchiveAddress = function (guid, options) {
 };
 
 MerchantAPI.prototype.createWallet = function (options) {
-  return this.cache.createWallet(options).then(function (guid) {
-    return this.getWallet(guid, options).then(function (wallet) {
-      var firstKey = wallet.keys[0];
-      return { guid: wallet.guid, address: firstKey.address, label: firstKey.label };
-    });
-  }.bind(this));
+  return this.cache.createWallet(options);
 };
 
 // HD Accounts API
