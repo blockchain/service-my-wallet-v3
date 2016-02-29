@@ -25,7 +25,8 @@ describe('service-my-wallet-v3', function () {
     password: 'pass123',
     address: 'address1',
     label: 'address_label',
-    second_password: '2pass'
+    second_password: '2pass',
+    api_code: 'asdfasdf-asdf-asdf-asdf-asdfasdfasdf'
   };
 
   describe('getBalance', function () {
