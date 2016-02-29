@@ -25,12 +25,13 @@ describe('service-integration-testing', function () {
         makeRequest('/login', { password: wallet.password, api_code: wallet.api_code })
           .then(function (result) {
             expect(result.success).to.equal(true);
+            expect(result.message).to.not.be.undefined;
             done()
           });
       });
 
       it('should get the balance', function (done) {
-        makeRequest('/balance', { password: wallet.password })
+        makeRequest('/balance', { password: wallet.password, api_code: wallet.api_code })
           .then(function (result) {
             expect(result.balance).to.be.at.least(0);
             done();
@@ -38,7 +39,7 @@ describe('service-integration-testing', function () {
       });
 
       it('should list the addresses', function (done) {
-        makeRequest('/list', { password: wallet.password })
+        makeRequest('/list', { password: wallet.password, api_code: wallet.api_code })
           .then(function (result) {
             console.log(result);
             expect(result.addresses).to.have.length.above(0);
@@ -48,7 +49,7 @@ describe('service-integration-testing', function () {
       });
 
       it('should get the balance of an address', function (done) {
-        makeRequest('/address_balance', { password: wallet.password, address: address })
+        makeRequest('/address_balance', { password: wallet.password, address: address, api_code: wallet.api_code })
           .then(function (result) {
             expect(result.balance).to.be.at.least(0);
             expect(result.total_received).to.be.at.least(0);
@@ -58,7 +59,7 @@ describe('service-integration-testing', function () {
       });
 
       it('should generate a new address', function (done) {
-        makeRequest('/new_address', { password: wallet.password, label: 'new_address_label' })
+        makeRequest('/new_address', { password: wallet.password, label: 'new_address_label', api_code: wallet.api_code })
           .then(function (result) {
             console.log(result);
             expect(result.address).to.not.be.undefined;
@@ -68,7 +69,7 @@ describe('service-integration-testing', function () {
       });
 
       it('should archive an address', function (done) {
-        makeRequest('/archive_address', { password: wallet.password, address: address })
+        makeRequest('/archive_address', { password: wallet.password, address: address, api_code: wallet.api_code })
           .then(function (result) {
             expect(result.archived).to.not.be.undefined;
             done();
@@ -76,7 +77,7 @@ describe('service-integration-testing', function () {
       });
 
       it('should unarchive an address', function (done) {
-        makeRequest('/unarchive_address', { password: wallet.password, address: address })
+        makeRequest('/unarchive_address', { password: wallet.password, address: address, api_code: wallet.api_code })
           .then(function (result) {
             expect(result.active).to.not.be.undefined;
             done();

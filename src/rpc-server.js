@@ -411,8 +411,7 @@ function parseArgs(f) {
 
     (f.$nowallet ?
       Promise.resolve(f(params)):
-      api.login(guid, walletOpts)
-        .then(api.getWallet.bind(api, guid, walletOpts))
+      api.getWallet(guid, walletOpts)
         .then(f.bind(f, params)))
       .then(callback.bind(null, null))
       .catch(callback);

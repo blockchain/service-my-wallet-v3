@@ -29,10 +29,7 @@ Note that `blockchain-wallet-service` is designed to be run locally on the same 
 
 ## Upgrading
 
-If you already have an application that uses [Blockchain.info's Wallet API](https://blockchain.info/api/blockchain_wallet_api), you will need to complete the steps in the Getting Started section above and then complete the following:
-
-  1. In your application code, replace calls to `blockchain.info/merchant/...` with `localhost:<port>/merchant/...`
-  2. Add an initial call, during your application's initialization, that calls [`/login`](#logging-into-a-wallet) with your wallet GUID and password. This call must be made before programmatically accessing your wallet. If your application interacts with more than one wallet, you must call the /login endpoint to switch between wallets. Subsequent calls made to any endpoint will use the last logged-in wallet.
+If you already have an application that uses [Blockchain.info's Wallet API](https://blockchain.info/api/blockchain_wallet_api), you will need to complete the steps in the Getting Started section above and then, in your application code, replace calls to `blockchain.info/merchant/...` with `localhost:<port>/merchant/...`.
 
 ## API Documentation
 
@@ -40,8 +37,7 @@ View the [original documentation](https://blockchain.info/api/blockchain_wallet_
 
 All endpoints present in the API documentation above are supported in Blockchain Wallet API V2. The differences between two are:
 
-  1. The `/login` endpoint that must be called prior to accessing a wallet
-  2. The "consolidate addresses" endpoint has been omitted
+  * The "consolidate addresses" endpoint has been omitted
 
 All endpoints can be called with `GET` or `POST`, and can only be accessed from `localhost`.
 
@@ -69,21 +65,6 @@ Sample Response:
 }
 ```
 
-### Logging into a Wallet
-
-Loads a blockchain.info wallet. A wallet must be loaded via this endpoint before any other api interactions can occur.
-
-Endpoint: `/merchant/:guid/login`
-
-Query Parameters:
-
-  * `password` - main wallet password (required)
-  * `api_code` - blockchain.info wallet api code (required)
-
-Get an API code [here](https://blockchain.info/api/api_create_code). **Note**: You must check the "Create Wallets" checkbox under "Permissions" when requesting an API code in order for it to be compatible with this app.
-
-The `api_code` parameter is only required for the call to `/login`. Subsequent API calls for this wallet will not require the api code.
-
 ### Make Payment
 
 Endpoint: `/merchant/:guid/payment`
@@ -94,6 +75,7 @@ Query Parameters:
   * `amount` - amount **in satoshi** to send (required)
   * `password` - main wallet password (required)
   * `second_password` - second wallet password (required, only if second password is enabled)
+  * `api_code` - blockchain.info wallet api code (required)
   * `from` - bitcoin address or account index to send from (optional)
   * `fee` - specify transaction fee **in satoshi** (optional, otherwise fee is computed)
   * `note` - public note to include with the transaction (optional, limit 255 characters, will fail if any transaction outputs are greater than 500000 satoshi)
@@ -120,6 +102,7 @@ Query Parameters:
   * `recipients` - a *URI encoded* [JSON object](http://json.org/example.html), with bitcoin addresses as keys and the **satoshi** amounts as values (required, see example below)
   * `password` - main wallet password (required)
   * `second_password` - second wallet password (required, only if second password is enabled)
+  * `api_code` - blockchain.info wallet api code (required)
   * `from` - bitcoin address or account index to send from (optional)
   * `fee` - specify transaction fee **in satoshi** (optional, otherwise fee is computed)
   * `note` - public note to include with the transaction (optional, limit 255 characters, will fail if any transaction outputs are greater than 500000 satoshi)
@@ -154,6 +137,7 @@ Endpoint: `/merchant/:guid/balance`
 Query Parameters:
 
   * `password` - main wallet password (required)
+  * `api_code` - blockchain.info wallet api code (required)
 
 Sample Response:
 
@@ -168,6 +152,7 @@ Endpoint: `/merchant/:guid/list`
 Query Parameters:
 
   * `password` - main wallet password (required)
+  * `api_code` - blockchain.info wallet api code (required)
 
 Sample Response:
 
@@ -197,6 +182,7 @@ Query Parameters:
 
   * `address` - address to fetch balance for (required)
   * `password` - main wallet password (required)
+  * `api_code` - blockchain.info wallet api code (required)
 
 Note: unlike the hosted API, there is no option of a `confirmations` parameter for specifying minimum confirmations.
 
@@ -214,6 +200,7 @@ Query Parameters:
 
   * `password` - main wallet password (required)
   * `label` - label to give to the address (optional)
+  * `api_code` - blockchain.info wallet api code (required)
 
 Sample Response:
 
@@ -229,6 +216,7 @@ Query Parameters:
 
   * `address` - address to archive (required)
   * `password` - main wallet password (required)
+  * `api_code` - blockchain.info wallet api code (required)
 
 Sample Response:
 
@@ -244,6 +232,7 @@ Query Parameters:
 
   * `address` - address to unarchive (required)
   * `password` - main wallet password (required)
+  * `api_code` - blockchain.info wallet api code (required)
 
 Sample Response:
 
@@ -255,43 +244,76 @@ Sample Response:
 
 Endpoint: `/merchant/:guid/enableHD`
 
+Query Parameters:
+
+  * `api_code` - blockchain.info wallet api code (required)
+
 This will upgrade a wallet to an HD (Hierarchical Deterministic) Wallet, which allows the use of accounts. See [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) for more information on HD wallets and accounts.
 
 ### List Active HD Accounts
 
 Endpoint: `/merchant/:guid/accounts`
 
+Query Parameters:
+
+  * `api_code` - blockchain.info wallet api code (required)
+
 ### List HD xPubs
 
 Endpoint: `/merchant/:guid/accounts/xpubs`
+
+Query Parameters:
+
+  * `api_code` - blockchain.info wallet api code (required)
 
 ### Create New HD Account
 
 Endpoint: `/merchant/:guid/accounts/create`
 
-Query Parameters (optional):
+Query Parameters:
 
+  * `api_code` - blockchain.info wallet api code (required)
   * `label` - label to assign to the newly created account
 
 ### Get Single HD Account
 
 Endpoint: `/merchant/:guid/accounts/:xpub_or_index`
 
+Query Parameters:
+
+  * `api_code` - blockchain.info wallet api code (required)
+
 ### Get HD Account Receiving Address
 
 Endpoint: `/merchant/:guid/accounts/:xpub_or_index/receiveAddress`
+
+Query Parameters:
+
+  * `api_code` - blockchain.info wallet api code (required)
 
 ### Check HD Account Balance
 
 Endpoint: `/merchant/:guid/accounts/:xpub_or_index/balance`
 
+Query Parameters:
+
+  * `api_code` - blockchain.info wallet api code (required)
+
 ### Archive HD Account
 
 Endpoint: `/merchant/:guid/accounts/:xpub_or_index/archive`
 
+Query Parameters:
+
+  * `api_code` - blockchain.info wallet api code (required)
+
 ### Unarchive HD Account
 
 Endpoint: `/merchant/:guid/accounts/:xpub_or_index/unarchive`
+
+Query Parameters:
+
+  * `api_code` - blockchain.info wallet api code (required)
 
 ## RPC
 
@@ -341,7 +363,7 @@ Runtime errors:
 
 Timeout Errors:
 
-  * If you are getting a timeout response when attempting to [`/login`](#logging-into-a-wallet) additional authorization from your blockchain wallet may be required. This can occur when using an unrecognized broswer or IP address. An email authorizing the API access attempt will be sent to the registered user that will require action in order to authorize future requests.
+  * If you are getting a timeout response, additional authorization from your blockchain wallet may be required. This can occur when using an unrecognized broswer or IP address. An email authorizing the API access attempt will be sent to the registered user that will require action in order to authorize future requests.
 
 If this section did not help, please open a github issue or visit our [support center](https://blockchain.zendesk.com).
 

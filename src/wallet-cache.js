@@ -34,24 +34,18 @@ WalletCache.prototype.login = function (guid, options) {
     this.instanceStore[guid].MyWallet.wallet.getHistory().then(fetched).catch(error);
   }.bind(this);
 
-  var login = function () {
-    this.loggingIn[guid] = true;
-    var instance = generateInstance();
-    instance.API.API_CODE = options.api_code;
-    instance.WalletStore.setAPICode(options.api_code);
-    instance.WalletStore.isLogoutDisabled = function () { return true; };
-    instance.MyWallet.login(guid, null, options.password, null, success, needs2FA, null, needsAuth, error);
-    this.instanceStore[guid] = instance;
-  }.bind(this);
-
   var done = function () {
     clearTimeout(timeout);
     this.loggingIn[guid] = false;
   }.bind(this);
 
-  this.getWallet(guid, options).then(function (wallet) {
-    wallet.guid === guid ? wallet.getHistory().then(fetched) : login();
-  }).catch(login);
+  this.loggingIn[guid] = true;
+  var instance = generateInstance();
+  instance.API.API_CODE = options.api_code;
+  instance.WalletStore.setAPICode(options.api_code);
+  instance.WalletStore.isLogoutDisabled = function () { return true; };
+  instance.MyWallet.login(guid, null, options.password, null, success, needs2FA, null, needsAuth, error);
+  this.instanceStore[guid] = instance;
 
   return deferred.promise.fin(done);
 };
@@ -94,10 +88,15 @@ WalletCache.prototype.createWallet = function (options) {
 
 WalletCache.prototype.getWallet = function (guid, options) {
   var inst    = this.instanceStore[guid]
-    , exists  = inst && inst.MyWallet.wallet && inst.MyWallet.wallet.guid === guid
-    , validpw = validatePassword(this.pwHashStore[guid], options.password)
-    , err     = !exists && 'ERR_WALLET_ID' || !validpw && 'ERR_PASSWORD';
-  return err ? q.reject(err) : q(inst.MyWallet.wallet);
+    , exists  = inst && inst.MyWallet.wallet && inst.MyWallet.wallet.guid === guid;
+
+  if (exists) {
+    var validpw = validatePassword(this.pwHashStore[guid], options.password);
+    return validpw ? q(inst.MyWallet.wallet) : q.reject('ERR_PASSWORD');
+  } else {
+    var getFromStore = function (r) { return this.instanceStore[r.guid].MyWallet.wallet; };
+    return this.login(guid, options).then(getFromStore.bind(this));
+  }
 };
 
 WalletCache.prototype.walletPayment = function (guid) {

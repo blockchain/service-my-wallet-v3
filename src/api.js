@@ -8,7 +8,11 @@ function MerchantAPI() {
 }
 
 MerchantAPI.prototype.login = function (guid, options) {
-  return this.cache.login(guid, options);
+  var addDeprecationWarning = function (response) {
+    response.message = 'This endpoint has been deprecated. You no longer have to call /login before accessing a wallet.';
+    return response;
+  };
+  return this.cache.login(guid, options).then(addDeprecationWarning);
 };
 
 MerchantAPI.prototype.getWallet = function (guid, options) {
