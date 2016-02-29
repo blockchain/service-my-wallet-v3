@@ -159,6 +159,10 @@ MerchantAPI.prototype.createWallet = function (options) {
   }.bind(this));
 };
 
+MerchantAPI.prototype.logoutWallet = function (guid) {
+  return this.cache.logoutWallet(guid);
+};
+
 // HD Accounts API
 MerchantAPI.prototype.upgradeWallet = function (guid, options) {
   return this.getWallet(guid, options)

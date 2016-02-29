@@ -105,6 +105,29 @@ WalletCache.prototype.walletPayment = function (guid) {
   return new instance.Payment();
 };
 
+WalletCache.prototype.logoutWallet = function (guid) {
+  var deferred  = q.defer()
+    , instance  = this.instanceStore[guid]
+    , error     = deferred.reject.bind(null, false);
+
+  var clearFromStore = function () {
+    this.instanceStore[guid] = undefined;
+    deferred.resolve(true);
+  }.bind(this);
+
+  if (instance && instance.MyWallet && instance.MyWallet.wallet) {
+    if (instance.WalletStore.isSynchronizedWithServer()) {
+      clearFromStore();
+    } else {
+      instance.MyWallet.syncWallet(clearFromStore, error);
+    }
+  } else {
+    deferred.resolve(true);
+  }
+
+  return deferred.promise;
+};
+
 module.exports = WalletCache;
 
 function generateInstance() {
