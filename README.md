@@ -84,8 +84,6 @@ Get an API code [here](https://blockchain.info/api/api_create_code). **Note**: Y
 
 The `api_code` parameter is only required for the call to `/login`. Subsequent API calls for this wallet will not require the api code.
 
-Note: at the moment, only one wallet can be "logged into" at a time. To make api calls to different wallets, run separate instances of this service for each wallet, or just remember to call `/login` each time you want to switch wallets.
-
 ### Make Payment
 
 Endpoint: `/merchant/:guid/payment`
