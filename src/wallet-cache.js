@@ -61,23 +61,20 @@ WalletCache.prototype.createWallet = function (options) {
 
   var instance = generateInstance();
   instance.API.API_CODE = options.api_code;
-  instance.WalletStore.setAPICode(options.api_code);
   instance.WalletStore.isLogoutDisabled = function () { return true; };
 
   var success = function (guid, sharedKey, password) {
-    var fetched = deferred.resolve.bind(null, guid)
-      , error   = deferred.reject.bind(null, 'ERR_HISTORY')
-      , pwHash  = generatePwHash(password);
-
-    this.pwHashStore[guid] = pwHash;
-    this.instanceStore[guid] = instance;
+    var wallet = instance.MyWallet.wallet;
 
     if (instance.MyWallet.detectPrivateKeyFormat(options.priv) !== null) {
-      instance.MyWallet.wallet.deleteLegacyAddress(instance.MyWallet.wallet.keys[0]);
-      instance.MyWallet.wallet.importLegacyAddress(options.priv, options.label);
+      wallet.deleteLegacyAddress(instance.MyWallet.wallet.keys[0]);
+      wallet.importLegacyAddress(options.priv, options.label);
     }
 
-    instance.MyWallet.wallet.getHistory().then(fetched).catch(error);
+    var firstKey = wallet.keys[0];
+    var response = { guid: wallet.guid, address: firstKey.address, label: firstKey.label };
+
+    deferred.resolve(response);
   }.bind(this);
 
   instance.MyWallet.createNewWallet(
