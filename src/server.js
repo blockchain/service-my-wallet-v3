@@ -18,7 +18,7 @@ var app         = express()
 
 // Configuration
 app.use('/merchant/:guid', merchantAPI);
-app.use('/v2', v2API);
+app.use('/api/v2', v2API);
 merchantAPI.use('/', legacyAPI);
 merchantAPI.use('/accounts', accountsAPI);
 

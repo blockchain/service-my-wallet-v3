@@ -43,7 +43,7 @@ All endpoints can be called with `GET` or `POST`, and can only be accessed from 
 
 ### Creating a new Blockchain Wallet
 
-Endpoint: `/v2/create`
+Endpoint: `/api/v2/create`
 
 Query Parameters:
 
