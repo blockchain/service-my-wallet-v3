@@ -363,7 +363,7 @@ Runtime errors:
 
 Timeout Errors:
 
-  * If you are getting a timeout response, additional authorization from your blockchain wallet may be required. This can occur when using an unrecognized broswer or IP address. An email authorizing the API access attempt will be sent to the registered user that will require action in order to authorize future requests.
+  * If you are getting a timeout response, additional authorization from your blockchain wallet may be required. This can occur when using an unrecognized browser or IP address. An email authorizing the API access attempt will be sent to the registered user that will require action in order to authorize future requests.
 
 If this section did not help, please open a github issue or visit our [support center](https://blockchain.zendesk.com).
 
