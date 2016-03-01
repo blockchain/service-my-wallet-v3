@@ -20,16 +20,18 @@
   "dependencies": {
     "basic-auth": "~1.0.3",
     "bitcoinjs-lib": "~2.2.0",
-    "bitcore-lib": "~0.13.13",
-    "bitcore-message": "~1.0.2",
     "blockchain-wallet-client-prebuilt": "~3.6.0",
-    "blockchain.info": "~2.2.1",
+    "blockchain.info": "~2.2.2",
     "body-parser": "~1.14.1",
     "commander": "~2.9.0",
     "express": "~4.13.3",
     "json-rpc2": "~1.0.2",
     "q": "~1.4.1",
     "request-promise": "^1.0.2"
+  },
+  "optionalDependencies": {
+    "bitcore-lib": "~0.13.13",
+    "bitcore-message": "~1.0.2"
   },
   "devDependencies": {
     "chai": "~3.4.1",

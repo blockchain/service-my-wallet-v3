@@ -9,11 +9,17 @@ var rpc   = require('json-rpc2')
   , pkg   = require('../package')
   , request = require('request-promise')
   , bitcoin = require('bitcoinjs-lib')
-  , bitcore = require('bitcore-lib')
-  , Message = require('bitcore-message')
   , helpers = require('../node_modules/blockchain-wallet-client-prebuilt/src/helpers')
   , Wallet  = require('../node_modules/blockchain-wallet-client-prebuilt/src/wallet')
   , wcrypto = require('../node_modules/blockchain-wallet-client-prebuilt/src/wallet-crypto');
+
+try {
+  var bitcore = require('bitcore-lib');
+  var Message = require('bitcore-message');
+} catch (e) {
+  var warn = 'Modules `bitcore-lib` and `bitcore-message` were not correctly installed, methods `signmessage` and `verifymessage` are not available.';
+  console.log(warn);
+}
 
 var api_code = '';
 var secondPasswordStore = new TimedStore();
@@ -369,6 +375,8 @@ function getnewaddress(params, wallet) {
 
 signmessage.$params = ['bitcoinAddress', 'message'];
 function signmessage(params, wallet) {
+  if (!Message || !bitcore) throw 'Missing dependencies: bitcore-message, bitcore-lib';
+
   var pass    = getSecondPasswordForWallet(wallet)
     , dec     = wcrypto.cipherFunction(pass, wallet.sharedKey, wallet.pbkdf2_iterations, 'dec')
     , key     = wallet.key(params.bitcoinAddress);
@@ -384,6 +392,7 @@ function signmessage(params, wallet) {
 
 verifymessage.$params = ['bitcoinAddress', 'signature', 'message'];
 function verifymessage(params, wallet) {
+  if (!Message || !bitcore) throw 'Missing dependencies: bitcore-message, bitcore-lib';
   return Message(params.message).verify(params.bitcoinAddress, params.signature);
 }
 
