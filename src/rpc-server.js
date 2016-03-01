@@ -75,7 +75,7 @@ function start(options) {
   });
 
   server.listen(options.rpcport, options.bind);
-  var msg = 'blockchain.info rpc server v%s running on %s:%d'
+  var msg   = 'blockchain.info rpc server v%s running on %s:%d'
     , warn  = 'WARNING - Binding this service to any ip other than localhost (127.0.0.1) can lead to security vulnerabilities!';
   if (options.bind !== '127.0.0.1') console.log(warn);
   console.log(msg, pkg.version, options.bind, options.rpcport);
@@ -84,19 +84,23 @@ function start(options) {
 // RPC methods
 getinfo.$params = [];
 function getinfo(params, wallet) {
-  return bci.statistics.get().then(function (stats) {
-    return request('https://blockchain.info/q/nconnected').then(function (connected) {
-      return {
-        connected: parseInt(connected),
-        difficulty: stats.difficulty,
-        proxy: '',
-        balance: satoshiToBTC(wallet.finalBalance),
-        blocks: stats.n_blocks_total,
-        testnet: false,
-        errors: '',
-        paytxfee: satoshiToBTC(wallet.fee_per_kb)
-      };
-    });
+  return Promise.all([
+    bci.statistics.get(),
+    request('https://blockchain.info/q/nconnected')
+  ])
+  .then(function (responses) {
+    var stats     = responses[0]
+      , connected = responses[1];
+    return {
+      connected   : parseInt(connected),
+      difficulty  : stats.difficulty,
+      proxy       : '',
+      balance     : satoshiToBTC(wallet.finalBalance),
+      blocks      : stats.n_blocks_total,
+      testnet     : false,
+      errors      : '',
+      paytxfee    : satoshiToBTC(wallet.fee_per_kb)
+    };
   });
 }
 
