@@ -5,6 +5,7 @@ global.navigator = { userAgent: 'nodejs' };
 
 var BYTES_PER_HASH = 32;
 var TIMEOUT_MS = 60000;
+var REFRESH_SEC = 120;
 
 var crypto  = require('crypto')
   , q       = require('q')
@@ -16,6 +17,7 @@ function WalletCache() {
   this.loggingIn = {};
   this.instanceStore = {};
   this.pwHashStore = {};
+  this.refreshTimeStore = {};
 }
 
 WalletCache.prototype.login = function (guid, options) {
@@ -85,14 +87,22 @@ WalletCache.prototype.createWallet = function (options) {
 
 WalletCache.prototype.getWallet = function (guid, options) {
   var inst    = this.instanceStore[guid]
-    , exists  = inst && inst.MyWallet.wallet && inst.MyWallet.wallet.guid === guid;
+    , exists  = inst && inst.MyWallet.wallet && inst.MyWallet.wallet.guid === guid
+    , getFromStore = function (guid) { return this.instanceStore[guid].MyWallet.wallet; };
 
   if (exists) {
-    var validpw = validatePassword(this.pwHashStore[guid], options.password);
-    return validpw ? q(inst.MyWallet.wallet) : q.reject('ERR_PASSWORD');
+    if (validatePassword(this.pwHashStore[guid], options.password)) {
+      if (this.refreshTimeStore[guid] > getProcessSeconds()) {
+        return q(inst.MyWallet.wallet);
+      } else {
+        this.refreshTimeStore[guid] = getProcessSeconds() + REFRESH_SEC;
+        return inst.MyWallet.wallet.getHistory().then(getFromStore.bind(this, guid));
+      }
+    } else {
+      return q.reject('ERR_PASSWORD');
+    }
   } else {
-    var getFromStore = function (r) { return this.instanceStore[r.guid].MyWallet.wallet; };
-    return this.login(guid, options).then(getFromStore.bind(this));
+    return this.login(guid, options).then(getFromStore.bind(this, guid));
   }
 };
 
@@ -122,4 +132,8 @@ function generatePwHash(pw) {
 function validatePassword(hash, maybePw) {
   if (!Buffer.isBuffer(hash) || !maybePw) return false;
   return generatePwHash(maybePw).compare(hash) === 0;
+}
+
+function getProcessSeconds() {
+  return process.hrtime()[0];
 }
