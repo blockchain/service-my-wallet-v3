@@ -107,7 +107,7 @@ function getinfo(params, wallet) {
 walletlock.$params = [];
 function walletlock(params, wallet) {
   secondPasswordStore.remove(wallet.guid);
-  return api.logoutWallet(wallet.guid);
+  return true;
 }
 
 settxfee.$params = ['amount'];
