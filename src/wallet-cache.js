@@ -5,7 +5,7 @@ global.navigator = { userAgent: 'nodejs' };
 
 var BYTES_PER_HASH = 32;
 var TIMEOUT_MS = 60000;
-var REFRESH_MS = 120000;
+var REFRESH_SEC = 120;
 
 var crypto  = require('crypto')
   , q       = require('q')
@@ -95,10 +95,10 @@ WalletCache.prototype.getWallet = function (guid, options) {
 
   if (exists) {
     if (validatePassword(this.pwHashStore[guid], options.password)) {
-      if (this.refreshTimeStore[guid] > Date.now()) {
+      if (this.refreshTimeStore[guid] > getProcessSeconds()) {
         return q(inst.MyWallet.wallet);
       } else {
-        this.refreshTimeStore[guid] = Date.now() + REFRESH_MS;
+        this.refreshTimeStore[guid] = getProcessSeconds() + REFRESH_SEC;
         return inst.MyWallet.wallet.getHistory().then(getFromStore.bind(this, guid));
       }
     } else {
@@ -135,4 +135,8 @@ function generatePwHash(pw) {
 function validatePassword(hash, maybePw) {
   if (!Buffer.isBuffer(hash) || !maybePw) return false;
   return generatePwHash(maybePw).compare(hash) === 0;
+}
+
+function getProcessSeconds() {
+  return process.hrtime()[0];
 }
