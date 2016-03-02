@@ -16,12 +16,19 @@ var Blockchain = require('blockchain-wallet-client-prebuilt');
 var WalletNetwork = require('blockchain-wallet-client-prebuilt/src/wallet-network');
 
 describe('create', function () {
-  var uuid = 'asdfasdf-asdf-asdf-asdf-asdfasdfasdf'
+  var uuid = 'asdfasdf-asdf-asdf-asdf-asdfasdfasdf';
+  var mockAPI, mockNetwork;
 
-  var mockAPI = sinon.mock(Blockchain.API);
-  mockAPI.expects('securePost').once().returns(Promise.resolve());
+  beforeEach(function () {
+    mockAPI = sinon.mock(Blockchain.API);
+    mockNetwork = sinon.mock(WalletNetwork);
+    mockAPI.expects('securePost').once().returns(Promise.resolve());
+  });
 
-  var mockNetwork = sinon.mock(WalletNetwork);
+  afterEach(function () {
+    mockAPI.restore();
+    mockNetwork.restore();
+  });
 
   describe('uuid generation', function () {
 
