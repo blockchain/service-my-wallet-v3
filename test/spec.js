@@ -18,7 +18,7 @@ api.getWalletHD = function (guid, options) {
   return q(wallet.hdwallet);
 };
 
-describe('service-my-wallet-v3', function () {
+describe('api', function () {
 
   var guid = 'guidguid-guid-guid-guid-guidguidguid';
   var options = {

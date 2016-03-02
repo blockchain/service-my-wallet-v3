@@ -8,8 +8,8 @@ var assert        = require('assert')
 
 // options { email: String, firstLabel: String, privateKey: String }
 function createWallet(password, options) {
-  if (password.length > 255) {
-    return Promise.reject('Passwords must be shorter than 256 characters'); }
+  if (!password || password.length > 255) {
+    return Promise.reject('Password must exist and be shorter than 256 characters'); }
 
   options = options || {};
   var email       = options.email
@@ -21,7 +21,7 @@ function createWallet(password, options) {
     var guid      = uuids[0]
       , sharedKey = uuids[1];
 
-    if (guid.length !== 36 || sharedKey.length !== 36) {
+    if (!guid || !sharedKey || guid.length !== 36 || sharedKey.length !== 36) {
       throw 'Error generating wallet identifier'; }
 
     return { guid: guid, sharedKey: sharedKey };

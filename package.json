@@ -35,9 +35,12 @@
   },
   "devDependencies": {
     "chai": "~3.4.1",
+    "chai-as-promised": "^5.2.0",
     "chai-spies": "~0.7.1",
     "mocha": "~2.3.4",
     "node-env-file": "~0.1.8",
-    "nodemon": "~1.8.1"
+    "nodemon": "~1.8.1",
+    "sinon": "^1.17.3",
+    "sinon-chai": "^2.8.0"
   }
 }
