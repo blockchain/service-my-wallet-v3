@@ -1,10 +1,13 @@
 'use strict';
 
 var chai    = require('chai')
-  , spies   = require('chai-spies')
+  , sinon   = require('sinon')
+  , sinonChai       = require('sinon-chai')
+  , chaiAsPromised  = require('chai-as-promised')
   , q       = require('q');
 
-chai.use(spies);
+chai.use(sinonChai);
+chai.use(chaiAsPromised);
 var expect  = chai.expect;
 
 var api     = require('../src/api')
@@ -18,7 +21,7 @@ api.getWalletHD = function (guid, options) {
   return q(wallet.hdwallet);
 };
 
-describe('service-my-wallet-v3', function () {
+describe('api', function () {
 
   var guid = 'guidguid-guid-guid-guid-guidguidguid';
   var options = {
@@ -70,11 +73,12 @@ describe('service-my-wallet-v3', function () {
 
   describe('generateAddress', function () {
     it('should call wallet.newLegacyAddress', function (done) {
-      chai.spy.on(wallet, 'newLegacyAddress');
+      sinon.spy(wallet, 'newLegacyAddress');
       api.generateAddress(guid, options).then(function (result) {
-        expect(wallet.newLegacyAddress).to.have.been.called.with(options.label, options.second_password);
+        expect(wallet.newLegacyAddress).to.have.been.called;
+        expect(result).to.deep.equal({ address: 'generated', label: 'my new address' });
         done();
-      });
+      }).catch(done);
     });
     it('should send the new address information', function (done) {
       api.generateAddress(guid, options).then(function (result) {

@@ -9,7 +9,8 @@ var REFRESH_SEC = 120;
 
 var crypto  = require('crypto')
   , q       = require('q')
-  , request = require('request-promise');
+  , request = require('request-promise')
+  , create  = require('./create');
 
 var randomBytes = crypto.randomBytes(BYTES_PER_HASH);
 
@@ -53,36 +54,11 @@ WalletCache.prototype.login = function (guid, options) {
 };
 
 WalletCache.prototype.createWallet = function (options) {
-  var lang, currency
-    , email = options.email || ''
-    , pass  = options.password
-    , label = options.label || 'First Address'
-    , isHD  = false
-    , deferred  = q.defer()
-    , timeout   = setTimeout(deferred.reject.bind(null, 'ERR_TIMEOUT'), TIMEOUT_MS);
-
-  var instance = generateInstance();
-  instance.API.API_CODE = options.api_code;
-  instance.WalletStore.isLogoutDisabled = function () { return true; };
-
-  var success = function (guid, sharedKey, password) {
-    var wallet = instance.MyWallet.wallet;
-
-    if (instance.MyWallet.detectPrivateKeyFormat(options.priv) !== null) {
-      wallet.deleteLegacyAddress(instance.MyWallet.wallet.keys[0]);
-      wallet.importLegacyAddress(options.priv, options.label);
-    }
-
-    var firstKey = wallet.keys[0];
-    var response = { guid: wallet.guid, address: firstKey.address, label: firstKey.label };
-
-    deferred.resolve(response);
-  }.bind(this);
-
-  instance.MyWallet.createNewWallet(
-    email, pass, label, lang, currency, success, deferred.reject, isHD);
-
-  return deferred.promise.fin(clearTimeout.bind(null, timeout));
+  return create(options.password, {
+    email       : options.email,
+    firstLabel  : options.label,
+    privateKey  : options.priv
+  });
 };
 
 WalletCache.prototype.getWallet = function (guid, options) {
