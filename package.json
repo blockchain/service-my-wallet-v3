@@ -29,10 +29,6 @@
     "q": "~1.4.1",
     "request-promise": "^1.0.2"
   },
-  "optionalDependencies": {
-    "bitcore-lib": "~0.13.13",
-    "bitcore-message": "~1.0.2"
-  },
   "devDependencies": {
     "chai": "~3.4.1",
     "chai-as-promised": "^5.2.0",
