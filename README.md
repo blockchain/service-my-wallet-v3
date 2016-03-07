@@ -359,6 +359,8 @@ If installation fails:
 
 Runtime errors:
 
+  * If you are seeing a `TypeError` claiming that an object `has no method 'compare'`, it is because you are on a version of Node older than 0.12, before the `compare` method was added to Buffers. Try upgrading to at least Node version 0.12.
+
   * If you are getting wallet decryption errors despite having correct credentials, then it's possible that you do not have Java installed, which is required by a dependency of the my-wallet-v3 module. Not having Java installed during the `npm install` process can result in the inability to decrypt wallets. Download the JDK from [here for Mac](https://support.apple.com/kb/DL1572) or by running `apt-get install default-jdk` on debian-based linux systems.
 
 Timeout Errors:
