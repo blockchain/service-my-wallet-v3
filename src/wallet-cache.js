@@ -47,6 +47,7 @@ WalletCache.prototype.login = function (guid, options) {
   instance.API.API_CODE = options.api_code;
   instance.WalletStore.setAPICode(options.api_code);
   instance.WalletStore.isLogoutDisabled = function () { return true; };
+  handleSocketErrors(instance.MyWallet.ws);
   instance.MyWallet.login(guid, null, options.password, null, success, needs2FA, null, needsAuth, error);
   this.instanceStore[guid] = instance;
 
@@ -98,6 +99,14 @@ function generateInstance() {
     })
     .forEach(function (module) { require.cache[module] = undefined; });
   return require('blockchain-wallet-client-prebuilt');
+}
+
+function handleSocketErrors(ws) {
+  var connectOnce = ws.connectOnce.bind(ws);
+  ws.connectOnce = function () {
+    connectOnce.apply(this, arguments);
+    this.socket.on('error', function (err) { console.log('WebSocket Error: %s', err.code); });
+  };
 }
 
 function generatePwHash(pw) {
