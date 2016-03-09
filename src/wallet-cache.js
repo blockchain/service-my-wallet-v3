@@ -9,6 +9,7 @@ var REFRESH_SEC = 120;
 
 var crypto  = require('crypto')
   , q       = require('q')
+  , winston = require('winston')
   , request = require('request-promise')
   , create  = require('./create');
 
@@ -105,7 +106,7 @@ function handleSocketErrors(ws) {
   var connectOnce = ws.connectOnce.bind(ws);
   ws.connectOnce = function () {
     connectOnce.apply(this, arguments);
-    this.socket.on('error', function (err) { console.log('WebSocket Error: %s', err.code); });
+    this.socket.on('error', function (err) { winston.error('WebSocketError', { code: err.code }); });
   };
 }
 
