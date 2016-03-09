@@ -9,6 +9,7 @@ var rpc   = require('json-rpc2')
   , pkg   = require('../package')
   , request = require('request-promise')
   , bitcoin = require('bitcoinjs-lib')
+  , winston = require('winston')
   , helpers = require('../node_modules/blockchain-wallet-client-prebuilt/src/helpers')
   , Wallet  = require('../node_modules/blockchain-wallet-client-prebuilt/src/wallet')
   , wcrypto = require('../node_modules/blockchain-wallet-client-prebuilt/src/wallet-crypto');
@@ -69,8 +70,8 @@ function start(options) {
   server.listen(options.rpcport, options.bind);
   var msg   = 'blockchain.info rpc server v%s running on %s:%d'
     , warn  = 'WARNING - Binding this service to any ip other than localhost (127.0.0.1) can lead to security vulnerabilities!';
-  if (options.bind !== '127.0.0.1') console.log(warn);
-  console.log(msg, pkg.version, options.bind, options.rpcport);
+  if (options.bind !== '127.0.0.1') winston.warn(warn);
+  winston.info(msg, pkg.version, options.bind, options.rpcport);
 }
 
 // RPC methods
