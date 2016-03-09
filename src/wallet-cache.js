@@ -6,6 +6,8 @@ global.navigator = { userAgent: 'nodejs' };
 var BYTES_PER_HASH = 32;
 var TIMEOUT_MS = 60000;
 var REFRESH_SEC = 120;
+var LOGIN_RETRY_COUNT = 5;
+var LOGIN_RETRY_DELAY_MS = 1500;
 
 var crypto  = require('crypto')
   , q       = require('q')
@@ -80,7 +82,8 @@ WalletCache.prototype.getWallet = function (guid, options) {
       return q.reject('ERR_PASSWORD');
     }
   } else {
-    return this.login(guid, options).then(getFromStore.bind(this, guid));
+    var loginRetry = retry(this.login.bind(this, guid, options), LOGIN_RETRY_COUNT, LOGIN_RETRY_DELAY_MS);
+    return loginRetry.then(getFromStore.bind(this, guid));
   }
 };
 
@@ -107,6 +110,22 @@ function handleSocketErrors(ws) {
   ws.connectOnce = function () {
     connectOnce.apply(this, arguments);
     this.socket.on('error', function (err) { winston.error('WebSocketError', { code: err.code }); });
+  };
+}
+
+function retry(f, count, delay) {
+  return (count > 1) ?
+    f().then(
+      undefined, // pass through success
+      delayFunction(retry.bind(null, f, count - 1, delay), delay)
+    ) : f();
+}
+
+function delayFunction(f, delay) {
+  return function () {
+    return new Promise(function (resolve, reject) {
+      setTimeout(function () { f().then(resolve, reject); }, delay);
+    });
   };
 }
 
