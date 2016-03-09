@@ -223,7 +223,7 @@ function handleResponse(apiAction, res, errCode) {
     .then(function (data) { res.status(200).json(data); })
     .catch(function (e) {
       winston.error(e);
-      var err = ecodes[e] || e || ecodes['ERR_UNEXPECT'];
+      var err = ecodes[e] || ecodes['ERR_UNEXPECT'];
       res.status(errCode || 500).json({ error: err });
     });
 }
