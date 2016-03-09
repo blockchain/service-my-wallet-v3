@@ -8,16 +8,27 @@ winston.add(winston.transports.Console, { timestamp: Date.now });
 var server  = require('./src/server')
   , rpc     = require('./src/rpc-server');
 
-// catch excessive logging from my-wallet-v3
-var loglist = [
-  'Server Time offset',
-  'SAVE CALLED...'
-];
+var extractWsError = /Websocket error: could not parse message data as JSON: ([^\^]+)/;
+var consolelog = console.log.bind(console);
 
-var log = console.log.bind(console);
-console.log = function (text) {
-  if (loglist.some(stringContains.bind(null, text))) return;
-  log.apply(this, arguments);
+console.log = function (msg) {
+  if (
+    // "noise" messages, do not log
+    stringContains(msg, 'Server Time offset') ||
+    stringContains(msg, 'SAVE CALLED...')
+  ) return;
+
+  if (stringContains(msg, 'Websocket error:')) {
+    winston.error('WebSocketError', { msg: msg.match(extractWsError)[1] });
+    return;
+  }
+
+  if (stringContains(msg, 'Maximum concurrent requests')) {
+    winston.error(msg.slice(0, msg.indexOf('. Please try again shortly')));
+    return;
+  }
+
+  consolelog.apply(this, arguments);
 };
 
 function stringContains(str0, str1) {
