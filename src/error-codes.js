@@ -24,7 +24,6 @@ module.exports = {
   ERR_JSON      : 'Invalid JSON',
   ERR_ADDRESS   : 'Address not found in this wallet',
   ERR_PASSWORD  : 'Main wallet password incorrect',
-  ERR_LOGIN_BUSY: 'Already trying to login to a wallet. To change wallets, try again in a moment',
   ERR_TIMEOUT   : 'Call to /login timed out, please try again',
   ERR_NO_HD     : 'Current wallet is not an HD wallet. To upgrade, call `/merchant/:guid/enableHD`',
   ERR_IS_HD     : 'Current wallet is already an HD wallet. To see your accounts, call `/merchant/:guid/accounts`',

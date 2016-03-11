@@ -16,43 +16,39 @@ var crypto  = require('crypto')
 var randomBytes = crypto.randomBytes(BYTES_PER_HASH);
 
 function WalletCache() {
-  this.loggingIn = {};
   this.instanceStore = {};
   this.pwHashStore = {};
   this.refreshTimeStore = {};
 }
 
 WalletCache.prototype.login = function (guid, options) {
-  if (this.loggingIn[guid]) return q.reject('ERR_LOGIN_BUSY');
+  winston.debug('Logging in');
 
-  var deferred  = q.defer()
+  var instance  = generateInstance()
+    , deferred  = q.defer()
+    , success   = deferred.resolve.bind(null, instance)
+    , error     = deferred.reject
     , needs2FA  = deferred.reject.bind(null, 'ERR_2FA')
     , needsAuth = deferred.reject.bind(null, 'ERR_AUTH')
-    , error     = deferred.reject
-    , fetched   = deferred.resolve.bind(null, { guid: guid, success: true })
-    , timeout   = setTimeout(deferred.reject.bind(null, 'ERR_TIMEOUT'), TIMEOUT_MS);
+    , timeout   = setTimeout(deferred.reject.bind(null, 'ERR_TIMEOUT'), TIMEOUT_MS)
+    , done      = clearTimeout.bind(null, timeout)
+    , remove    = function () { this.instanceStore[guid] = undefined; }.bind(this);
 
-  var success = function () {
-    var pwHash = generatePwHash(options.password);
-    this.pwHashStore[guid] = pwHash;
-    this.instanceStore[guid].MyWallet.wallet.getHistory().then(fetched).catch(error);
-  }.bind(this);
+  this.instanceStore[guid] = deferred.promise;
 
-  var done = function () {
-    clearTimeout(timeout);
-    this.loggingIn[guid] = false;
-  }.bind(this);
+  var pwHash = generatePwHash(options.password);
+  this.pwHashStore[guid] = pwHash;
 
-  this.loggingIn[guid] = true;
-  var instance = generateInstance();
   instance.API.API_CODE = options.api_code;
-  instance.WalletStore.setAPICode(options.api_code);
   instance.WalletStore.isLogoutDisabled = function () { return true; };
   handleSocketErrors(instance.MyWallet.ws);
   instance.MyWallet.login(guid, null, options.password, null, success, needs2FA, null, needsAuth, error);
-  this.instanceStore[guid] = instance;
 
-  return deferred.promise.fin(done);
+  deferred.promise.then(function (instance) {
+    instance.MyWallet.wallet.createPayment = function (p) { return new instance.Payment(p); };
+  });
+
+  return deferred.promise.catch(remove).fin(done);
 };
 
 WalletCache.prototype.createWallet = function (options) {
@@ -64,30 +60,21 @@ WalletCache.prototype.createWallet = function (options) {
 };
 
 WalletCache.prototype.getWallet = function (guid, options) {
-  var inst    = this.instanceStore[guid]
-    , exists  = inst && inst.MyWallet.wallet && inst.MyWallet.wallet.guid === guid
-    , getFromStore = function (guid) { return this.instanceStore[guid].MyWallet.wallet; };
+  var instance = this.instanceStore[guid];
+  var fetchHistory = fetchWalletHistory.bind(this);
 
-  if (exists) {
+  if (instance != null) {
     if (validatePassword(this.pwHashStore[guid], options.password)) {
-      if (this.refreshTimeStore[guid] > getProcessSeconds()) {
-        return q(inst.MyWallet.wallet);
-      } else {
-        this.refreshTimeStore[guid] = getProcessSeconds() + REFRESH_SEC;
-        return inst.MyWallet.wallet.getHistory().then(getFromStore.bind(this, guid));
-      }
+      var walletP = instance.then(walletFromInstance);
+      var shouldRefresh = getProcessSeconds() > this.refreshTimeStore[guid];
+      return shouldRefresh ? walletP.then(fetchHistory) : walletP;
     } else {
       return q.reject('ERR_PASSWORD');
     }
   } else {
-    return this.login(guid, options).then(getFromStore.bind(this, guid));
+    this.login(guid, options);
+    return this.instanceStore[guid].then(walletFromInstance).then(fetchHistory);
   }
-};
-
-WalletCache.prototype.walletPayment = function (guid) {
-  var instance = this.instanceStore[guid];
-  if (!instance || !instance.Payment) throw 'ERR_PAYMENT';
-  return new instance.Payment();
 };
 
 module.exports = WalletCache;
@@ -108,6 +95,19 @@ function handleSocketErrors(ws) {
     connectOnce.apply(this, arguments);
     this.socket.on('error', function (err) { winston.error('WebSocketError', { code: err.code }); });
   };
+}
+
+function walletFromInstance(instance) {
+  return instance.MyWallet.wallet;
+}
+
+function fetchWalletHistory(wallet) {
+  winston.debug('Fetching wallet history');
+  if (!this instanceof WalletCache) throw 'ERR_HISTORY';
+  return wallet.getHistory().then(function () {
+    this.refreshTimeStore[wallet.guid] = getProcessSeconds() + REFRESH_SEC;
+    return wallet;
+  }.bind(this));
 }
 
 function generatePwHash(pw) {
