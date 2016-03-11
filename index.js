@@ -13,12 +13,14 @@ var server  = require('./src/server')
 
 var extractWsError = /Websocket error: could not parse message data as JSON: ([^\^]+)/;
 var consolelog = console.log.bind(console);
+var consolewarn = console.warn.bind(console);
 
 console.log = function (msg) {
   if (
     // "noise" messages, do not log
     stringContains(msg, 'Server Time offset') ||
-    stringContains(msg, 'SAVE CALLED...')
+    stringContains(msg, 'SAVE CALLED...') ||
+    stringContains(msg, 'published')
   ) return;
 
   if (stringContains(msg, 'Websocket error:')) {
@@ -32,6 +34,15 @@ console.log = function (msg) {
   }
 
   consolelog.apply(this, arguments);
+};
+
+console.warn = function (msg) {
+  if (
+    // bitcoinjs deprecation warning, safe to ignore
+    stringContains(msg, 'Transaction.prototype.')
+  ) return;
+
+  consolewarn.apply(this, arguments);
 };
 
 function stringContains(str0, str1) {
