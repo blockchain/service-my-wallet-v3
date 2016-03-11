@@ -7,14 +7,6 @@ function MerchantAPI() {
   this.cache = new WalletCache();
 }
 
-MerchantAPI.prototype.login = function (guid, options) {
-  var addDeprecationWarning = function (response) {
-    response.message = 'This endpoint has been deprecated. You no longer have to call /login before accessing a wallet.';
-    return response;
-  };
-  return this.cache.login(guid, options).then(addDeprecationWarning);
-};
-
 MerchantAPI.prototype.getWallet = function (guid, options) {
   return this.cache.getWallet(guid, options);
 };
@@ -23,6 +15,15 @@ MerchantAPI.prototype.getWalletHD = function (guid, options) {
   return this.cache.getWallet(guid, options).then(function (wallet) {
     return wallet.isUpgradedToHD ? wallet.hdwallet : q.reject('ERR_NO_HD');
   });
+};
+
+MerchantAPI.prototype.login = function (guid, options) {
+  var successResponse = {
+    guid: guid,
+    success: true,
+    message: 'This endpoint has been deprecated. You no longer have to call /login before accessing a wallet.'
+  };
+  return this.getWallet(guid, options).then(function () { return successResponse; });
 };
 
 MerchantAPI.prototype.getBalance = function (guid, options) {

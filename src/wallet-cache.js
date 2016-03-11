@@ -6,6 +6,8 @@ global.navigator = { userAgent: 'nodejs' };
 var BYTES_PER_HASH = 32;
 var TIMEOUT_MS = 60000;
 var REFRESH_SEC = 120;
+var LOGIN_RETRY_COUNT = 5;
+var LOGIN_RETRY_DELAY_MS = 1500;
 
 var crypto  = require('crypto')
   , q       = require('q')
@@ -22,8 +24,16 @@ function WalletCache() {
   this.refreshTimeStore = {};
 }
 
-WalletCache.prototype.login = function (guid, options) {
-  if (this.loggingIn[guid]) return q.reject('ERR_LOGIN_BUSY');
+WalletCache.prototype.login = function (guid, options, retryCount) {
+  if (retryCount == null || isNaN(retryCount)) {
+    retryCount = LOGIN_RETRY_COUNT;
+  }
+
+  if (this.loggingIn[guid]) {
+    return --retryCount <= 0 ?
+      q.reject('ERR_LOGIN_BUSY'):
+      delayFunction(this.login.bind(this, guid, options, retryCount), LOGIN_RETRY_DELAY_MS);
+  }
 
   var deferred  = q.defer()
     , needs2FA  = deferred.reject.bind(null, 'ERR_2FA')
@@ -108,6 +118,12 @@ function handleSocketErrors(ws) {
     connectOnce.apply(this, arguments);
     this.socket.on('error', function (err) { winston.error('WebSocketError', { code: err.code }); });
   };
+}
+
+function delayFunction(f, delay) {
+  return new Promise(function (resolve, reject) {
+    setTimeout(function () { f().then(resolve, reject); }, delay);
+  });
 }
 
 function generatePwHash(pw) {
