@@ -25,6 +25,7 @@ WalletCache.prototype.login = function (guid, options) {
   winston.debug('Logging in');
 
   var instance  = generateInstance()
+    , pwHash    = generatePwHash(options.password)
     , deferred  = q.defer()
     , success   = deferred.resolve.bind(null, instance)
     , error     = deferred.reject
@@ -35,18 +36,15 @@ WalletCache.prototype.login = function (guid, options) {
     , remove    = function () { this.instanceStore[guid] = undefined; }.bind(this);
 
   this.instanceStore[guid] = deferred.promise;
-
-  var pwHash = generatePwHash(options.password);
-  this.pwHashStore[guid] = pwHash;
-
   instance.API.API_CODE = options.api_code;
   instance.WalletStore.isLogoutDisabled = function () { return true; };
   handleSocketErrors(instance.MyWallet.ws);
   instance.MyWallet.login(guid, null, options.password, null, success, needs2FA, null, needsAuth, error);
 
   deferred.promise.then(function (instance) {
+    this.pwHashStore[guid] = pwHash;
     instance.MyWallet.wallet.createPayment = function (p) { return new instance.Payment(p); };
-  });
+  }.bind(this));
 
   return deferred.promise.catch(remove).fin(done);
 };
@@ -60,21 +58,17 @@ WalletCache.prototype.createWallet = function (options) {
 };
 
 WalletCache.prototype.getWallet = function (guid, options) {
-  var instance = this.instanceStore[guid];
-  var fetchHistory = fetchWalletHistory.bind(this);
+  var _fetchWalletHistory = fetchWalletHistory.bind(this);
+  var _walletFromInstance = walletFromInstance.bind(this, options.password);
+  var shouldRefresh       = getProcessSeconds() > this.refreshTimeStore[guid];
 
-  if (instance != null) {
-    if (validatePassword(this.pwHashStore[guid], options.password)) {
-      var walletP = instance.then(walletFromInstance);
-      var shouldRefresh = getProcessSeconds() > this.refreshTimeStore[guid];
-      return shouldRefresh ? walletP.then(fetchHistory) : walletP;
-    } else {
-      return q.reject('ERR_PASSWORD');
-    }
-  } else {
+  if (this.instanceStore[guid] == null) {
+    shouldRefresh = true;
     this.login(guid, options);
-    return this.instanceStore[guid].then(walletFromInstance).then(fetchHistory);
   }
+
+  var maybeWallet = this.instanceStore[guid].then(_walletFromInstance);
+  return shouldRefresh ? maybeWallet.then(_fetchWalletHistory) : maybeWallet;
 };
 
 module.exports = WalletCache;
@@ -97,8 +91,11 @@ function handleSocketErrors(ws) {
   };
 }
 
-function walletFromInstance(instance) {
-  return instance.MyWallet.wallet;
+function walletFromInstance(maybePw, instance) {
+  if (!this instanceof WalletCache) throw 'ERR_UNEXPECT';
+  var w = instance.MyWallet.wallet;
+  if (!validatePassword(this.pwHashStore[w.guid], maybePw)) throw 'ERR_PASSWORD';
+  return w;
 }
 
 function fetchWalletHistory(wallet) {
