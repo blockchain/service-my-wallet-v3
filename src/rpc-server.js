@@ -9,6 +9,7 @@ var rpc   = require('json-rpc2')
   , pkg   = require('../package')
   , request = require('request-promise')
   , bitcoin = require('bitcoinjs-lib')
+  , winston = require('winston')
   , helpers = require('../node_modules/blockchain-wallet-client-prebuilt/src/helpers')
   , Wallet  = require('../node_modules/blockchain-wallet-client-prebuilt/src/wallet')
   , wcrypto = require('../node_modules/blockchain-wallet-client-prebuilt/src/wallet-crypto');
@@ -69,8 +70,8 @@ function start(options) {
   server.listen(options.rpcport, options.bind);
   var msg   = 'blockchain.info rpc server v%s running on %s:%d'
     , warn  = 'WARNING - Binding this service to any ip other than localhost (127.0.0.1) can lead to security vulnerabilities!';
-  if (options.bind !== '127.0.0.1') console.log(warn);
-  console.log(msg, pkg.version, options.bind, options.rpcport);
+  if (options.bind !== '127.0.0.1') winston.warn(warn);
+  winston.info(msg, pkg.version, options.bind, options.rpcport);
 }
 
 // RPC methods
@@ -294,7 +295,7 @@ function move(params, wallet) {
     , to    = getAccountAddresses(wallet, params.toAccount)[0]
     , amt   = btcToSatoshi(params.amount);
 
-  var payment = api.cache.walletPayment(wallet.guid).from(from).to(to).amount(amt);
+  var payment = wallet.createPayment().from(from).to(to).amount(amt);
   return publishPayment(payment, pass);
 }
 
@@ -305,7 +306,7 @@ function sendfrom(params, wallet) {
     , to    = params.bitcoinAddress
     , amt   = btcToSatoshi(params.amount);
 
-  var payment = api.cache.walletPayment(wallet.guid).from(from).to(to).amount(amt);
+  var payment = wallet.createPayment().from(from).to(to).amount(amt);
   return publishPayment(payment, pass);
 }
 
@@ -320,7 +321,7 @@ function sendmany(params, wallet) {
     amts.push(btcToSatoshi(params.addressAmountPairs[address]));
   });
 
-  var payment = api.cache.walletPayment(wallet.guid).from(from).to(to).amount(amts);
+  var payment = wallet.createPayment().from(from).to(to).amount(amts);
   return publishPayment(payment, pass);
 }
 
@@ -331,7 +332,7 @@ function sendtoaddress(params, wallet) {
     , to    = params.bitcoinAddress
     , amt   = btcToSatoshi(params.amount);
 
-  var payment = api.cache.walletPayment(wallet.guid).from(from).to(to).amount(amt);
+  var payment = wallet.createPayment().from(from).to(to).amount(amt);
   return publishPayment(payment, pass);
 }
 
@@ -400,6 +401,9 @@ function parseArgs(f) {
     var credentials = auth(opts.req)
       , guid        = credentials.name
       , walletOpts  = { password: credentials.pass, api_code: api_code };
+
+    if (!guid) throw 'Missing wallet guid';
+    if (!walletOpts.password) throw 'Missing wallet password';
 
     if (args.length > f.$params.length)
       throw 'Expected max of ' + f.$params.length + ' parameters, received ' + args.length;

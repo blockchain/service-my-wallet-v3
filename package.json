@@ -1,6 +1,6 @@
 {
   "name": "blockchain-wallet-service",
-  "version": "0.18.1",
+  "version": "0.19.0",
   "description": "Blockchain.info wallet api service",
   "main": "index.js",
   "bin": {
@@ -27,7 +27,8 @@
     "express": "~4.13.3",
     "json-rpc2": "~1.0.2",
     "q": "~1.4.1",
-    "request-promise": "^1.0.2"
+    "request-promise": "^1.0.2",
+    "winston": "^2.2.0"
   },
   "devDependencies": {
     "chai": "~3.4.1",

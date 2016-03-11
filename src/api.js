@@ -2,18 +2,11 @@
 
 var WalletCache = require('./wallet-cache')
   , q           = require('q')
+  , winston     = require('winston');
 
 function MerchantAPI() {
   this.cache = new WalletCache();
 }
-
-MerchantAPI.prototype.login = function (guid, options) {
-  var addDeprecationWarning = function (response) {
-    response.message = 'This endpoint has been deprecated. You no longer have to call /login before accessing a wallet.';
-    return response;
-  };
-  return this.cache.login(guid, options).then(addDeprecationWarning);
-};
 
 MerchantAPI.prototype.getWallet = function (guid, options) {
   return this.cache.getWallet(guid, options);
@@ -23,6 +16,15 @@ MerchantAPI.prototype.getWalletHD = function (guid, options) {
   return this.cache.getWallet(guid, options).then(function (wallet) {
     return wallet.isUpgradedToHD ? wallet.hdwallet : q.reject('ERR_NO_HD');
   });
+};
+
+MerchantAPI.prototype.login = function (guid, options) {
+  var successResponse = {
+    guid    : guid,
+    success : true,
+    message : 'This endpoint has been deprecated. You no longer have to call /login before accessing a wallet.'
+  };
+  return this.getWallet(guid, options).then(function () { return successResponse; });
 };
 
 MerchantAPI.prototype.getBalance = function (guid, options) {
@@ -77,7 +79,7 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
       var from = isNaN(options.from) ?
         options.from : parseInt(options.from);
 
-      var payment = this.cache.walletPayment(wallet.guid)
+      var payment = wallet.createPayment()
         .to(options.to)
         .amount(options.amount)
         .from(from);
@@ -91,6 +93,8 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
       if (options.note) payment.note(options.note);
 
       function success(tx) {
+        winston.debug('Transaction published', { hash: tx.txid });
+        var message = tx.to.length > 1 ? 'Sent to Multiple Recipients' : 'Payment Sent';
         return {
           to      : tx.to,
           amounts : tx.amounts,
@@ -98,7 +102,7 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
           fee     : tx.fee,
           txid    : tx.txid,
           tx_hash : tx.txid,
-          message : 'Sent to Multiple Recipients',
+          message : message,
           success : true
         };
       }
@@ -140,14 +144,14 @@ MerchantAPI.prototype.archiveAddress = function (guid, options) {
   return this.getWallet(guid, options).then(function (wallet) {
     wallet.key(options.address).archived = true;
     return { archived: options.address };
-  }).catch(function (e) { throw e || 'ERR_ADDRESS'; });
+  }).catch(function (e) { throw 'ERR_ADDRESS'; });
 };
 
 MerchantAPI.prototype.unarchiveAddress = function (guid, options) {
   return this.getWallet(guid, options).then(function (wallet) {
     wallet.key(options.address).archived = false;
     return { active: options.address };
-  }).catch(function (e) { throw e || 'ERR_ADDRESS'; });
+  }).catch(function (e) { throw 'ERR_ADDRESS'; });
 };
 
 MerchantAPI.prototype.createWallet = function (options) {
