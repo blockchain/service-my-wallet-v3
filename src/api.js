@@ -94,6 +94,7 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
 
       function success(tx) {
         winston.debug('Transaction published', { hash: tx.txid });
+        var message = tx.to.length > 1 ? 'Sent to Multiple Recipients' : 'Payment Sent';
         return {
           to      : tx.to,
           amounts : tx.amounts,
@@ -101,7 +102,7 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
           fee     : tx.fee,
           txid    : tx.txid,
           tx_hash : tx.txid,
-          message : 'Sent to Multiple Recipients',
+          message : message,
           success : true
         };
       }
