@@ -402,6 +402,9 @@ function parseArgs(f) {
       , guid        = credentials.name
       , walletOpts  = { password: credentials.pass, api_code: api_code };
 
+    if (!guid) throw 'Missing wallet guid';
+    if (!walletOpts.password) throw 'Missing wallet password';
+
     if (args.length > f.$params.length)
       throw 'Expected max of ' + f.$params.length + ' parameters, received ' + args.length;
 
