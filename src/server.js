@@ -3,6 +3,7 @@
 var express     = require('express')
   , bodyParser  = require('body-parser')
   , q           = require('q')
+  , winston     = require('winston')
   , ecodes      = require('./error-codes')
   , api         = require('./api');
 
@@ -221,8 +222,8 @@ function handleResponse(apiAction, res, errCode) {
   apiAction
     .then(function (data) { res.status(200).json(data); })
     .catch(function (e) {
-      console.log(e);
-      var err = ecodes[e] || e || ecodes['ERR_UNEXPECT'];
+      winston.error(e);
+      var err = ecodes[e] || ecodes['ERR_UNEXPECT'];
       res.status(errCode || 500).json({ error: err });
     });
 }
@@ -237,13 +238,17 @@ function interpretError(code, bindings) {
 
 function start(options) {
   var deferred = q.defer();
-  app.listen(options.port, options.bind, function () {
+  var initApp = function () {
     var pkg   = require('../package.json')
       , msg   = 'blockchain.info wallet service v%s running on %s:%d'
       , warn  = 'WARNING - Binding this service to any ip other than localhost (127.0.0.1) can lead to security vulnerabilities!';
-    if (options.bind !== '127.0.0.1') console.log(warn);
-    console.log(msg, pkg.version, options.bind, options.port);
+    if (options.bind !== '127.0.0.1') winston.warn(warn);
+    winston.info(msg, pkg.version, options.bind, options.port);
     deferred.resolve(true);
-  });
+  };
+  var handleStartError = function (err) {
+    winston.error(err.message);
+  };
+  app.listen(options.port, options.bind, initApp).on('error', handleStartError);
   return deferred.promise;
 }

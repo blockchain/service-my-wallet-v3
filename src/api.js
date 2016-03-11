@@ -2,18 +2,11 @@
 
 var WalletCache = require('./wallet-cache')
   , q           = require('q')
+  , winston     = require('winston');
 
 function MerchantAPI() {
   this.cache = new WalletCache();
 }
-
-MerchantAPI.prototype.login = function (guid, options) {
-  var addDeprecationWarning = function (response) {
-    response.message = 'This endpoint has been deprecated. You no longer have to call /login before accessing a wallet.';
-    return response;
-  };
-  return this.cache.login(guid, options).then(addDeprecationWarning);
-};
 
 MerchantAPI.prototype.getWallet = function (guid, options) {
   return this.cache.getWallet(guid, options);
@@ -23,6 +16,15 @@ MerchantAPI.prototype.getWalletHD = function (guid, options) {
   return this.cache.getWallet(guid, options).then(function (wallet) {
     return wallet.isUpgradedToHD ? wallet.hdwallet : q.reject('ERR_NO_HD');
   });
+};
+
+MerchantAPI.prototype.login = function (guid, options) {
+  var successResponse = {
+    guid    : guid,
+    success : true,
+    message : 'This endpoint has been deprecated. You no longer have to call /login before accessing a wallet.'
+  };
+  return this.getWallet(guid, options).then(function () { return successResponse; });
 };
 
 MerchantAPI.prototype.getBalance = function (guid, options) {
@@ -77,7 +79,7 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
       var from = isNaN(options.from) ?
         options.from : parseInt(options.from);
 
-      var payment = this.cache.walletPayment(wallet.guid)
+      var payment = wallet.createPayment()
         .to(options.to)
         .amount(options.amount)
         .from(from);
@@ -91,6 +93,7 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
       if (options.note) payment.note(options.note);
 
       function success(tx) {
+        winston.debug('Transaction published', { hash: tx.txid });
         return {
           to      : tx.to,
           amounts : tx.amounts,
