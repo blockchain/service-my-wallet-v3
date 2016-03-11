@@ -224,9 +224,17 @@ function handleResponse(apiAction, res, errCode) {
     .catch(function (e) {
       winston.error(e);
       var err = ecodes[e] || ecodes['ERR_UNEXPECT'];
-      if (e.indexOf('Missing query parameter') === 0) err = e;
+      if (
+        stringContains(e, 'Missing query parameter') ||
+        stringContains(e, 'Error Decrypting Wallet')
+      ) err = e;
       res.status(errCode || 500).json({ error: err });
     });
+}
+
+function stringContains(str0, str1) {
+  if (!str0 || !str1) return false;
+  return str0.toString().indexOf(str1) > -1;
 }
 
 function interpretError(code, bindings) {
