@@ -28,8 +28,11 @@ console.log = function (msg) {
     return;
   }
 
-  if (stringContains(msg, 'Maximum concurrent requests')) {
-    winston.error(msg.slice(0, msg.indexOf('. Please try again shortly')));
+  if (
+    stringContains(msg, 'Maximum concurrent requests') ||
+    stringContains(msg, 'Unknown API Key')
+  ) {
+    winston.error(msg);
     return;
   }
 
