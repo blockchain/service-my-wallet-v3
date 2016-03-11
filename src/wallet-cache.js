@@ -24,8 +24,16 @@ function WalletCache() {
   this.refreshTimeStore = {};
 }
 
-WalletCache.prototype.login = function (guid, options) {
-  if (this.loggingIn[guid]) return q.reject('ERR_LOGIN_BUSY');
+WalletCache.prototype.login = function (guid, options, retryCount) {
+  if (retryCount == null || isNaN(retryCount)) {
+    retryCount = LOGIN_RETRY_COUNT;
+  }
+
+  if (this.loggingIn[guid]) {
+    return --retryCount <= 0 ?
+      q.reject('ERR_LOGIN_BUSY'):
+      delayFunction(this.login.bind(this, guid, options, retryCount), LOGIN_RETRY_DELAY_MS);
+  }
 
   var deferred  = q.defer()
     , needs2FA  = deferred.reject.bind(null, 'ERR_2FA')
@@ -82,8 +90,7 @@ WalletCache.prototype.getWallet = function (guid, options) {
       return q.reject('ERR_PASSWORD');
     }
   } else {
-    var loginRetry = retry(this.login.bind(this, guid, options), LOGIN_RETRY_COUNT, LOGIN_RETRY_DELAY_MS);
-    return loginRetry.then(getFromStore.bind(this, guid));
+    return this.login(guid, options).then(getFromStore.bind(this, guid));
   }
 };
 
@@ -113,20 +120,10 @@ function handleSocketErrors(ws) {
   };
 }
 
-function retry(f, count, delay) {
-  return (count > 1) ?
-    f().then(
-      undefined, // pass through success
-      delayFunction(retry.bind(null, f, count - 1, delay), delay)
-    ) : f();
-}
-
 function delayFunction(f, delay) {
-  return function () {
-    return new Promise(function (resolve, reject) {
-      setTimeout(function () { f().then(resolve, reject); }, delay);
-    });
-  };
+  return new Promise(function (resolve, reject) {
+    setTimeout(function () { f().then(resolve, reject); }, delay);
+  });
 }
 
 function generatePwHash(pw) {
