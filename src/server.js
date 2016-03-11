@@ -224,6 +224,7 @@ function handleResponse(apiAction, res, errCode) {
     .catch(function (e) {
       winston.error(e);
       var err = ecodes[e] || ecodes['ERR_UNEXPECT'];
+      if (e.indexOf('Missing query parameter') === 0) err = e;
       res.status(errCode || 500).json({ error: err });
     });
 }
