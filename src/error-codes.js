@@ -25,6 +25,7 @@ module.exports = {
   ERR_ADDRESS   : 'Address not found in this wallet',
   ERR_PASSWORD  : 'Main wallet password incorrect',
   ERR_TIMEOUT   : 'Request to fetch wallet timed out, check that your API key is correct',
+  ERR_API_KEY   : 'Unknown API key',
   ERR_NO_HD     : 'Current wallet is not an HD wallet. To upgrade, call `/merchant/:guid/enableHD`',
   ERR_IS_HD     : 'Current wallet is already an HD wallet. To see your accounts, call `/merchant/:guid/accounts`',
   ERR_ACCT_IDX  : 'Account nonexistent, check that your account xpub or index is correct',

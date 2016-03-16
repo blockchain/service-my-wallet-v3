@@ -16,6 +16,8 @@ function createWallet(password, options) {
     , firstLabel  = options.firstLabel
     , privateKey  = options.privateKey;
 
+  Blockchain.API.API_CODE = options.api_code;
+
   // Handle response from WalletNetwork
   var generatedUUIDs = function (uuids) {
     var guid      = uuids[0]
@@ -81,7 +83,8 @@ function createWallet(password, options) {
   return WalletNetwork.generateUUIDs(2)
     .then(generatedUUIDs)
     .then(newWallet)
-    .then(insertWallet);
+    .then(insertWallet)
+    .catch(function (err) { throw err === 'Unknown API Key' ? 'ERR_API_KEY' : err; });
 }
 
 function sha256(data) {

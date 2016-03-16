@@ -53,7 +53,8 @@ WalletCache.prototype.createWallet = function (options) {
   return create(options.password, {
     email       : options.email,
     firstLabel  : options.label,
-    privateKey  : options.priv
+    privateKey  : options.priv,
+    api_code    : options.api_code
   });
 };
 
