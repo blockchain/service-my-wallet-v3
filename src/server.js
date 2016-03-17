@@ -163,7 +163,7 @@ v2API.use(parseOptions({
 }));
 
 v2API.all(
-  '/create',
+  /\/create|\/create_wallet/,
   required(['password', 'api_code']),
   function (req, res) {
     var apiAction = api.createWallet(req.options);
