@@ -41,11 +41,7 @@ WalletCache.prototype.login = function (guid, options) {
   handleSocketErrors(instance.MyWallet.ws);
   instance.MyWallet.login(guid, null, options.password, null, success, needs2FA, null, needsAuth, error);
 
-  deferred.promise.then(function (instance) {
-    this.pwHashStore[guid] = pwHash;
-    instance.MyWallet.wallet.createPayment = function (p) { return new instance.Payment(p); };
-  }.bind(this));
-
+  deferred.promise.then(function () { this.pwHashStore[guid] = pwHash; }.bind(this));
   return deferred.promise.catch(remove).fin(done);
 };
 
@@ -96,6 +92,7 @@ function walletFromInstance(maybePw, instance) {
   if (!this instanceof WalletCache) throw 'ERR_UNEXPECT';
   var w = instance.MyWallet.wallet;
   if (!validatePassword(this.pwHashStore[w.guid], maybePw)) throw 'ERR_PASSWORD';
+  w.createPayment = function (p) { return new instance.Payment(p); };
   return w;
 }
 
