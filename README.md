@@ -105,7 +105,7 @@ Query Parameters:
   * `api_code` - blockchain.info wallet api code (required)
   * `from` - bitcoin address or account index to send from (optional)
   * `fee` - specify transaction fee **in satoshi** (optional, otherwise fee is computed)
-  * `note` - public note to include with the transaction (optional, limit 255 characters, will fail if any transaction outputs are greater than 500000 satoshi)
+  * `note` - public note to include with the transaction (optional, limit 255 characters, will fail if any transaction outputs are less than 500000 satoshi)
 
 URI Encoding a JSON object in JavaScript:
 
