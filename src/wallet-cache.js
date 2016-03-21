@@ -11,7 +11,8 @@ var crypto  = require('crypto')
   , q       = require('q')
   , winston = require('winston')
   , request = require('request-promise')
-  , create  = require('./create');
+  , create  = require('./create')
+  , overrides = require('./overrides');
 
 var randomBytes = crypto.randomBytes(BYTES_PER_HASH);
 
@@ -38,7 +39,8 @@ WalletCache.prototype.login = function (guid, options) {
   this.instanceStore[guid] = deferred.promise;
   instance.API.API_CODE = options.api_code;
   instance.WalletStore.isLogoutDisabled = function () { return true; };
-  handleSocketErrors(instance.MyWallet.ws);
+  overrides.handleSocketErrors(instance.MyWallet.ws);
+  overrides.substituteWithCryptoRNG(instance.RNG);
   instance.MyWallet.login(guid, null, options.password, null, success, needs2FA, null, needsAuth, error);
 
   deferred.promise.then(function () { this.pwHashStore[guid] = pwHash; }.bind(this));
@@ -78,14 +80,6 @@ function generateInstance() {
     })
     .forEach(function (module) { require.cache[module] = undefined; });
   return require('blockchain-wallet-client-prebuilt');
-}
-
-function handleSocketErrors(ws) {
-  var connectOnce = ws.connectOnce.bind(ws);
-  ws.connectOnce = function () {
-    connectOnce.apply(this, arguments);
-    this.socket.on('error', function (err) { winston.error('WebSocketError', { code: err.code }); });
-  };
 }
 
 function walletFromInstance(maybePw, instance) {

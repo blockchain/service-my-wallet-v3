@@ -14,6 +14,7 @@ var server  = require('./src/server')
 var extractWsError = /Websocket error: could not parse message data as JSON: ([^\^]+)/;
 var consolelog = console.log.bind(console);
 var consolewarn = console.warn.bind(console);
+var consoleerror = console.error.bind(console);
 
 console.log = function (msg) {
   if (
@@ -46,6 +47,14 @@ console.warn = function (msg) {
   ) return;
 
   consolewarn.apply(this, arguments);
+};
+
+console.error = function (msg) {
+  if (
+    stringContains(msg, 'Unknown Key Format')
+  ) return;
+
+  consoleerror.apply(this, arguments);
 };
 
 function stringContains(str0, str1) {
