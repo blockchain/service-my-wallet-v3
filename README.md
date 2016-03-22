@@ -344,9 +344,23 @@ Differences from server API:
 $ npm install -g blockchain-wallet-service
 ```
 
-Required versions:
+For the best stability and performance, make sure you are always using the latest version.
 
-  * nodejs >= 0.12.0
+To check your version:
+
+```sh
+$ blockchain-wallet-service -V
+```
+
+To update to the latest version:
+
+```sh
+$ npm update -g blockchain-wallet-service
+```
+
+Requires:
+
+  * node >= 0.12.0
   * npm >= 2.12.0, < 3.0.0
 
 If you have issues with the installation process, see the troubleshooting section below.
