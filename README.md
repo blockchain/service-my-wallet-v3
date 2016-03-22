@@ -353,9 +353,13 @@ If you have issues with the installation process, see the troubleshooting sectio
 
 ## Troubleshooting
 
-If installation fails:
+Installation errors:
 
   * If you are getting `EACCESS` or permissions-related errors, it might be necessary to run the install as root, using the `sudo` command.
+
+Startup errors:
+
+  * If startup fails with `/usr/bin/env: node: No such file or directory`, it's possible node is not installed, or was installed with a different name (Ubuntu, for example, installs node as nodejs). If node was installed with a different name, create a symlink to your node binary: `sudo ln -s /usr/bin/nodejs /usr/bin/node`, or install node through [Node Version Manager](https://github.com/creationix/nvm).
 
 Runtime errors:
 
