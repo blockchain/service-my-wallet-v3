@@ -244,6 +244,6 @@ function formatAcct(a) {
     balance: a.balance, label: a.label, index: a.index, archived: a.archived,
     extendedPublicKey: a.extendedPublicKey, extendedPrivateKey: a.extendedPrivateKey,
     receiveIndex: a.receiveIndex, lastUsedReceiveIndex: a.lastUsedReceiveIndex,
-    receivingAddressLabels: a.receivingAddressesLabels
+    receivingAddressLabels: a.receivingAddressesLabels, receiveAddress: a.receiveAddress
   };
 }
