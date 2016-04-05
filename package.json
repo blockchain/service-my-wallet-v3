@@ -3,6 +3,13 @@
   "version": "0.19.3",
   "description": "Blockchain.info wallet api service",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/blockchain/service-my-wallet-v3.git"
+  },
+  "bugs": {
+    "url": "https://github.com/blockchain/service-my-wallet-v3/issues"
+  },
   "bin": {
     "blockchain-wallet-service": "./bin/cli.js"
   },
