@@ -189,42 +189,43 @@ MerchantAPI.prototype.createAccount = function (guid, options) {
 
 MerchantAPI.prototype.listAccounts = function (guid, options) {
   return this.getWalletHD(guid, options).then(function (hdwallet) {
-    var byId = function (acct) {
-      return acct.index === parseInt(options.account);
-    };
-    var notFound = q.reject('ERR_ACCT_IDX');
-    return hdwallet.isValidAccountIndex(parseInt(options.account)) ?
-      (formatAcct(hdwallet.accounts.filter(byId)[0]) || notFound):
-      (options.account ?
-        (formatAcct(hdwallet.account(options.account)) || notFound):
-        (hdwallet.activeAccounts.map(formatAcct))
-      );
+    if (options.account == null) {
+      var activeAccounts = hdwallet.accounts.filter(byProp('active', true));
+      return activeAccounts.map(formatAcct);
+    } else {
+      var account = getWalletAccount(hdwallet, options.account);
+      return formatAcct(account);
+    }
   });
 };
 
 MerchantAPI.prototype.getReceiveAddress = function (guid, options) {
-  return this.listAccounts(guid, options).then(function (account) {
+  return this.getWalletHD(guid, options).then(function (hdwallet) {
+    var account = getWalletAccount(hdwallet, options.account);
     return { address: account.receiveAddress };
   });
 };
 
 MerchantAPI.prototype.getAccountBalance = function (guid, options) {
-  return this.listAccounts(guid, options).then(function (account) {
+  return this.getWalletHD(guid, options).then(function (hdwallet) {
+    var account = getWalletAccount(hdwallet, options.account);
     return { balance: account.balance };
   });
 };
 
 MerchantAPI.prototype.archiveAccount = function (guid, options) {
-  return this.listAccounts(guid, options).then(function (account) {
+  return this.getWalletHD(guid, options).then(function (hdwallet) {
+    var account = getWalletAccount(hdwallet, options.account);
     account.archived = true;
-    return account;
+    return formatAcct(account);
   });
 };
 
 MerchantAPI.prototype.unarchiveAccount = function (guid, options) {
-  return this.listAccounts(guid, options).then(function (account) {
+  return this.getWalletHD(guid, options).then(function (hdwallet) {
+    var account = getWalletAccount(hdwallet, options.account);
     account.archived = false;
-    return account;
+    return formatAcct(account);
   });
 };
 
@@ -237,6 +238,22 @@ function requireSecondPassword(options) {
       throw 'ERR_SECPASS';
     return wallet;
   };
+}
+
+function getWalletAccount(hdwallet, account) {
+  if (hdwallet.isValidAccountIndex(parseInt(account))) {
+    var filtered = hdwallet.accounts.filter(byProp('index', parseInt(account)));
+    if (filtered.length === 0) throw 'ERR_ACCT_IDX';
+    return filtered[0];
+  } else if (typeof account === 'string' && account.slice(0, 4) === 'xpub') {
+    return hdwallet.account(account);
+  } else {
+    throw 'ERR_ACCT_IDX';
+  }
+}
+
+function byProp(prop, val) {
+  return function (elem) { return elem[prop] === val; };
 }
 
 function formatAcct(a) {
