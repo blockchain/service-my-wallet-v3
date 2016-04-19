@@ -23,6 +23,8 @@ program
   .description('start a wallet api service server')
   .option('-p, --port <n>', 'port number - defaults to 3000', parseInt)
   .option('-b, --bind [ip]', 'bind to a specific ip - defaults to 127.0.0.1')
+  .option('--ssl-key <path>', 'path to ssl key')
+  .option('--ssl-cert <path>', 'path to ssl certificate')
   .action(postpone(start));
 
 program
@@ -41,7 +43,9 @@ var wallet = require(program.cwd ? process.cwd() : '..');
 function start(options) {
   var startOptions = {
     port: options.port || defaults.port,
-    bind: options.bind || defaults.bind
+    bind: options.bind || defaults.bind,
+    sslKey: options.sslKey,
+    sslCert: options.sslCert
   };
   wallet.start(startOptions);
 }
