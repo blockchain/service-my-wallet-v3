@@ -1,6 +1,9 @@
 'use strict';
 
-var express     = require('express')
+var fs          = require('fs')
+  , http        = require('http')
+  , https       = require('https')
+  , express     = require('express')
   , bodyParser  = require('body-parser')
   , q           = require('q')
   , winston     = require('winston')
@@ -224,6 +227,15 @@ function handleResponse(apiAction, res, errCode) {
     .catch(function (e) {
       winston.error(e);
       var err = ecodes[e] || ecodes['ERR_UNEXPECT'];
+      if (stringContains(e, 'Insufficient funds. Value Needed')) {
+        var rgx = /Insufficient funds. Value Needed ([^\^]+)BTC. Available amount ([^\^]+)BTC/;
+        var errData = e.match(rgx);
+        return res.status(400).json({
+          error: 'Insufficient funds',
+          needed: errData ? parseFloat(errData[1]) : undefined,
+          available: errData ? parseFloat(errData[2]) : undefined
+        })
+      }
       if (
         stringContains(e, 'Missing query parameter') ||
         stringContains(e, 'Error Decrypting Wallet')
@@ -247,17 +259,26 @@ function interpretError(code, bindings) {
 
 function start(options) {
   var deferred = q.defer();
+
+  var ssl = options.sslKey && options.sslCert;
+  var sslOpts = !ssl ? {} :
+    { key : fs.readFileSync(options.sslKey)
+    , cert: fs.readFileSync(options.sslCert) };
+
   var initApp = function () {
     var pkg   = require('../package.json')
-      , msg   = 'blockchain.info wallet service v%s running on %s:%d'
+      , msg   = 'blockchain.info wallet service v%s running on http%s://%s:%d'
       , warn  = 'WARNING - Binding this service to any ip other than localhost (127.0.0.1) can lead to security vulnerabilities!';
+
     if (options.bind !== '127.0.0.1') winston.warn(warn);
-    winston.info(msg, pkg.version, options.bind, options.port);
+    winston.info(msg, pkg.version, ssl ? 's' : '', options.bind, options.port);
     deferred.resolve(true);
   };
-  var handleStartError = function (err) {
-    winston.error(err.message);
-  };
-  app.listen(options.port, options.bind, initApp).on('error', handleStartError);
+
+  var handleStartError = function (err) { winston.error(err.message); };
+
+  var server = ssl ? https.createServer(sslOpts, app) : http.createServer(app);
+  server.listen(options.port, options.bind, initApp).on('error', handleStartError);
+
   return deferred.promise;
 }

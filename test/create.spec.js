@@ -15,6 +15,9 @@ var create = require('../src/create');
 var Blockchain = require('blockchain-wallet-client-prebuilt');
 var WalletNetwork = require('blockchain-wallet-client-prebuilt/src/wallet-network');
 
+var overrides = require('../src/overrides');
+overrides.substituteWithCryptoRNG(Blockchain.RNG);
+
 describe('create', function () {
   var uuid = 'asdfasdf-asdf-asdf-asdf-asdfasdfasdf';
   var mockAPI, mockNetwork;

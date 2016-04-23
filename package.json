@@ -27,7 +27,7 @@
   "dependencies": {
     "basic-auth": "~1.0.3",
     "bitcoinjs-lib": "~2.2.0",
-    "blockchain-wallet-client-prebuilt": "~3.6.0",
+    "blockchain-wallet-client-prebuilt": "~3.10.0",
     "blockchain.info": "~2.2.2",
     "body-parser": "~1.14.1",
     "commander": "~2.9.0",

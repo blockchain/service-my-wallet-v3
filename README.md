@@ -410,6 +410,8 @@ Command options:
   * `-h, --help` - output usage information
   * `-p, --port` - port number to run the server on (defaults to `3000`)
   * `-b, --bind` - bind to a specific ip (defaults to `127.0.0.1`, note that binding to an ip other than this can lead to security vulnerabilities)
+  * `--ssl-key` - the path to your ssl key (optional)
+  * `--ssl-cert` - the path to your ssl certificate (optional)
 
 To open the service to all incoming connections, bind to `0.0.0.0`.
 
