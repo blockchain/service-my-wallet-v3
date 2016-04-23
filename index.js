@@ -21,7 +21,8 @@ console.log = function (msg) {
     // "noise" messages, do not log
     stringContains(msg, 'Server Time offset') ||
     stringContains(msg, 'SAVE CALLED...') ||
-    stringContains(msg, 'published')
+    stringContains(msg, 'published') ||
+    stringContains(msg, 'No free outputs to spend')
   ) return;
 
   if (stringContains(msg, 'Websocket error:')) {

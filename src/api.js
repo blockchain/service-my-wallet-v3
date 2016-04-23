@@ -108,6 +108,7 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
       }
 
       function error(e) {
+        if (e === 'Missing coins to spend') e = 'ERR_BALANCE';
         return q.reject(e || 'ERR_PUSHTX');
       }
 

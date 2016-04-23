@@ -227,6 +227,15 @@ function handleResponse(apiAction, res, errCode) {
     .catch(function (e) {
       winston.error(e);
       var err = ecodes[e] || ecodes['ERR_UNEXPECT'];
+      if (stringContains(e, 'Insufficient funds. Value Needed')) {
+        var rgx = /Insufficient funds. Value Needed ([^\^]+)BTC. Available amount ([^\^]+)BTC/;
+        var errData = e.match(rgx);
+        return res.status(400).json({
+          error: 'Insufficient funds',
+          needed: errData ? parseFloat(errData[1]) : undefined,
+          available: errData ? parseFloat(errData[2]) : undefined
+        })
+      }
       if (
         stringContains(e, 'Missing query parameter') ||
         stringContains(e, 'Error Decrypting Wallet')
