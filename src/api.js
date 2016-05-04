@@ -1,5 +1,7 @@
 'use strict';
 
+var SATOSHI_PER_BTC = 100000000;
+
 var WalletCache = require('./wallet-cache')
   , q           = require('q')
   , winston     = require('winston');
@@ -104,8 +106,13 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
       }
 
       function error(e) {
-        if (e && e.error === 'NO_UNSPENT_OUTPUTS') e = 'ERR_BALANCE';
-        return q.reject(e || 'ERR_PUSHTX');
+        var msg = e.error;
+        if (msg === 'NO_UNSPENT_OUTPUTS') {
+          var have = satoshiToBTC(e.payment.balance);
+          var need = satoshiToBTC(e.payment.amounts.reduce(add, isNaN(options.fee) ? 10000 : options.fee));
+          msg = 'Insufficient funds. Value Needed ' + need + 'BTC. Available amount ' + have + 'BTC';
+        }
+        return q.reject(msg || 'ERR_PUSHTX');
       }
 
       var deferred = q.defer();
@@ -118,7 +125,8 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
         })
         .catch(function (e) {
           var errMsg = e.error ? (e.error.message || e.error) : 'ERR_BUILDTX';
-          deferred.reject(errMsg);
+          errMsg = errMsg.error ? errMsg.error : errMsg;
+          deferred.reject({ error: errMsg, payment: e.payment });
         });
 
       return deferred.promise
@@ -260,4 +268,12 @@ function formatAcct(a) {
     receiveIndex: a.receiveIndex, lastUsedReceiveIndex: a.lastUsedReceiveIndex,
     receivingAddressLabels: a.receivingAddressesLabels, receiveAddress: a.receiveAddress
   };
+}
+
+function add(total, next) {
+  return total + next;
+}
+
+function satoshiToBTC(satoshi) {
+  return parseFloat((satoshi / SATOSHI_PER_BTC).toFixed(8));
 }
