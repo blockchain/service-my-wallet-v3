@@ -13,8 +13,6 @@ var server  = require('./src/server')
 
 var extractWsError = /Websocket error: could not parse message data as JSON: ([^\^]+)/;
 var consolelog = console.log.bind(console);
-var consolewarn = console.warn.bind(console);
-var consoleerror = console.error.bind(console);
 
 console.log = function (msg) {
   if (
@@ -22,11 +20,12 @@ console.log = function (msg) {
     stringContains(msg, 'Server Time offset') ||
     stringContains(msg, 'SAVE CALLED...') ||
     stringContains(msg, 'published') ||
-    stringContains(msg, 'No free outputs to spend')
+    stringContains(msg, 'No free outputs to spend') ||
+    stringContains(msg && msg.initial_error, 'Connectivity error')
   ) return;
 
   if (stringContains(msg, 'Websocket error:')) {
-    winston.error('WebSocketError', { msg: msg.match(extractWsError)[1] });
+    winston.error('WebSocketError', { message: msg.match(extractWsError)[1] });
     return;
   }
 
@@ -39,23 +38,6 @@ console.log = function (msg) {
   }
 
   consolelog.apply(this, arguments);
-};
-
-console.warn = function (msg) {
-  if (
-    // bitcoinjs deprecation warning, safe to ignore
-    stringContains(msg, 'Transaction.prototype.')
-  ) return;
-
-  consolewarn.apply(this, arguments);
-};
-
-console.error = function (msg) {
-  if (
-    stringContains(msg, 'Unknown Key Format')
-  ) return;
-
-  consoleerror.apply(this, arguments);
 };
 
 function stringContains(str0, str1) {

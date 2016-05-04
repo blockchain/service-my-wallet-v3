@@ -21,7 +21,7 @@ module.exports = {
   ERR_BUILDTX   : 'Error building transaction',
   ERR_PAYMENT   : 'Failed to create wallet payment',
   ERR_PUSHTX    : 'Error signing and pushing transaction',
-  ERR_BALANCE   : 'Cannot spend from an address with 0 balance',
+  ERR_BALANCE   : 'Not enough available funds',
   ERR_JSON      : 'Invalid JSON',
   ERR_ADDRESS   : 'Address not found in this wallet',
   ERR_PASSWORD  : 'Main wallet password incorrect',

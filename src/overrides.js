@@ -3,10 +3,13 @@ var winston = require('winston')
   , crypto  = require('crypto');
 
 exports.handleSocketErrors = function (ws) {
-  var connectOnce = ws.connectOnce.bind(ws);
-  ws.connectOnce = function () {
-    connectOnce.apply(this, arguments);
-    this.socket.on('error', function (err) { winston.error('WebSocketError', { code: err.code }); });
+  var initialize = ws._initialize.bind(ws);
+  var handler = function (err) {
+    winston.error('WebSocketError', { message: err.message, code: err.code });
+  };
+  ws._initialize = function () {
+    initialize.apply(this, arguments);
+    this.socket.on('error', handler);
   };
 };
 

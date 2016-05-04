@@ -41,7 +41,6 @@ legacyAPI.use(parseOptions({
   address         : String,
   to              : String,
   from            : String,
-  note            : String,
   label           : String,
   recipients      : Identity,
   second_password : String,

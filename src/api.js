@@ -82,15 +82,11 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
       var payment = wallet.createPayment()
         .to(options.to)
         .amount(options.amount)
-        .from(from);
+        .from(from)
+        .fee(isNaN(options.fee) ? 10000 : options.fee);
 
       var password;
-      if (wallet.isDoubleEncrypted) {
-        password = options.second_password;
-      }
-
-      if (options.fee) payment.fee(options.fee);
-      if (options.note) payment.note(options.note);
+      if (wallet.isDoubleEncrypted) password = options.second_password;
 
       function success(tx) {
         winston.debug('Transaction published', { hash: tx.txid });
@@ -99,7 +95,7 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
           to      : tx.to,
           amounts : tx.amounts,
           from    : tx.from,
-          fee     : tx.fee,
+          fee     : tx.finalFee,
           txid    : tx.txid,
           tx_hash : tx.txid,
           message : message,
@@ -115,7 +111,7 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
       var deferred = q.defer();
 
       // NOTE: payment.buildbeta() does NOT return a promise
-      payment.buildbeta()
+      payment.build()
         .then(function (p) {
           deferred.resolve(payment.sign(password).publish().payment);
           return p;

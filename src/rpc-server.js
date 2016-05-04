@@ -293,9 +293,10 @@ function move(params, wallet) {
   var pass  = getSecondPasswordForWallet(wallet)
     , from  = getAccountAddresses(wallet, params.fromAccount)
     , to    = getAccountAddresses(wallet, params.toAccount)[0]
-    , amt   = btcToSatoshi(params.amount);
+    , amt   = btcToSatoshi(params.amount)
+    , fee   = isNaN(wallet.fee_per_kb) ? 10000 : wallet.fee_per_kb;
 
-  var payment = wallet.createPayment().from(from).to(to).amount(amt);
+  var payment = wallet.createPayment().from(from).to(to).amount(amt).fee(fee);
   return publishPayment(payment, pass);
 }
 
@@ -304,9 +305,10 @@ function sendfrom(params, wallet) {
   var pass  = getSecondPasswordForWallet(wallet)
     , from  = getAccountAddresses(wallet, params.fromAccount)
     , to    = params.bitcoinAddress
-    , amt   = btcToSatoshi(params.amount);
+    , amt   = btcToSatoshi(params.amount)
+    , fee   = isNaN(wallet.fee_per_kb) ? 10000 : wallet.fee_per_kb;
 
-  var payment = wallet.createPayment().from(from).to(to).amount(amt);
+  var payment = wallet.createPayment().from(from).to(to).amount(amt).fee(fee);
   return publishPayment(payment, pass);
 }
 
@@ -314,6 +316,7 @@ sendmany.$params = ['fromAccount', 'addressAmountPairs'];
 function sendmany(params, wallet) {
   var pass  = getSecondPasswordForWallet(wallet)
     , from  = getAccountAddresses(wallet, params.fromAccount)
+    , fee   = isNaN(wallet.fee_per_kb) ? 10000 : wallet.fee_per_kb
     , to    = [], amts = [];
 
   Object.keys(params.addressAmountPairs).forEach(function (address) {
@@ -321,7 +324,7 @@ function sendmany(params, wallet) {
     amts.push(btcToSatoshi(params.addressAmountPairs[address]));
   });
 
-  var payment = wallet.createPayment().from(from).to(to).amount(amts);
+  var payment = wallet.createPayment().from(from).to(to).amount(amts).fee(fee);
   return publishPayment(payment, pass);
 }
 
@@ -330,9 +333,10 @@ function sendtoaddress(params, wallet) {
   var pass  = getSecondPasswordForWallet(wallet)
     , from  = wallet.spendableActiveAddresses
     , to    = params.bitcoinAddress
-    , amt   = btcToSatoshi(params.amount);
+    , amt   = btcToSatoshi(params.amount)
+    , fee   = isNaN(wallet.fee_per_kb) ? 10000 : wallet.fee_per_kb
 
-  var payment = wallet.createPayment().from(from).to(to).amount(amt);
+  var payment = wallet.createPayment().from(from).to(to).amount(amt).fee(fee);
   return publishPayment(payment, pass);
 }
 
@@ -473,7 +477,7 @@ function getAccountAddresses(wallet, account) {
 
 function publishPayment(payment, password) {
   return new Promise(function (resolve, reject) {
-    payment.buildbeta()
+    payment.build()
       .then(function (p) {
         resolve(payment.sign(password).publish().payment);
         return p;
