@@ -2,6 +2,7 @@
 
 var assert        = require('assert')
   , crypto        = require('crypto')
+  , overrides     = require('./overrides')
   , Blockchain    = require('blockchain-wallet-client-prebuilt')
   , Address       = require('blockchain-wallet-client-prebuilt/src/address')
   , WalletNetwork = require('blockchain-wallet-client-prebuilt/src/wallet-network');
@@ -90,5 +91,7 @@ function createWallet(password, options) {
 function sha256(data) {
   return crypto.createHash('sha256').update(data).digest();
 }
+
+overrides.substituteWithCryptoRNG(Blockchain.RNG);
 
 module.exports = createWallet;
