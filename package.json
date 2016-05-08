@@ -20,8 +20,8 @@
   "scripts": {
     "start": "node_modules/nodemon/bin/nodemon.js scripts/start.js",
     "start:debug": "node-debug scripts/start.js",
-    "test": "node_modules/mocha/bin/mocha test/*.spec.js",
-    "test:int": "node_modules/mocha/bin/mocha test/integration.js"
+    "test": "node_modules/mocha/bin/mocha test/*.spec.js --timeout 5000",
+    "test:int": "node_modules/mocha/bin/mocha test/integration.js --timeout 5000"
   },
   "author": "Justin Tormey <justin@blockchain.info>",
   "dependencies": {

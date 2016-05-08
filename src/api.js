@@ -138,8 +138,10 @@ MerchantAPI.prototype.generateAddress = function (guid, options) {
   return this.getWallet(guid, options)
     .then(requireSecondPassword(options))
     .then(function (wallet) {
-      var a = wallet.newLegacyAddress(options.label, options.second_password);
-      return { address: a.address, label: a.label };
+      return q.Promise(function (resolve, reject) {
+        var a = wallet.newLegacyAddress(options.label, options.second_password, success, reject);
+        function success () { resolve({ address: a.address, label: a.label }); }
+      });
     }).catch(function (e) {
       throw e.message || e;
     });
