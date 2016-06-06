@@ -10,9 +10,9 @@ var rpc   = require('json-rpc2')
   , request = require('request-promise')
   , bitcoin = require('bitcoinjs-lib')
   , winston = require('winston')
-  , helpers = require('../node_modules/blockchain-wallet-client-prebuilt/src/helpers')
-  , Wallet  = require('../node_modules/blockchain-wallet-client-prebuilt/src/wallet')
-  , wcrypto = require('../node_modules/blockchain-wallet-client-prebuilt/src/wallet-crypto');
+  , helpers = require('blockchain-wallet-client-prebuilt/src/helpers')
+  , Wallet  = require('blockchain-wallet-client-prebuilt/src/wallet')
+  , wcrypto = require('blockchain-wallet-client-prebuilt/src/wallet-crypto');
 
 var api_code = '';
 var secondPasswordStore = new TimedStore();
