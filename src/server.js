@@ -51,105 +51,105 @@ legacyAPI.use(parseOptions({
 
 merchantAPI.all(
   '/login',
-  required(['password', 'api_code']),
+  required(['password']),
   callApi('login')
 );
 
 merchantAPI.all(
   '/enableHD',
-  required(['password', 'api_code']),
+  required(['password']),
   callApi('upgradeWallet')
 );
 
 // Routing: Legacy Wallet API
 legacyAPI.all(
   '/balance',
-  required(['password', 'api_code']),
+  required(['password']),
   callApi('getBalance')
 );
 
 legacyAPI.all(
   '/list',
-  required(['password', 'api_code']),
+  required(['password']),
   callApi('listAddresses')
 );
 
 legacyAPI.all(
   '/address_balance',
-  required(['address', 'password', 'api_code']),
+  required(['address', 'password']),
   callApi('getAddressBalance')
 );
 
 legacyAPI.all(
   '/sendmany',
-  required(['recipients', 'password', 'api_code']),
+  required(['recipients', 'password']),
   callApi('sendMany')
 );
 
 legacyAPI.all(
   '/payment',
-  required(['to', 'amount', 'password', 'api_code']),
+  required(['to', 'amount', 'password']),
   callApi('makePayment')
 );
 
 legacyAPI.all(
   '/new_address',
-  required(['password', 'api_code']),
+  required(['password']),
   callApi('generateAddress')
 );
 
 legacyAPI.all(
   '/archive_address',
-  required(['address', 'password', 'api_code']),
+  required(['address', 'password']),
   callApi('archiveAddress')
 );
 
 legacyAPI.all(
   '/unarchive_address',
-  required(['address', 'password', 'api_code']),
+  required(['address', 'password']),
   callApi('unarchiveAddress')
 );
 
 // Routing: HD Accounts API
 accountsAPI.all(
   '/xpubs',
-  required(['password', 'api_code']),
+  required(['password']),
   callApi('listxPubs')
 );
 
 accountsAPI.all(
   '/create',
-  required(['password', 'api_code']),
+  required(['password']),
   callApi('createAccount')
 );
 
 accountsAPI.all(
   '/:account?',
-  required(['password', 'api_code']),
+  required(['password']),
   callApi('listAccounts')
 );
 
 accountsAPI.all(
   '/:account/receiveAddress',
-  required(['password', 'api_code']),
+  required(['password']),
   callApi('getReceiveAddress')
 );
 
 accountsAPI.all(
   '/:account/balance',
-  required(['password', 'api_code']),
+  required(['password']),
   callApi('getAccountBalance')
 );
 
 accountsAPI.all(
   '/:account/archive',
-  required(['password', 'api_code']),
+  required(['password']),
   callApi('archiveAccount')
 );
 
 accountsAPI.all(
   '/:account/unarchive',
-  required(['password', 'api_code']),
+  required(['password']),
   callApi('unarchiveAccount')
 );
 

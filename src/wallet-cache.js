@@ -28,7 +28,6 @@ WalletCache.prototype.login = function (guid, options) {
   var instance  = generateInstance()
     , pwHash    = generatePwHash(options.password)
     , deferred  = q.defer()
-    , success   = deferred.resolve.bind(null, instance)
     , error     = deferred.reject
     , needs2FA  = deferred.reject.bind(null, 'ERR_2FA')
     , needsAuth = deferred.reject.bind(null, 'ERR_AUTH')
@@ -36,15 +35,19 @@ WalletCache.prototype.login = function (guid, options) {
     , done      = clearTimeout.bind(null, timeout)
     , remove    = function () { this.instanceStore[guid] = undefined; }.bind(this);
 
-  this.instanceStore[guid] = deferred.promise;
   instance.API.API_CODE = options.api_code;
   instance.WalletStore.isLogoutDisabled = function () { return true; };
   overrides.handleSocketErrors(instance.MyWallet.ws);
   overrides.substituteWithCryptoRNG(instance.RNG);
-  instance.MyWallet.login(guid, null, options.password, null, success, needs2FA, null, needsAuth, error);
 
-  deferred.promise.then(function () { this.pwHashStore[guid] = pwHash; }.bind(this));
-  return deferred.promise.catch(remove).fin(done);
+  var callbacks = { authorizationRequired: needsAuth, needsTwoFactorCode: needs2FA };
+  var loginP = instance.MyWallet.login(guid, options.password, { twoFactor: null }, callbacks);
+  var startupPromise = q.race([ deferred.promise, loginP.then(function () { return instance; }) ]);
+
+  this.instanceStore[guid] = startupPromise;
+  startupPromise.then(function () { this.pwHashStore[guid] = pwHash; }.bind(this));
+
+  return startupPromise.catch(remove).fin(done);
 };
 
 WalletCache.prototype.createWallet = function (options) {

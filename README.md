@@ -27,6 +27,8 @@ Start by completing the following steps:
 
 Note that `blockchain-wallet-service` is designed to be run locally on the same machine as your application and therefore will only accept connections from `localhost`. If you modify this service to accept external connections, be sure to add the appropriate firewall rules to prevent unauthorized use.
 
+An API code is required for wallet creation and higher request limits. For basic usage, no API code is required. Request an API code [here](https://blockchain.info/api/api_create_code).
+
 ## Upgrading
 
 If you already have an application that uses [Blockchain.info's Wallet API](https://blockchain.info/api/blockchain_wallet_api), you will need to complete the steps in the Getting Started section above and then, in your application code, replace calls to `blockchain.info/merchant/...` with `localhost:<port>/merchant/...`.
@@ -53,8 +55,6 @@ Query Parameters:
   * `label` - label to give to the first address generated in the wallet (optional)
   * `email` - email to associate with the newly created wallet (optional)
 
-Get an API code [here](https://blockchain.info/api/api_create_code). **Note**: You must check the "Create Wallets" checkbox under "Permissions" when requesting an API code in order for it to be compatible with this app.
-
 Sample Response:
 
 ```json
@@ -75,7 +75,7 @@ Query Parameters:
   * `amount` - amount **in satoshi** to send (required)
   * `password` - main wallet password (required)
   * `second_password` - second wallet password (required, only if second password is enabled)
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.info wallet api code (optional)
   * `from` - bitcoin address or account index to send from (optional)
   * `fee` - specify transaction fee **in satoshi** (optional, otherwise fee is computed)
 
@@ -101,7 +101,7 @@ Query Parameters:
   * `recipients` - a *URI encoded* [JSON object](http://json.org/example.html), with bitcoin addresses as keys and the **satoshi** amounts as values (required, see example below)
   * `password` - main wallet password (required)
   * `second_password` - second wallet password (required, only if second password is enabled)
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.info wallet api code (optional)
   * `from` - bitcoin address or account index to send from (optional)
   * `fee` - specify transaction fee **in satoshi** (optional, otherwise fee is computed)
 
@@ -150,7 +150,7 @@ Endpoint: `/merchant/:guid/list`
 Query Parameters:
 
   * `password` - main wallet password (required)
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.info wallet api code (optional)
 
 Sample Response:
 
@@ -180,7 +180,7 @@ Query Parameters:
 
   * `address` - address to fetch balance for (required)
   * `password` - main wallet password (required)
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.info wallet api code (optional)
 
 Note: unlike the hosted API, there is no option of a `confirmations` parameter for specifying minimum confirmations.
 
@@ -198,7 +198,7 @@ Query Parameters:
 
   * `password` - main wallet password (required)
   * `label` - label to give to the address (optional)
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.info wallet api code (optional)
 
 Sample Response:
 
@@ -214,7 +214,7 @@ Query Parameters:
 
   * `address` - address to archive (required)
   * `password` - main wallet password (required)
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.info wallet api code (optional)
 
 Sample Response:
 
@@ -230,7 +230,7 @@ Query Parameters:
 
   * `address` - address to unarchive (required)
   * `password` - main wallet password (required)
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.info wallet api code (optional)
 
 Sample Response:
 
@@ -244,7 +244,7 @@ Endpoint: `/merchant/:guid/enableHD`
 
 Query Parameters:
 
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.info wallet api code (optional)
 
 This will upgrade a wallet to an HD (Hierarchical Deterministic) Wallet, which allows the use of accounts. See [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) for more information on HD wallets and accounts.
 
@@ -254,7 +254,7 @@ Endpoint: `/merchant/:guid/accounts`
 
 Query Parameters:
 
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.info wallet api code (optional)
 
 ### List HD xPubs
 
@@ -262,7 +262,7 @@ Endpoint: `/merchant/:guid/accounts/xpubs`
 
 Query Parameters:
 
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.info wallet api code (optional)
 
 ### Create New HD Account
 
@@ -270,7 +270,7 @@ Endpoint: `/merchant/:guid/accounts/create`
 
 Query Parameters:
 
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.info wallet api code (optional)
   * `label` - label to assign to the newly created account
 
 ### Get Single HD Account
@@ -279,7 +279,7 @@ Endpoint: `/merchant/:guid/accounts/:xpub_or_index`
 
 Query Parameters:
 
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.info wallet api code (optional)
 
 ### Get HD Account Receiving Address
 
@@ -287,7 +287,7 @@ Endpoint: `/merchant/:guid/accounts/:xpub_or_index/receiveAddress`
 
 Query Parameters:
 
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.info wallet api code (optional)
 
 ### Check HD Account Balance
 
@@ -295,7 +295,7 @@ Endpoint: `/merchant/:guid/accounts/:xpub_or_index/balance`
 
 Query Parameters:
 
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.info wallet api code (optional)
 
 ### Archive HD Account
 
@@ -303,7 +303,7 @@ Endpoint: `/merchant/:guid/accounts/:xpub_or_index/archive`
 
 Query Parameters:
 
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.info wallet api code (optional)
 
 ### Unarchive HD Account
 
@@ -311,7 +311,7 @@ Endpoint: `/merchant/:guid/accounts/:xpub_or_index/unarchive`
 
 Query Parameters:
 
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.info wallet api code (optional)
 
 ## RPC
 
