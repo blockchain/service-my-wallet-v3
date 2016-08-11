@@ -244,6 +244,7 @@ Endpoint: `/merchant/:guid/enableHD`
 
 Query Parameters:
 
+  * `password` - main wallet password (required)
   * `api_code` - blockchain.info wallet api code (optional)
 
 This will upgrade a wallet to an HD (Hierarchical Deterministic) Wallet, which allows the use of accounts. See [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) for more information on HD wallets and accounts.
@@ -254,6 +255,7 @@ Endpoint: `/merchant/:guid/accounts`
 
 Query Parameters:
 
+  * `password` - main wallet password (required)
   * `api_code` - blockchain.info wallet api code (optional)
 
 ### List HD xPubs
@@ -262,6 +264,7 @@ Endpoint: `/merchant/:guid/accounts/xpubs`
 
 Query Parameters:
 
+  * `password` - main wallet password (required)
   * `api_code` - blockchain.info wallet api code (optional)
 
 ### Create New HD Account
@@ -270,8 +273,9 @@ Endpoint: `/merchant/:guid/accounts/create`
 
 Query Parameters:
 
+  * `label` - label to assign to the newly created account (optional)
+  * `password` - main wallet password (required)
   * `api_code` - blockchain.info wallet api code (optional)
-  * `label` - label to assign to the newly created account
 
 ### Get Single HD Account
 
@@ -279,6 +283,7 @@ Endpoint: `/merchant/:guid/accounts/:xpub_or_index`
 
 Query Parameters:
 
+  * `password` - main wallet password (required)
   * `api_code` - blockchain.info wallet api code (optional)
 
 ### Get HD Account Receiving Address
@@ -287,6 +292,7 @@ Endpoint: `/merchant/:guid/accounts/:xpub_or_index/receiveAddress`
 
 Query Parameters:
 
+  * `password` - main wallet password (required)
   * `api_code` - blockchain.info wallet api code (optional)
 
 ### Check HD Account Balance
@@ -295,6 +301,7 @@ Endpoint: `/merchant/:guid/accounts/:xpub_or_index/balance`
 
 Query Parameters:
 
+  * `password` - main wallet password (required)
   * `api_code` - blockchain.info wallet api code (optional)
 
 ### Archive HD Account
@@ -303,6 +310,7 @@ Endpoint: `/merchant/:guid/accounts/:xpub_or_index/archive`
 
 Query Parameters:
 
+  * `password` - main wallet password (required)
   * `api_code` - blockchain.info wallet api code (optional)
 
 ### Unarchive HD Account
@@ -311,6 +319,7 @@ Endpoint: `/merchant/:guid/accounts/:xpub_or_index/unarchive`
 
 Query Parameters:
 
+  * `password` - main wallet password (required)
   * `api_code` - blockchain.info wallet api code (optional)
 
 ## RPC
