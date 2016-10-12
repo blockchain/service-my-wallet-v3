@@ -173,7 +173,7 @@ MerchantAPI.prototype.upgradeWallet = function (guid, options) {
       if (wallet.isUpgradedToHD) return q.reject('ERR_IS_HD');
       var deferred  = q.defer()
         , error     = deferred.reject.bind(null, 'ERR_SYNC')
-        , hdwallet  = wallet.newHDWallet(options.label, options.second_password, success, error);
+        , hdwallet  = wallet.upgradeToV3(options.label, options.second_password, success, error);
       function success(s) { deferred.resolve(formatAcct(hdwallet.accounts[0])); }
       return deferred.promise;
     });
