@@ -383,8 +383,8 @@ function signmessage(params, wallet) {
   if (!key) throw 'Private key is not known';
 
   var priv    = wallet.isDoubleEncrypted ? dec(key.priv) : key.priv
-    , format  = Wallet.detectPrivateKeyFormat(priv)
-    , wif     = Wallet.privateKeyStringToKey(priv, format).toWIF()
+    , format  = helpers.detectPrivateKeyFormat(priv)
+    , wif     = helpers.privateKeyStringToKey(priv, format).toWIF()
     , keypair = bitcoin.ECPair.fromWIF(wif);
 
   return bitcoin.message.sign(keypair, params.message).toString('base64');
