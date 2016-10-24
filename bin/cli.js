@@ -56,7 +56,6 @@ function startrpc(options) {
     rpcport: options.rpcport || defaults.rpcport,
     bind: options.bind || defaults.bind
   };
-  if (!startOptions.api_code) throw 'Missing required option: --key';
   wallet.startRPC(startOptions);
 }
 
