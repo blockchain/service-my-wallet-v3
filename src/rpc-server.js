@@ -11,7 +11,6 @@ var rpc   = require('json-rpc2')
   , bitcoin = require('bitcoinjs-lib')
   , winston = require('winston')
   , helpers = require('blockchain-wallet-client-prebuilt/src/helpers')
-  , Wallet  = require('blockchain-wallet-client-prebuilt/src/wallet')
   , wcrypto = require('blockchain-wallet-client-prebuilt/src/wallet-crypto');
 
 var api_code = '';
@@ -351,8 +350,8 @@ function validateaddress(params, wallet) {
 
   if (key && key.priv) {
     var priv = wallet.isDoubleEncrypted ? decipher(key.priv) : key.priv
-      , format = Wallet.detectPrivateKeyFormat(priv)
-      , keypair = bitcoin.ECPair.fromWIF(Wallet.privateKeyStringToKey(priv, format).toWIF());
+      , format = helpers.detectPrivateKeyFormat(priv)
+      , keypair = bitcoin.ECPair.fromWIF(helpers.privateKeyStringToKey(priv, format).toWIF());
     compressed = keypair.compressed;
     pubkey = keypair.getPublicKeyBuffer().toString('hex');
   }
@@ -383,8 +382,8 @@ function signmessage(params, wallet) {
   if (!key) throw 'Private key is not known';
 
   var priv    = wallet.isDoubleEncrypted ? dec(key.priv) : key.priv
-    , format  = Wallet.detectPrivateKeyFormat(priv)
-    , wif     = Wallet.privateKeyStringToKey(priv, format).toWIF()
+    , format  = helpers.detectPrivateKeyFormat(priv)
+    , wif     = helpers.privateKeyStringToKey(priv, format).toWIF()
     , keypair = bitcoin.ECPair.fromWIF(wif);
 
   return bitcoin.message.sign(keypair, params.message).toString('base64');
