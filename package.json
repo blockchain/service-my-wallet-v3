@@ -21,7 +21,8 @@
     "start": "node_modules/nodemon/bin/nodemon.js scripts/start.js",
     "start:debug": "node-debug scripts/start.js",
     "test": "node_modules/mocha/bin/mocha test/*.spec.js --timeout 5000",
-    "test:int": "node_modules/mocha/bin/mocha test/integration.js --timeout 5000"
+    "test:int": "node_modules/mocha/bin/mocha test/integration.js --timeout 5000",
+    "lint": "node_modules/.bin/standard src/*.js"
   },
   "author": "Justin Tormey <justin@blockchain.info>",
   "dependencies": {
@@ -44,6 +45,7 @@
     "node-env-file": "~0.1.8",
     "nodemon": "~1.8.1",
     "sinon": "^1.17.3",
-    "sinon-chai": "^2.8.0"
+    "sinon-chai": "^2.8.0",
+    "standard": "~8.6.0"
   }
 }
