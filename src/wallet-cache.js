@@ -74,13 +74,12 @@ WalletCache.prototype.getWallet = function (guid, options) {
 module.exports = WalletCache
 
 function generateInstance () {
+  var walletModule = 'blockchain-wallet-client-prebuilt'
+  var walletModuleR = new RegExp(walletModule + '.(index|src)')
   Object.keys(require.cache)
-    .filter(function (module) {
-      return (module.indexOf('blockchain-wallet-client-prebuilt/index') > -1 ||
-              module.indexOf('blockchain-wallet-client-prebuilt/src') > -1)
-    })
-    .forEach(function (module) { require.cache[module] = undefined })
-  return require('blockchain-wallet-client-prebuilt')
+    .filter(function (m) { return walletModuleR.test(m) })
+    .forEach(function (m) { delete require.cache[m] })
+  return require(walletModule)
 }
 
 function walletFromInstance (maybePw, instance) {
