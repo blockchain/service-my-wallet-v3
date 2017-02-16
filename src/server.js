@@ -9,6 +9,7 @@ var q = require('q')
 var winston = require('winston')
 var ecodes = require('./error-codes')
 var api = require('./api')
+var metrics = require('./metrics')
 
 module.exports = {
   start: start
@@ -272,6 +273,7 @@ function start (options) {
 
     if (options.bind !== '127.0.0.1') winston.warn(warn)
     winston.info(msg, pkg.version, ssl ? 's' : '', options.bind, options.port)
+    setInterval(metrics.recordHeartbeat, metrics.getHeartbeatInterval())
     deferred.resolve(true)
   }
 
