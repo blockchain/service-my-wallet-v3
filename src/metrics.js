@@ -2,14 +2,17 @@
 var ONE_MINUTE = 60000
 var HEARTBEAT_INTERVAL = 10 * ONE_MINUTE
 var EVENT_URL = 'https://blockchain.info/event'
-var EVENT_BASE = 'wallet_smwv3_'
 
 var request = require('request-promise')
 var winston = require('winston')
 
 function recordEvent (name) {
   winston.debug('Recording smwv3 event', { name: name })
-  request(EVENT_URL + '?name=' + EVENT_BASE + name)
+  request(EVENT_URL + '?name=' + smwv3Event(name))
+}
+
+function smwv3Event (name) {
+  return 'wallet_smwv3_' + name
 }
 
 module.exports = {
