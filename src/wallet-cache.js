@@ -47,7 +47,11 @@ WalletCache.prototype.login = function (guid, options) {
 
   startupPromise.then(function (instance) {
     this.pwHashStore[guid] = pwHash
-    instance.WalletStore.addEventListener('on_tx_received', metrics.recordReceive)
+    var listener = createEventListener('on_tx', function () {
+      let tx = instance.MyWallet.wallet.txList.transactions()[0]
+      if (tx.result > 0 && tx.txType === 'received') metrics.recordReceive()
+    })
+    instance.WalletStore.addEventListener(listener)
   }.bind(this))
 
   return startupPromise.catch(remove).fin(done)
@@ -116,4 +120,10 @@ function validatePassword (hash, maybePw) {
 
 function getProcessSeconds () {
   return process.hrtime()[0]
+}
+
+function createEventListener (eventName, f) {
+  return function (event, data) {
+    if (event === eventName) { f(data) }
+  }
 }
