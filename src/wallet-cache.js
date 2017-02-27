@@ -12,6 +12,7 @@ var q = require('q')
 var winston = require('winston')
 var create = require('./create')
 var overrides = require('./overrides')
+var metrics = require('./metrics')
 
 var randomBytes = crypto.randomBytes(BYTES_PER_HASH)
 
@@ -43,7 +44,15 @@ WalletCache.prototype.login = function (guid, options) {
   var startupPromise = q.race([ deferred.promise, loginP.then(function () { return instance }) ])
 
   this.instanceStore[guid] = startupPromise
-  startupPromise.then(function () { this.pwHashStore[guid] = pwHash }.bind(this))
+
+  startupPromise.then(function (instance) {
+    this.pwHashStore[guid] = pwHash
+    var listener = createEventListener('on_tx', function () {
+      let tx = instance.MyWallet.wallet.txList.transactions()[0]
+      if (tx.result > 0 && tx.txType === 'received') metrics.recordReceive()
+    })
+    instance.WalletStore.addEventListener(listener)
+  }.bind(this))
 
   return startupPromise.catch(remove).fin(done)
 }
@@ -111,4 +120,10 @@ function validatePassword (hash, maybePw) {
 
 function getProcessSeconds () {
   return process.hrtime()[0]
+}
+
+function createEventListener (eventName, f) {
+  return function (event, data) {
+    if (event === eventName) { f(data) }
+  }
 }

@@ -7,6 +7,7 @@ var auth = require('basic-auth')
 var bci = require('blockchain.info')
 var api = require('./api')
 var pkg = require('../package')
+var metrics = require('./metrics')
 var request = require('request-promise')
 var bitcoin = require('bitcoinjs-lib')
 var winston = require('winston')
@@ -71,6 +72,7 @@ function start (options) {
   var warn = 'WARNING - Binding this service to any ip other than localhost (127.0.0.1) can lead to security vulnerabilities!'
   if (options.bind !== '127.0.0.1') winston.warn(warn)
   winston.info(msg, pkg.version, options.bind, options.rpcport)
+  setInterval(metrics.recordHeartbeat, metrics.getHeartbeatInterval())
 }
 
 // RPC methods
@@ -482,7 +484,10 @@ function publishPayment (payment, password) {
         reject(e.error ? (e.error.message || e.error) : 'Failed to build transaction')
         return e.payment
       })
-  }).then(pluck('txid'))
+  }).then(function (tx) {
+    metrics.recordSend()
+    return pluck('txid')(tx)
+  })
 }
 
 function getSecondPasswordForWallet (wallet) {

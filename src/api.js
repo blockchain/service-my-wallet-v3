@@ -3,6 +3,7 @@
 var SATOSHI_PER_BTC = 100000000
 
 var WalletCache = require('./wallet-cache')
+var metrics = require('./metrics')
 var q = require('q')
 var winston = require('winston')
 
@@ -93,6 +94,7 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
       function success (tx) {
         winston.debug('Transaction published', { hash: tx.txid })
         var message = tx.to.length > 1 ? 'Sent to Multiple Recipients' : 'Payment Sent'
+        metrics.recordSend()
         return {
           to: tx.to,
           amounts: tx.amounts,
