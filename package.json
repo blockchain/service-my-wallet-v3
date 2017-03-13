@@ -31,11 +31,16 @@
     "blockchain-wallet-client-prebuilt": "3.22.*",
     "blockchain.info": "~2.2.2",
     "body-parser": "~1.14.1",
+    "colors": "~1.1.2",
     "commander": "~2.9.0",
     "express": "~4.13.3",
     "json-rpc2": "~1.0.2",
     "q": "~1.4.1",
+    "ramda": "~0.23.0",
+    "registry-url": "~3.1.0",
     "request-promise": "^2.0.1",
+    "semver": "~5.3.0",
+    "unicode-length": "~2.0.0",
     "winston": "^2.2.0"
   },
   "devDependencies": {

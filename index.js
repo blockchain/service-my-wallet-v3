@@ -1,5 +1,13 @@
 'use strict'
 
+var colors = require('colors/safe')
+var request = require('request-promise')
+var semver = require('semver')
+var registryUrl = require('registry-url')
+
+var pkg = require('./package.json')
+var format = require('./src/format')
+
 var winston = require('winston')
 winston.level = process.env.LOGLEVEL || 'info'
 winston.remove(winston.transports.Console)
@@ -44,6 +52,25 @@ function stringContains (str0, str1) {
   if (!str0 || !str1) return false
   return str0.toString().indexOf(str1) > -1
 }
+
+function outputUpgradeWarning (latest) {
+  var lines = [
+    'This version is outdated! Latest version: ' + colors.bold.green(latest),
+    'To upgrade, run: ' + colors.grey('npm install -g ' + pkg.name + '@' + latest)
+  ]
+  let warning = format.boxMessage(lines, { borderChar: colors.blue('*') })
+  winston.warn('\n\n' + warning + '\n')
+}
+
+function checkForUpgrade () {
+  var packageLatestUrl = registryUrl() + pkg.name + '/latest'
+  request(packageLatestUrl).then(function (res) {
+    var latest = JSON.parse(res).version
+    if (semver.gt(latest, pkg.version)) { outputUpgradeWarning(latest) }
+  })
+}
+
+checkForUpgrade()
 
 module.exports = {
   start: server.start,
