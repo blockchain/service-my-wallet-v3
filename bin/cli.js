@@ -3,8 +3,15 @@
 'use strict'
 
 var pkg = require('../package.json')
+var format = require('../src/format')
+
 var program = require('commander')
 var timers = require('timers')
+var winston = require('winston')
+var colors = require('colors/safe')
+var request = require('request-promise')
+var semver = require('semver')
+var registryUrl = require('registry-url')
 
 var defaults = {
   port: 3000,
@@ -45,6 +52,7 @@ function start (options) {
     sslKey: options.sslKey,
     sslCert: options.sslCert
   }
+  checkForUpgrade()
   wallet.start(startOptions)
 }
 
@@ -54,6 +62,7 @@ function startrpc (options) {
     rpcport: options.rpcport || defaults.rpcport,
     bind: options.bind || defaults.bind
   }
+  checkForUpgrade()
   wallet.startRPC(startOptions)
 }
 
@@ -61,4 +70,21 @@ function postpone (f) {
   return function (options) {
     timers.setTimeout(f.bind(null, options))
   }
+}
+
+function checkForUpgrade () {
+  var packageLatestUrl = registryUrl() + pkg.name + '/latest'
+  request(packageLatestUrl).then(function (res) {
+    var latest = JSON.parse(res).version
+    if (semver.gt(latest, pkg.version)) { outputUpgradeWarning(latest) }
+  })
+}
+
+function outputUpgradeWarning (latest) {
+  var lines = [
+    'This version is outdated! Latest version: ' + colors.bold.green(latest),
+    'To upgrade, run: ' + colors.grey('npm install -g ' + pkg.name + '@' + latest)
+  ]
+  let warning = format.boxMessage(lines, { borderChar: colors.blue('*') })
+  winston.warn('\n\n' + warning + '\n')
 }
