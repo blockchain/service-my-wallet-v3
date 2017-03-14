@@ -85,6 +85,6 @@ function outputUpgradeWarning (latest) {
     'This version is outdated! Latest version: ' + colors.bold.green(latest),
     'To upgrade, run: ' + colors.grey('npm install -g ' + pkg.name + '@' + latest)
   ]
-  let warning = format.boxMessage(lines, { borderChar: colors.blue('*') })
+  var warning = format.boxMessage(lines, { borderChar: colors.blue('*') })
   winston.warn('\n\n' + warning + '\n')
 }
