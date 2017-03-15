@@ -48,7 +48,7 @@ WalletCache.prototype.login = function (guid, options) {
   startupPromise.then(function (instance) {
     this.pwHashStore[guid] = pwHash
     var listener = createEventListener('on_tx', function () {
-      let tx = instance.MyWallet.wallet.txList.transactions()[0]
+      var tx = instance.MyWallet.wallet.txList.transactions()[0]
       if (tx.result > 0 && tx.txType === 'received') metrics.recordReceive()
     })
     instance.WalletStore.addEventListener(listener)
