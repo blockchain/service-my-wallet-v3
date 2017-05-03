@@ -269,6 +269,7 @@ function start (options) {
     var warn = 'WARNING - Binding this service to any ip other than localhost (127.0.0.1) can lead to security vulnerabilities!'
 
     if (options.bind !== '127.0.0.1') winston.warn(warn)
+    winston.debug('Debug messages are enabled')
     winston.info(msg, pkg.version, ssl ? 's' : '', options.bind, options.port)
     setInterval(metrics.recordHeartbeat, metrics.getHeartbeatInterval())
     deferred.resolve(true)

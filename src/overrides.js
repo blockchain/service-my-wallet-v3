@@ -19,3 +19,17 @@ exports.handleSocketErrors = function (ws) {
 exports.substituteWithCryptoRNG = function (rng) {
   rng.run = crypto.randomBytes.bind(crypto)
 }
+
+exports.disableSyncWallet = function (instance) {
+  instance.syncWallet = function () {
+    winston.debug('prevented syncWallet')
+  }
+}
+
+exports.clearModuleRequireCache = function () {
+  var walletModule = 'blockchain-wallet-client-prebuilt'
+  var walletModuleR = new RegExp(walletModule + '.(index|src)')
+  Object.keys(require.cache)
+    .filter(function (m) { return walletModuleR.test(m) })
+    .forEach(function (m) { delete require.cache[m] })
+}

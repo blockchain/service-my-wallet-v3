@@ -1,12 +1,29 @@
 'use strict'
 
 var crypto = require('crypto')
+var BIP39 = require('bip39')
+var winston = require('winston')
 var overrides = require('./overrides')
+
+overrides.clearModuleRequireCache()
+
 var Blockchain = require('blockchain-wallet-client-prebuilt')
 var Address = require('blockchain-wallet-client-prebuilt/src/address')
 var WalletNetwork = require('blockchain-wallet-client-prebuilt/src/wallet-network')
+var HDWallet = require('blockchain-wallet-client-prebuilt/src/hd-wallet')
 
-// options { email: String, firstLabel: String, privateKey: String }
+overrides.substituteWithCryptoRNG(Blockchain.RNG)
+overrides.disableSyncWallet(Blockchain.MyWallet)
+
+var NOT_HD_WARNING = 'Created non-HD wallet, for privacy and security, it is recommended that new wallets are created with "hd=true".'
+
+/**
+ *  email: String (optional)
+ *  firstLabel: String (optional)
+ *  privateKey: String (optional)
+ *  hd: Boolean (default: false)
+ */
+
 function createWallet (password, options) {
   if (!password || password.length > 255) {
     return Promise.reject('Password must exist and be shorter than 256 characters')
@@ -16,6 +33,7 @@ function createWallet (password, options) {
   var email = options.email
   var firstLabel = options.firstLabel
   var privateKey = options.privateKey
+  var isHdWallet = Boolean(options.hd)
 
   Blockchain.API.API_CODE = options.api_code
 
@@ -45,12 +63,26 @@ function createWallet (password, options) {
       }
     }
 
-    var firstAddressJSON = (privateKey
-      ? Address.import(privateKey, firstLabel)
-      : Address.new(firstLabel)
-    ).toJSON()
+    var createHdWallet = function () {
+      var mnemonic = BIP39.generateMnemonic(undefined, Blockchain.RNG.run.bind(Blockchain.RNG))
+      var hd = HDWallet.new(mnemonic)
+      hd.newAccount()
+      return hd
+    }
 
-    walletJSON.keys = [firstAddressJSON]
+    var createLegacyAddress = function (priv, label) {
+      return priv ? Address.import(priv, label) : Address.new(label)
+    }
+
+    if (isHdWallet) {
+      var hd = createHdWallet()
+      walletJSON.hd_wallets = [hd.toJSON()]
+    } else {
+      winston.warn(NOT_HD_WARNING)
+      var firstAddress = createLegacyAddress(privateKey, firstLabel)
+      walletJSON.keys = [firstAddress.toJSON()]
+    }
+
     return walletJSON
   }
 
@@ -78,8 +110,13 @@ function createWallet (password, options) {
     if (email) postData.email = email
 
     return Blockchain.API.securePost('wallet', postData).then(function () {
-      var firstKey = wallet.keys[0]
-      return { guid: wallet.guid, address: firstKey.addr, label: firstKey.label }
+      if (isHdWallet) {
+        var account = wallet.hd_wallets[0].accounts[0]
+        return { guid: wallet.guid, address: account.xpub, label: account.label }
+      } else {
+        var firstKey = wallet.keys[0]
+        return { guid: wallet.guid, address: firstKey.addr, label: firstKey.label, warning: NOT_HD_WARNING }
+      }
     })
   }
 
@@ -93,7 +130,5 @@ function createWallet (password, options) {
 function sha256 (data) {
   return crypto.createHash('sha256').update(data).digest()
 }
-
-overrides.substituteWithCryptoRNG(Blockchain.RNG)
 
 module.exports = createWallet
