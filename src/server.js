@@ -160,6 +160,7 @@ v2API.use(bodyParser.json())
 v2API.use(bodyParser.urlencoded({ extended: true }))
 v2API.use(parseOptions({
   password: String,
+  hd: Boolean,
   api_code: String,
   priv: String,
   label: MaybeString,

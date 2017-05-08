@@ -112,7 +112,7 @@ function createWallet (password, options) {
     return Blockchain.API.securePost('wallet', postData).then(function () {
       if (isHdWallet) {
         var account = wallet.hd_wallets[0].accounts[0]
-        return { guid: wallet.guid, address: account.xpub, label: account.label }
+        return { guid: wallet.guid, address: account.extendedPublicKey, label: account.label }
       } else {
         var firstKey = wallet.keys[0]
         return { guid: wallet.guid, address: firstKey.addr, label: firstKey.label, warning: NOT_HD_WARNING }
