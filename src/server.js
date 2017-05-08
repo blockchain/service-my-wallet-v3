@@ -72,12 +72,14 @@ legacyAPI.all(
 
 legacyAPI.all(
   '/list',
+  deprecate(),
   required(['password']),
   callApi('listAddresses')
 )
 
 legacyAPI.all(
   '/address_balance',
+  deprecate(),
   required(['address', 'password']),
   callApi('getAddressBalance')
 )
@@ -96,18 +98,21 @@ legacyAPI.all(
 
 legacyAPI.all(
   '/new_address',
+  deprecate(),
   required(['password']),
   callApi('generateAddress')
 )
 
 legacyAPI.all(
   '/archive_address',
+  deprecate(),
   required(['address', 'password']),
   callApi('archiveAddress')
 )
 
 legacyAPI.all(
   '/unarchive_address',
+  deprecate(),
   required(['address', 'password']),
   callApi('unarchiveAddress')
 )
@@ -184,6 +189,18 @@ function callApi (method) {
   }
 }
 
+function deprecate () {
+  var warning = (
+    'This endpoint has been deprecated, ' +
+    'for the best safety and security, use the HD API instead: ' +
+    'https://github.com/blockchain/service-my-wallet-v3#enable-hd-functionality'
+  )
+  return function (req, res, next) {
+    res.deprecationWarning = warning
+    next()
+  }
+}
+
 function required (props) {
   props = props instanceof Array ? props : [props]
   return function (req, res, next) {
@@ -224,12 +241,17 @@ function Identity (a) { return a }
 function MaybeString (s) { return s ? String(s) : undefined }
 
 function handleResponse (apiAction, res, errCode) {
+  var addWarning = function (data) {
+    var warning = res.deprecationWarning
+    return warning ? Object.assign({}, data, { warning: warning }) : data
+  }
+
   apiAction
-    .then(function (data) { res.status(200).json(data) })
+    .then(function (data) { res.status(200).json(addWarning(data)) })
     .catch(function (e) {
       if (typeof e === 'object') {
         winston.error(e.error, e)
-        res.status(errCode || 500).json(e)
+        res.status(errCode || 500).json(addWarning(e))
       } else {
         winston.error(e)
         var err = ecodes[e] || ecodes['ERR_UNEXPECT']
@@ -237,7 +259,7 @@ function handleResponse (apiAction, res, errCode) {
           stringContains(e, 'Missing query parameter') ||
           stringContains(e, 'Error Decrypting Wallet')
         ) err = e
-        res.status(errCode || 500).json({ error: err })
+        res.status(errCode || 500).json(addWarning({ error: err }))
       }
     })
 }
