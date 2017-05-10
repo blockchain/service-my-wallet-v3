@@ -191,7 +191,8 @@ MerchantAPI.prototype.createAccount = function (guid, options) {
   return this.getWalletHD(guid, options)
     .then(requireSecondPassword(options))
     .then(function (wallet) {
-      return wallet.newAccount(options.label, options.second_password)
+      var account = wallet.newAccount(options.label, options.second_password)
+      return wallet.waitForSync(account)
     })
 }
 
