@@ -127,9 +127,14 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
       function error (e) {
         var msg = e.error
         if (msg === 'NO_UNSPENT_OUTPUTS') {
-          var have = satoshiToBTC(e.payment.balance)
-          var need = satoshiToBTC(e.payment.amounts.reduce(add, isNaN(options.fee) ? 10000 : options.fee))
-          msg = 'Insufficient funds. Value Needed ' + need + 'BTC. Available amount ' + have + 'BTC'
+          var p = e.payment
+          msg = {
+            error: 'Insufficient funds',
+            available: satoshiToBTC(p.balance),
+            needed: satoshiToBTC(p.amounts.reduce(add, p.balance - p.sweepAmount)),
+            sweep_amount_satoshi: p.sweepAmount,
+            sweep_fee_satoshi: p.sweepFee
+          }
         }
         return q.reject(msg || 'ERR_PUSHTX')
       }
