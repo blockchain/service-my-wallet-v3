@@ -18,7 +18,7 @@ api.getWallet = function (guid, options) {
 };
 
 api.getWalletHD = function (guid, options) {
-  return q(wallet.hdwallet);
+  return q(wallet);
 };
 
 describe('api', function () {

@@ -34,7 +34,8 @@ var wallet = {
     setTimeout(success, 100);
     return newKey;
   },
-  newAccount: function () { return newAccount; }
+  newAccount: function () { return newAccount; },
+  waitForSync: function (v) { return Promise.resolve(v) }
 };
 
 module.exports = wallet;

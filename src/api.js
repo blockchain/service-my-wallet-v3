@@ -17,7 +17,7 @@ MerchantAPI.prototype.getWallet = function (guid, options) {
 
 MerchantAPI.prototype.getWalletHD = function (guid, options) {
   return this.cache.getWallet(guid, options).then(function (wallet) {
-    return wallet.isUpgradedToHD ? wallet.hdwallet : q.reject('ERR_NO_HD')
+    return wallet.isUpgradedToHD ? wallet : q.reject('ERR_NO_HD')
   })
 }
 
@@ -182,57 +182,57 @@ MerchantAPI.prototype.upgradeWallet = function (guid, options) {
 }
 
 MerchantAPI.prototype.listxPubs = function (guid, options) {
-  return this.getWalletHD(guid, options).then(function (hdwallet) {
-    return hdwallet.xpubs
+  return this.getWalletHD(guid, options).then(function (wallet) {
+    return wallet.hdwallet.xpubs
   })
 }
 
 MerchantAPI.prototype.createAccount = function (guid, options) {
-  return this.getWallet(guid, options)
+  return this.getWalletHD(guid, options)
     .then(requireSecondPassword(options))
     .then(function (wallet) {
-      if (!wallet.isUpgradedToHD) return q.reject('ERR_NO_HD')
-      return wallet.newAccount(options.label, options.second_password)
+      var account = wallet.newAccount(options.label, options.second_password)
+      return wallet.waitForSync(account)
     })
 }
 
 MerchantAPI.prototype.listAccounts = function (guid, options) {
-  return this.getWalletHD(guid, options).then(function (hdwallet) {
+  return this.getWalletHD(guid, options).then(function (wallet) {
     if (options.account == null) {
-      var activeAccounts = hdwallet.accounts.filter(byProp('active', true))
+      var activeAccounts = wallet.hdwallet.accounts.filter(byProp('active', true))
       return activeAccounts.map(formatAcct)
     } else {
-      var account = getWalletAccount(hdwallet, options.account)
+      var account = getWalletAccount(wallet.hdwallet, options.account)
       return formatAcct(account)
     }
   })
 }
 
 MerchantAPI.prototype.getReceiveAddress = function (guid, options) {
-  return this.getWalletHD(guid, options).then(function (hdwallet) {
-    var account = getWalletAccount(hdwallet, options.account)
+  return this.getWalletHD(guid, options).then(function (wallet) {
+    var account = getWalletAccount(wallet.hdwallet, options.account)
     return { address: account.receiveAddress }
   })
 }
 
 MerchantAPI.prototype.getAccountBalance = function (guid, options) {
-  return this.getWalletHD(guid, options).then(function (hdwallet) {
-    var account = getWalletAccount(hdwallet, options.account)
+  return this.getWalletHD(guid, options).then(function (wallet) {
+    var account = getWalletAccount(wallet.hdwallet, options.account)
     return { balance: account.balance }
   })
 }
 
 MerchantAPI.prototype.archiveAccount = function (guid, options) {
-  return this.getWalletHD(guid, options).then(function (hdwallet) {
-    var account = getWalletAccount(hdwallet, options.account)
+  return this.getWalletHD(guid, options).then(function (wallet) {
+    var account = getWalletAccount(wallet.hdwallet, options.account)
     account.archived = true
     return formatAcct(account)
   })
 }
 
 MerchantAPI.prototype.unarchiveAccount = function (guid, options) {
-  return this.getWalletHD(guid, options).then(function (hdwallet) {
-    var account = getWalletAccount(hdwallet, options.account)
+  return this.getWalletHD(guid, options).then(function (wallet) {
+    var account = getWalletAccount(wallet.hdwallet, options.account)
     account.archived = false
     return formatAcct(account)
   })
