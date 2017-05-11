@@ -44,6 +44,7 @@ legacyAPI.use(parseOptions({
   from: String,
   label: String,
   recipients: Identity,
+  fee_per_byte: Number,
   second_password: String,
   amount: Number,
   fee: Number,
@@ -225,22 +226,18 @@ function handleResponse (apiAction, res, errCode) {
   apiAction
     .then(function (data) { res.status(200).json(data) })
     .catch(function (e) {
-      winston.error(e)
-      var err = ecodes[e] || ecodes['ERR_UNEXPECT']
-      if (stringContains(e, 'Insufficient funds. Value Needed')) {
-        var rgx = /Insufficient funds. Value Needed ([^]+)BTC. Available amount ([^]+)BTC/
-        var errData = e.match(rgx)
-        return res.status(400).json({
-          error: 'Insufficient funds',
-          needed: errData ? parseFloat(errData[1]) : undefined,
-          available: errData ? parseFloat(errData[2]) : undefined
-        })
+      if (typeof e === 'object') {
+        winston.error(e.error, e)
+        res.status(errCode || 500).json(e)
+      } else {
+        winston.error(e)
+        var err = ecodes[e] || ecodes['ERR_UNEXPECT']
+        if (
+          stringContains(e, 'Missing query parameter') ||
+          stringContains(e, 'Error Decrypting Wallet')
+        ) err = e
+        res.status(errCode || 500).json({ error: err })
       }
-      if (
-        stringContains(e, 'Missing query parameter') ||
-        stringContains(e, 'Error Decrypting Wallet')
-      ) err = e
-      res.status(errCode || 500).json({ error: err })
     })
 }
 

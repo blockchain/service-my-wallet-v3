@@ -86,7 +86,23 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
         .to(options.to)
         .amount(options.amount)
         .from(from)
-        .fee(isNaN(options.fee) ? 10000 : options.fee)
+
+      var warning
+      if (!isNaN(options.fee_per_byte)) {
+        if (options.fee_per_byte < 50) {
+          warning = 'Setting a fee_per_byte value below 50 satoshi/byte is not recommended, and may lead to long confirmation times'
+        }
+        payment.then(function (paymentObject) {
+          paymentObject.feePerKb = feePerByteToFeePerKb(options.fee_per_byte)
+          return paymentObject
+        }).prebuild()
+      } else if (!isNaN(options.fee)) {
+        warning = 'Using a static fee amount may cause large transactions to confirm slowly'
+        payment.fee(options.fee)
+      } else {
+        warning = 'It is recommended to specify a custom fee using the fee_per_byte parameter, transactions using the default 10000 satoshi fee may not confirm'
+        payment.fee(10000)
+      }
 
       var password
       if (wallet.isDoubleEncrypted) password = options.second_password
@@ -103,16 +119,22 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
           txid: tx.txid,
           tx_hash: tx.txid,
           message: message,
-          success: true
+          success: true,
+          warning: warning
         }
       }
 
       function error (e) {
         var msg = e.error
         if (msg === 'NO_UNSPENT_OUTPUTS') {
-          var have = satoshiToBTC(e.payment.balance)
-          var need = satoshiToBTC(e.payment.amounts.reduce(add, isNaN(options.fee) ? 10000 : options.fee))
-          msg = 'Insufficient funds. Value Needed ' + need + 'BTC. Available amount ' + have + 'BTC'
+          var p = e.payment
+          msg = {
+            error: 'Insufficient funds',
+            available: satoshiToBTC(p.balance),
+            needed: satoshiToBTC(p.amounts.reduce(add, p.balance - p.sweepAmount)),
+            sweep_amount_satoshi: p.sweepAmount,
+            sweep_fee_satoshi: p.sweepFee
+          }
         }
         return q.reject(msg || 'ERR_PUSHTX')
       }
@@ -287,4 +309,8 @@ function add (total, next) {
 
 function satoshiToBTC (satoshi) {
   return parseFloat((satoshi / SATOSHI_PER_BTC).toFixed(8))
+}
+
+function feePerByteToFeePerKb (feePerByte) {
+  return Math.floor(feePerByte * 1000)
 }
