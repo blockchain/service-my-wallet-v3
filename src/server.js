@@ -44,6 +44,7 @@ legacyAPI.use(parseOptions({
   from: String,
   label: String,
   recipients: Identity,
+  fee_per_byte: Number,
   second_password: String,
   amount: Number,
   fee: Number,
