@@ -4,6 +4,7 @@ var crypto = require('crypto')
 var BIP39 = require('bip39')
 var winston = require('winston')
 var overrides = require('./overrides')
+var warnings = require('./warnings')
 
 overrides.clearModuleRequireCache()
 
@@ -14,8 +15,6 @@ var HDWallet = require('blockchain-wallet-client-prebuilt/src/hd-wallet')
 
 overrides.substituteWithCryptoRNG(Blockchain.RNG)
 overrides.disableSyncWallet(Blockchain.MyWallet)
-
-var NOT_HD_WARNING = 'Created non-HD wallet, for privacy and security, it is recommended that new wallets are created with "hd=true".'
 
 /**
  *  email: String (optional)
@@ -79,7 +78,7 @@ function createWallet (password, options) {
       hdJSON.accounts = hdJSON.accounts.map(function (a) { return a.toJSON() })
       walletJSON.hd_wallets = [hdJSON]
     } else {
-      winston.warn(NOT_HD_WARNING)
+      winston.warn(warnings.CREATED_NON_HD)
       var firstAddress = createLegacyAddress(privateKey, firstLabel)
       walletJSON.keys = [firstAddress.toJSON()]
     }
@@ -116,7 +115,7 @@ function createWallet (password, options) {
         return { guid: wallet.guid, address: account.xpub, label: account.label }
       } else {
         var firstKey = wallet.keys[0]
-        return { guid: wallet.guid, address: firstKey.addr, label: firstKey.label, warning: NOT_HD_WARNING }
+        return { guid: wallet.guid, address: firstKey.addr, label: firstKey.label, warning: warnings.CREATED_NON_HD }
       }
     })
   }

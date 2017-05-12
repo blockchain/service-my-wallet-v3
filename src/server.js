@@ -10,6 +10,7 @@ var winston = require('winston')
 var ecodes = require('./error-codes')
 var api = require('./api')
 var metrics = require('./metrics')
+var warnings = require('./warnings')
 
 module.exports = {
   start: start
@@ -190,13 +191,8 @@ function callApi (method) {
 }
 
 function deprecate () {
-  var warning = (
-    'This endpoint has been deprecated, ' +
-    'for the best safety and security, use the HD API instead: ' +
-    'https://github.com/blockchain/service-my-wallet-v3#enable-hd-functionality'
-  )
   return function (req, res, next) {
-    res.deprecationWarning = warning
+    res.deprecationWarning = warnings.LEGACY_DECPRECATED
     next()
   }
 }
@@ -289,9 +285,8 @@ function start (options) {
   var initApp = function () {
     var pkg = require('../package.json')
     var msg = 'blockchain.info wallet service v%s running on http%s://%s:%d'
-    var warn = 'WARNING - Binding this service to any ip other than localhost (127.0.0.1) can lead to security vulnerabilities!'
 
-    if (options.bind !== '127.0.0.1') winston.warn(warn)
+    if (options.bind !== '127.0.0.1') winston.warn(warnings.BIND_TO_LOCALHOST)
     winston.debug('Debug messages are enabled')
     winston.info(msg, pkg.version, ssl ? 's' : '', options.bind, options.port)
     setInterval(metrics.recordHeartbeat, metrics.getHeartbeatInterval())

@@ -4,6 +4,7 @@ var SATOSHI_PER_BTC = 100000000
 
 var WalletCache = require('./wallet-cache')
 var metrics = require('./metrics')
+var warnings = require('./warnings')
 var q = require('q')
 var winston = require('winston')
 
@@ -22,11 +23,7 @@ MerchantAPI.prototype.getWalletHD = function (guid, options) {
 }
 
 MerchantAPI.prototype.login = function (guid, options) {
-  var successResponse = {
-    guid: guid,
-    success: true,
-    message: 'This endpoint has been deprecated. You no longer have to call /login before accessing a wallet.'
-  }
+  var successResponse = { guid: guid, success: true, message: warnings.LOGIN_DEPRECATED }
   return this.getWallet(guid, options).then(function () { return successResponse })
 }
 
@@ -89,18 +86,16 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
 
       var warning
       if (!isNaN(options.fee_per_byte)) {
-        if (options.fee_per_byte < 50) {
-          warning = 'Setting a fee_per_byte value below 50 satoshi/byte is not recommended, and may lead to long confirmation times'
-        }
+        if (options.fee_per_byte < 50) warning = warnings.LOW_FEE_PER_BYTE
         payment.then(function (paymentObject) {
           paymentObject.feePerKb = feePerByteToFeePerKb(options.fee_per_byte)
           return paymentObject
         }).prebuild()
       } else if (!isNaN(options.fee)) {
-        warning = 'Using a static fee amount may cause large transactions to confirm slowly'
+        warning = warnings.STATIC_FEE_AMOUNT
         payment.fee(options.fee)
       } else {
-        warning = 'It is recommended to specify a custom fee using the fee_per_byte parameter, transactions using the default 10000 satoshi fee may not confirm'
+        warning = warnings.USING_DEFAULT_FEE
         payment.fee(10000)
       }
 
