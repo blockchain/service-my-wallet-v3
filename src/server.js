@@ -10,6 +10,7 @@ var winston = require('winston')
 var ecodes = require('./error-codes')
 var api = require('./api')
 var metrics = require('./metrics')
+var warnings = require('./warnings')
 
 module.exports = {
   start: start
@@ -72,12 +73,14 @@ legacyAPI.all(
 
 legacyAPI.all(
   '/list',
+  deprecate(),
   required(['password']),
   callApi('listAddresses')
 )
 
 legacyAPI.all(
   '/address_balance',
+  deprecate(),
   required(['address', 'password']),
   callApi('getAddressBalance')
 )
@@ -96,18 +99,21 @@ legacyAPI.all(
 
 legacyAPI.all(
   '/new_address',
+  deprecate(),
   required(['password']),
   callApi('generateAddress')
 )
 
 legacyAPI.all(
   '/archive_address',
+  deprecate(),
   required(['address', 'password']),
   callApi('archiveAddress')
 )
 
 legacyAPI.all(
   '/unarchive_address',
+  deprecate(),
   required(['address', 'password']),
   callApi('unarchiveAddress')
 )
@@ -160,6 +166,7 @@ v2API.use(bodyParser.json())
 v2API.use(bodyParser.urlencoded({ extended: true }))
 v2API.use(parseOptions({
   password: String,
+  hd: Boolean,
   api_code: String,
   priv: String,
   label: MaybeString,
@@ -180,6 +187,13 @@ function callApi (method) {
   return function (req, res) {
     var apiAction = api[method](req.guid, req.options)
     handleResponse(apiAction, res)
+  }
+}
+
+function deprecate () {
+  return function (req, res, next) {
+    res.deprecationWarning = warnings.LEGACY_DECPRECATED
+    next()
   }
 }
 
@@ -223,12 +237,17 @@ function Identity (a) { return a }
 function MaybeString (s) { return s ? String(s) : undefined }
 
 function handleResponse (apiAction, res, errCode) {
+  var addWarning = function (data) {
+    var warning = res.deprecationWarning
+    return warning ? Object.assign({}, data, { warning: warning }) : data
+  }
+
   apiAction
-    .then(function (data) { res.status(200).json(data) })
+    .then(function (data) { res.status(200).json(addWarning(data)) })
     .catch(function (e) {
       if (typeof e === 'object') {
         winston.error(e.error, e)
-        res.status(errCode || 500).json(e)
+        res.status(errCode || 500).json(addWarning(e))
       } else {
         winston.error(e)
         var err = ecodes[e] || ecodes['ERR_UNEXPECT']
@@ -236,7 +255,7 @@ function handleResponse (apiAction, res, errCode) {
           stringContains(e, 'Missing query parameter') ||
           stringContains(e, 'Error Decrypting Wallet')
         ) err = e
-        res.status(errCode || 500).json({ error: err })
+        res.status(errCode || 500).json(addWarning({ error: err }))
       }
     })
 }
@@ -266,9 +285,9 @@ function start (options) {
   var initApp = function () {
     var pkg = require('../package.json')
     var msg = 'blockchain.info wallet service v%s running on http%s://%s:%d'
-    var warn = 'WARNING - Binding this service to any ip other than localhost (127.0.0.1) can lead to security vulnerabilities!'
 
-    if (options.bind !== '127.0.0.1') winston.warn(warn)
+    if (options.bind !== '127.0.0.1') winston.warn(warnings.BIND_TO_LOCALHOST)
+    winston.debug('Debug messages are enabled')
     winston.info(msg, pkg.version, ssl ? 's' : '', options.bind, options.port)
     setInterval(metrics.recordHeartbeat, metrics.getHeartbeatInterval())
     deferred.resolve(true)

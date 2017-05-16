@@ -62,6 +62,7 @@ WalletCache.prototype.createWallet = function (options) {
     email: options.email,
     firstLabel: options.label,
     privateKey: options.priv,
+    hd: options.hd,
     api_code: options.api_code
   })
 }
@@ -83,12 +84,8 @@ WalletCache.prototype.getWallet = function (guid, options) {
 module.exports = WalletCache
 
 function generateInstance () {
-  var walletModule = 'blockchain-wallet-client-prebuilt'
-  var walletModuleR = new RegExp(walletModule + '.(index|src)')
-  Object.keys(require.cache)
-    .filter(function (m) { return walletModuleR.test(m) })
-    .forEach(function (m) { delete require.cache[m] })
-  return require(walletModule)
+  overrides.clearModuleRequireCache()
+  return require('blockchain-wallet-client-prebuilt')
 }
 
 function walletFromInstance (maybePw, instance) {
