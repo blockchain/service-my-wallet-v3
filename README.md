@@ -143,101 +143,6 @@ Sample Response:
 { "balance": 10000 }
 ```
 
-### List Addresses
-
-Endpoint: `/merchant/:guid/list`
-
-Query Parameters:
-
-  * `password` - main wallet password (required)
-  * `api_code` - blockchain.info wallet api code (optional)
-
-Sample Response:
-
-```json
-{
-  "addresses": [
-    {
-        "balance": 79434360,
-        "address": "1A8JiWcwvpY7tAopUkSnGuEYHmzGYfZPiq",
-        "label": "My Wallet",
-        "total_received": 453300048335
-    },
-    {
-        "balance": 0,
-        "address": "17p49XUC2fw4Fn53WjZqYAm4APKqhNPEkY",
-        "total_received": 0
-    }
-  ]
-}
-```
-
-### Fetch Address Balance
-
-Endpoint: `/merchant/:guid/address_balance`
-
-Query Parameters:
-
-  * `address` - address to fetch balance for (required)
-  * `password` - main wallet password (required)
-  * `api_code` - blockchain.info wallet api code (optional)
-
-Note: unlike the hosted API, there is no option of a `confirmations` parameter for specifying minimum confirmations.
-
-Sample Response:
-
-```json
-{ "balance": 129043, "address": "19r7jAbPDtfTKQ9VJpvDzFFxCjUJFKesVZ", "total_received": 53645423 }
-```
-
-### Generate Address
-
-Endpoint: `/merchant/:guid/new_address`
-
-Query Parameters:
-
-  * `password` - main wallet password (required)
-  * `label` - label to give to the address (optional)
-  * `api_code` - blockchain.info wallet api code (optional)
-
-Sample Response:
-
-```json
-{ "address" : "18fyqiZzndTxdVo7g9ouRogB4uFj86JJiy" , "label":  "My New Address" }
-```
-
-### Archive Address
-
-Endpoint: `/merchant/:guid/archive_address`
-
-Query Parameters:
-
-  * `address` - address to archive (required)
-  * `password` - main wallet password (required)
-  * `api_code` - blockchain.info wallet api code (optional)
-
-Sample Response:
-
-```json
-{ "archived" : "18fyqiZzndTxdVo7g9ouRogB4uFj86JJiy" }
-```
-
-### Unarchive Address
-
-Endpoint: `/merchant/:guid/unarchive_address`
-
-Query Parameters:
-
-  * `address` - address to unarchive (required)
-  * `password` - main wallet password (required)
-  * `api_code` - blockchain.info wallet api code (optional)
-
-Sample Response:
-
-```json
-{ "active" : "18fyqiZzndTxdVo7g9ouRogB4uFj86JJiy" }
-```
-
 ### Enable HD Functionality
 
 Endpoint: `/merchant/:guid/enableHD`
@@ -321,6 +226,101 @@ Query Parameters:
 
   * `password` - main wallet password (required)
   * `api_code` - blockchain.info wallet api code (optional)
+
+### List Addresses (deprecated, use the HD API instead)
+
+Endpoint: `/merchant/:guid/list`
+
+Query Parameters:
+
+  * `password` - main wallet password (required)
+  * `api_code` - blockchain.info wallet api code (optional)
+
+Sample Response:
+
+```json
+{
+  "addresses": [
+    {
+        "balance": 79434360,
+        "address": "1A8JiWcwvpY7tAopUkSnGuEYHmzGYfZPiq",
+        "label": "My Wallet",
+        "total_received": 453300048335
+    },
+    {
+        "balance": 0,
+        "address": "17p49XUC2fw4Fn53WjZqYAm4APKqhNPEkY",
+        "total_received": 0
+    }
+  ]
+}
+```
+
+### Fetch Address Balance (deprecated, use the HD API instead)
+
+Endpoint: `/merchant/:guid/address_balance`
+
+Query Parameters:
+
+  * `address` - address to fetch balance for (required)
+  * `password` - main wallet password (required)
+  * `api_code` - blockchain.info wallet api code (optional)
+
+Note: unlike the hosted API, there is no option of a `confirmations` parameter for specifying minimum confirmations.
+
+Sample Response:
+
+```json
+{ "balance": 129043, "address": "19r7jAbPDtfTKQ9VJpvDzFFxCjUJFKesVZ", "total_received": 53645423 }
+```
+
+### Generate Address (deprecated, use the HD API instead)
+
+Endpoint: `/merchant/:guid/new_address`
+
+Query Parameters:
+
+  * `password` - main wallet password (required)
+  * `label` - label to give to the address (optional)
+  * `api_code` - blockchain.info wallet api code (optional)
+
+Sample Response:
+
+```json
+{ "address" : "18fyqiZzndTxdVo7g9ouRogB4uFj86JJiy" , "label":  "My New Address" }
+```
+
+### Archive Address (deprecated, use the HD API instead)
+
+Endpoint: `/merchant/:guid/archive_address`
+
+Query Parameters:
+
+  * `address` - address to archive (required)
+  * `password` - main wallet password (required)
+  * `api_code` - blockchain.info wallet api code (optional)
+
+Sample Response:
+
+```json
+{ "archived" : "18fyqiZzndTxdVo7g9ouRogB4uFj86JJiy" }
+```
+
+### Unarchive Address (deprecated, use the HD API instead)
+
+Endpoint: `/merchant/:guid/unarchive_address`
+
+Query Parameters:
+
+  * `address` - address to unarchive (required)
+  * `password` - main wallet password (required)
+  * `api_code` - blockchain.info wallet api code (optional)
+
+Sample Response:
+
+```json
+{ "active" : "18fyqiZzndTxdVo7g9ouRogB4uFj86JJiy" }
+```
 
 ## RPC
 
