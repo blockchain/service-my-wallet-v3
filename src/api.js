@@ -46,8 +46,9 @@ MerchantAPI.prototype.listAddresses = function (guid, options) {
 MerchantAPI.prototype.getAddressBalance = function (guid, options) {
   return this.getWallet(guid, options).then(function (wallet) {
     var addr = wallet.key(options.address)
+    if (!addr) throw 'ERR_ADDRESS'
     return { balance: addr.balance, address: addr.address, total_received: addr.totalReceived }
-  }).catch(function () { throw 'ERR_ADDRESS' })
+  })
 }
 
 MerchantAPI.prototype.sendMany = function (guid, options) {
@@ -168,16 +169,20 @@ MerchantAPI.prototype.generateAddress = function (guid, options) {
 
 MerchantAPI.prototype.archiveAddress = function (guid, options) {
   return this.getWallet(guid, options).then(function (wallet) {
-    wallet.key(options.address).archived = true
+    var addr = wallet.key(options.address)
+    if (!addr) throw 'ERR_ADDRESS'
+    addr.archived = true
     return { archived: options.address }
-  }).catch(function (e) { throw 'ERR_ADDRESS' })
+  })
 }
 
 MerchantAPI.prototype.unarchiveAddress = function (guid, options) {
   return this.getWallet(guid, options).then(function (wallet) {
-    wallet.key(options.address).archived = false
+    var addr = wallet.key(options.address)
+    if (!addr) throw 'ERR_ADDRESS'
+    addr.archived = false
     return { active: options.address }
-  }).catch(function (e) { throw 'ERR_ADDRESS' })
+  })
 }
 
 MerchantAPI.prototype.createWallet = function (options) {
