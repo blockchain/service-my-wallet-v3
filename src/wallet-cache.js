@@ -34,6 +34,11 @@ WalletCache.prototype.login = function (guid, options) {
   var done = clearTimeout.bind(null, timeout)
   var remove = function () { this.instanceStore[guid] = undefined }.bind(this)
 
+  var handleMainPwError = function (error) {
+    var message = error.indexOf('Error decrypting wallet') > -1 ? 'ERR_PASSWORD' : error
+    return q.reject(message)
+  }
+
   instance.API.API_CODE = options.api_code
   instance.WalletStore.isLogoutDisabled = function () { return true }
   overrides.handleSocketErrors(instance.MyWallet.ws)
@@ -41,7 +46,11 @@ WalletCache.prototype.login = function (guid, options) {
 
   var callbacks = { authorizationRequired: needsAuth, needsTwoFactorCode: needs2FA }
   var loginP = instance.MyWallet.login(guid, options.password, { twoFactor: null }, callbacks)
-  var startupPromise = q.race([ deferred.promise, loginP.then(function () { return instance }) ])
+
+  var startupPromise = q.race([
+    deferred.promise,
+    loginP.then(function () { return instance }).catch(handleMainPwError)
+  ])
 
   this.instanceStore[guid] = startupPromise
 
