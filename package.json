@@ -27,6 +27,7 @@
   "author": "Justin Tormey <justin@blockchain.info>",
   "dependencies": {
     "basic-auth": "~1.0.3",
+    "bip39": "~2.3.1",
     "bitcoinjs-lib": "~2.2.0",
     "blockchain-wallet-client-prebuilt": "3.22.*",
     "blockchain.info": "~2.2.2",
