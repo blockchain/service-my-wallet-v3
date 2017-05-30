@@ -13,6 +13,7 @@ var Address = Blockchain.Address
 var WalletNetwork = Blockchain.WalletNetwork
 var HDWallet = require('blockchain-wallet-client/lib/hd-wallet')
 
+overrides.configureApiUrls(Blockchain.API)
 overrides.substituteWithCryptoRNG(Blockchain.RNG)
 overrides.disableSyncWallet(Blockchain.MyWallet)
 

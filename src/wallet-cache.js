@@ -39,11 +39,9 @@ WalletCache.prototype.login = function (guid, options) {
     return q.reject(message)
   }
 
-  instance.API.ROOT_URL = 'https://blockchain.info/'
-  instance.API.API_ROOT_URL = 'https://api.blockchain.info/'
   instance.API.API_CODE = options.api_code
-
   instance.WalletStore.isLogoutDisabled = function () { return true }
+  overrides.configureApiUrls(instance.API)
   overrides.handleSocketErrors(instance.MyWallet.ws)
   overrides.substituteWithCryptoRNG(instance.RNG)
 
