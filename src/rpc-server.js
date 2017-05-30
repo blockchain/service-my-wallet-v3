@@ -11,8 +11,8 @@ var metrics = require('./metrics')
 var request = require('request-promise')
 var bitcoin = require('bitcoinjs-lib')
 var winston = require('winston')
-var helpers = require('blockchain-wallet-client-prebuilt/src/helpers')
-var wcrypto = require('blockchain-wallet-client-prebuilt/src/wallet-crypto')
+var helpers = require('blockchain-wallet-client/lib/helpers')
+var wcrypto = require('blockchain-wallet-client/lib/wallet-crypto')
 
 var apiCode = ''
 var secondPasswordStore = new TimedStore()

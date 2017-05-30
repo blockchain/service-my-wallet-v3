@@ -12,8 +12,8 @@ var expect  = chai.expect;
 
 var api = require('../src/api');
 var create = require('../src/create');
-var Blockchain = require('blockchain-wallet-client-prebuilt');
-var WalletNetwork = require('blockchain-wallet-client-prebuilt/src/wallet-network');
+var Blockchain = require('blockchain-wallet-client');
+var WalletNetwork = Blockchain.WalletNetwork
 
 var overrides = require('../src/overrides');
 overrides.substituteWithCryptoRNG(Blockchain.RNG);

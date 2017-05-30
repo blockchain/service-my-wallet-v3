@@ -1,6 +1,7 @@
 
 var WS_URL = 'wss://ws.blockchain.info/inv'
 
+var path = require('path')
 var winston = require('winston')
 var crypto = require('crypto')
 
@@ -27,9 +28,8 @@ exports.disableSyncWallet = function (instance) {
 }
 
 exports.clearModuleRequireCache = function () {
-  var walletModule = 'blockchain-wallet-client-prebuilt'
-  var walletModuleR = new RegExp(walletModule + '.(index|src)')
+  var walletModule = 'blockchain-wallet-client' + path.sep + 'lib'
   Object.keys(require.cache)
-    .filter(function (m) { return walletModuleR.test(m) })
+    .filter(function (m) { return m.indexOf(walletModule) > -1 })
     .forEach(function (m) { delete require.cache[m] })
 }

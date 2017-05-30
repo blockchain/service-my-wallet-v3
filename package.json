@@ -29,7 +29,7 @@
     "basic-auth": "~1.0.3",
     "bip39": "~2.3.1",
     "bitcoinjs-lib": "~2.2.0",
-    "blockchain-wallet-client-prebuilt": "3.22.*",
+    "blockchain-wallet-client": "~3.32.0",
     "blockchain.info": "~2.2.2",
     "body-parser": "~1.14.1",
     "colors": "~1.1.2",
@@ -39,19 +39,19 @@
     "q": "~1.4.1",
     "ramda": "~0.23.0",
     "registry-url": "~3.1.0",
-    "request-promise": "^2.0.1",
+    "request-promise": "~2.0.1",
     "semver": "~5.3.0",
     "unicode-length": "~2.0.0",
-    "winston": "^2.2.0"
+    "winston": "~2.2.0"
   },
   "devDependencies": {
     "chai": "~3.4.1",
-    "chai-as-promised": "^5.2.0",
+    "chai-as-promised": "~5.2.0",
     "mocha": "~2.3.4",
     "node-env-file": "~0.1.8",
     "nodemon": "~1.8.1",
-    "sinon": "^1.17.3",
-    "sinon-chai": "^2.8.0",
+    "sinon": "~1.17.3",
+    "sinon-chai": "~2.8.0",
     "standard": "~8.6.0"
   }
 }
