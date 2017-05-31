@@ -46,6 +46,9 @@ function stringContains (str0, str1) {
 }
 
 module.exports = {
-  start: server.start,
+  start: function (options) {
+    winston.level = options.logLevel || winston.level
+    return server.start(options)
+  },
   startRPC: rpc.start
 }

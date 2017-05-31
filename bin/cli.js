@@ -29,6 +29,7 @@ program
   .description('start a wallet api service server')
   .option('-p, --port <n>', 'port number - defaults to 3000', parseInt)
   .option('-b, --bind [ip]', 'bind to a specific ip - defaults to 127.0.0.1')
+  .option('--log-level [level]', 'log level to use - defaults to \'info\'')
   .option('--ssl-key <path>', 'path to ssl key')
   .option('--ssl-cert <path>', 'path to ssl certificate')
   .action(postpone(start))
@@ -49,6 +50,7 @@ function start (options) {
   var startOptions = {
     port: options.port || defaults.port,
     bind: options.bind || defaults.bind,
+    logLevel: options.logLevel,
     sslKey: options.sslKey,
     sslCert: options.sslCert
   }
