@@ -26,6 +26,16 @@
     "lint": "node_modules/.bin/standard src/*.js"
   },
   "author": "Justin Tormey <justin@blockchain.info>",
+  "standard": {
+    "global": [
+      "describe",
+      "it",
+      "before",
+      "beforeEach",
+      "after",
+      "afterEach"
+    ]
+  },
   "dependencies": {
     "basic-auth": "~1.0.3",
     "bip39": "~2.3.1",
