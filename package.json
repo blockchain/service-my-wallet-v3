@@ -3,6 +3,7 @@
   "version": "0.25.1",
   "description": "Blockchain.info wallet api service",
   "main": "index.js",
+  "preferGlobal": true,
   "repository": {
     "type": "git",
     "url": "git://github.com/blockchain/service-my-wallet-v3.git"
