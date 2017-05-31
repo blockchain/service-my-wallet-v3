@@ -31,5 +31,6 @@ module.exports = {
   ERR_IS_HD: 'Current wallet is already an HD wallet. To see your accounts, call `/merchant/:guid/accounts`',
   ERR_ACCT_IDX: 'Account nonexistent, check that your account xpub or index is correct',
   ERR_SYNC: 'Attempt to save wallet to server failed',
+  ERR_SESSION: 'Unable to establish session',
   ERR_AUTH: 'Wallets that require email authorization are currently not supported in the Wallet API. Please disable this in your wallet settings, or add the IP address of this server to your wallet IP whitelist.'
 }

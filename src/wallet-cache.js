@@ -34,22 +34,48 @@ WalletCache.prototype.login = function (guid, options) {
   var done = clearTimeout.bind(null, timeout)
   var remove = function () { this.instanceStore[guid] = undefined }.bind(this)
 
-  var handleMainPwError = function (error) {
-    var message = error.indexOf('Error decrypting wallet') > -1 ? 'ERR_PASSWORD' : error
-    return q.reject(message)
-  }
+  var handleLoginError = function (error) {
+    if (error.indexOf('Error decrypting wallet') > -1) {
+      return q.reject('ERR_PASSWORD')
+    }
+
+    if (error.indexOf('Unable to establish session') > -1 && !options.sessionToken) {
+      winston.debug('Failed to establish session, retrying...')
+      return instance.WalletNetwork.establishSession().then(function (token) {
+        winston.debug('Established session, retrying login...')
+        return this.login(guid, Object.assign({}, options, { sessionToken: token }))
+      }.bind(this), function (error) {
+        winston.debug('Failed to establish session, reason: ' + error)
+        return q.reject('ERR_SESSION')
+      })
+    }
+
+    return q.reject(error)
+  }.bind(this)
 
   instance.API.API_CODE = options.api_code
   instance.WalletStore.isLogoutDisabled = function () { return true }
   overrides.handleSocketErrors(instance.MyWallet.ws)
   overrides.substituteWithCryptoRNG(instance.RNG)
 
-  var callbacks = { authorizationRequired: needsAuth, needsTwoFactorCode: needs2FA }
-  var loginP = instance.MyWallet.login(guid, options.password, { twoFactor: null }, callbacks)
+  var callbacks = {
+    authorizationRequired: needsAuth,
+    needsTwoFactorCode: needs2FA,
+    newSessionToken: function () { winston.debug('Created new session token') },
+    didFetch: function () { winston.debug('Fetched wallet') },
+    didDecrypt: function () { winston.debug('Decrypted wallet') }
+  }
+
+  var credentials = {
+    twoFactor: null,
+    sessionToken: options.sessionToken
+  }
+
+  var loginP = instance.MyWallet.login(guid, options.password, credentials, callbacks)
 
   var startupPromise = q.race([
     deferred.promise,
-    loginP.then(function () { return instance }).catch(handleMainPwError)
+    loginP.then(function () { return instance }).catch(handleLoginError)
   ])
 
   this.instanceStore[guid] = startupPromise
