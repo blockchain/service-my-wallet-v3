@@ -88,10 +88,7 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
       var warning
       if (!isNaN(options.fee_per_byte)) {
         if (options.fee_per_byte < 50) warning = warnings.LOW_FEE_PER_BYTE
-        payment.then(function (paymentObject) {
-          paymentObject.feePerKb = feePerByteToFeePerKb(options.fee_per_byte)
-          return paymentObject
-        }).prebuild()
+        payment.updateFeePerKb(options.fee_per_byte)
       } else if (!isNaN(options.fee)) {
         warning = warnings.STATIC_FEE_AMOUNT
         payment.fee(options.fee)
@@ -309,8 +306,4 @@ function add (total, next) {
 
 function satoshiToBTC (satoshi) {
   return parseFloat((satoshi / SATOSHI_PER_BTC).toFixed(8))
-}
-
-function feePerByteToFeePerKb (feePerByte) {
-  return Math.floor(feePerByte * 1000)
 }

@@ -55,6 +55,7 @@ WalletCache.prototype.login = function (guid, options) {
 
   instance.API.API_CODE = options.api_code
   instance.WalletStore.isLogoutDisabled = function () { return true }
+  overrides.configureApiUrls(instance.API)
   overrides.handleSocketErrors(instance.MyWallet.ws)
   overrides.substituteWithCryptoRNG(instance.RNG)
 
@@ -120,14 +121,13 @@ module.exports = WalletCache
 
 function generateInstance () {
   overrides.clearModuleRequireCache()
-  return require('blockchain-wallet-client-prebuilt')
+  return require('blockchain-wallet-client')
 }
 
 function walletFromInstance (maybePw, instance) {
   if (!(this instanceof WalletCache)) throw 'ERR_UNEXPECT'
   var w = instance.MyWallet.wallet
   if (!validatePassword(this.pwHashStore[w.guid], maybePw)) throw 'ERR_PASSWORD'
-  w.createPayment = function (p) { return new instance.Payment(p) }
 
   w.waitForSync = function (value) {
     winston.debug('Waiting for wallet sync')

@@ -8,11 +8,12 @@ var warnings = require('./warnings')
 
 overrides.clearModuleRequireCache()
 
-var Blockchain = require('blockchain-wallet-client-prebuilt')
-var Address = require('blockchain-wallet-client-prebuilt/src/address')
-var WalletNetwork = require('blockchain-wallet-client-prebuilt/src/wallet-network')
-var HDWallet = require('blockchain-wallet-client-prebuilt/src/hd-wallet')
+var Blockchain = require('blockchain-wallet-client')
+var Address = Blockchain.Address
+var WalletNetwork = Blockchain.WalletNetwork
+var HDWallet = require('blockchain-wallet-client/lib/hd-wallet')
 
+overrides.configureApiUrls(Blockchain.API)
 overrides.substituteWithCryptoRNG(Blockchain.RNG)
 overrides.disableSyncWallet(Blockchain.MyWallet)
 

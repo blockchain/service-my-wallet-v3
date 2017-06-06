@@ -367,8 +367,8 @@ $ npm update -g blockchain-wallet-service
 
 Requires:
 
-  * node >= 0.12.0
-  * npm >= 2.12.0, < 3.0.0
+  * node >= 6.0.0
+  * npm >= 3.0.0
 
 If you have issues with the installation process, see the troubleshooting section below.
 
@@ -377,6 +377,8 @@ If you have issues with the installation process, see the troubleshooting sectio
 Installation errors:
 
   * If you are getting `EACCESS` or permissions-related errors, it might be necessary to run the install as root, using the `sudo` command.
+
+  * If you are getting errors concerning node-gyp or python, install with `npm install --no-optional`
 
 Startup errors:
 
@@ -447,8 +449,8 @@ $ blockchain-wallet-service start --port 3000
 ## Development
 
   1. Clone this repo
-  2. Run `npm install`
-  3. Run `npm start`
+  2. Run `yarn --ignore-engines`
+  3. Run `yarn start`
   4. Dev server is now running on port 3000
 
 If you are developing `blockchain-wallet-client` alongside this module, it is useful to create a symlink to `my-wallet-v3`:
@@ -460,7 +462,7 @@ $ ln -s ../path/to/my-wallet-v3 node_modules/blockchain-wallet-client
 ### Testing
 
 ```sh
-$ npm test
+$ yarn test
 ```
 
 ### Configuration
