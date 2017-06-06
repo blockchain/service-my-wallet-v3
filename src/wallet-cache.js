@@ -102,7 +102,6 @@ function walletFromInstance (maybePw, instance) {
   if (!(this instanceof WalletCache)) throw 'ERR_UNEXPECT'
   var w = instance.MyWallet.wallet
   if (!validatePassword(this.pwHashStore[w.guid], maybePw)) throw 'ERR_PASSWORD'
-  w.createPayment = function (p) { return new instance.Payment(p) }
 
   w.waitForSync = function (value) {
     winston.debug('Waiting for wallet sync')
