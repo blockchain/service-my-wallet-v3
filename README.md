@@ -447,8 +447,8 @@ $ blockchain-wallet-service start --port 3000
 ## Development
 
   1. Clone this repo
-  2. Run `npm install`
-  3. Run `npm start`
+  2. Run `yarn --ignore-engines`
+  3. Run `yarn start`
   4. Dev server is now running on port 3000
 
 If you are developing `blockchain-wallet-client` alongside this module, it is useful to create a symlink to `my-wallet-v3`:
@@ -460,7 +460,7 @@ $ ln -s ../path/to/my-wallet-v3 node_modules/blockchain-wallet-client
 ### Testing
 
 ```sh
-$ npm test
+$ yarn test
 ```
 
 ### Configuration
