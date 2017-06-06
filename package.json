@@ -40,7 +40,7 @@
     "basic-auth": "~1.0.3",
     "bip39": "~2.3.1",
     "bitcoinjs-lib": "~2.2.0",
-    "blockchain-wallet-client": "~3.32.0",
+    "blockchain-wallet-client": "3.32.4",
     "blockchain.info": "~2.2.2",
     "body-parser": "~1.14.1",
     "colors": "~1.1.2",
