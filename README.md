@@ -367,8 +367,8 @@ $ npm update -g blockchain-wallet-service
 
 Requires:
 
-  * node >= 0.12.0
-  * npm >= 2.12.0, < 3.0.0
+  * node >= 6.0.0
+  * npm >= 3.0.0
 
 If you have issues with the installation process, see the troubleshooting section below.
 
