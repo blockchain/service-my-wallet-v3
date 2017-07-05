@@ -21,12 +21,14 @@ var v2API = express()
 var merchantAPI = express()
 var legacyAPI = express()
 var accountsAPI = express()
+var contactsAPI = express()
 
 // Configuration
 app.use('/merchant/:guid', merchantAPI)
 app.use('/api/v2', v2API)
 merchantAPI.use('/', legacyAPI)
 merchantAPI.use('/accounts', accountsAPI)
+merchantAPI.use('/contacts', contactsAPI)
 
 app.param('guid', setParam('guid'))
 accountsAPI.param('account', setParam('account'))
@@ -50,6 +52,15 @@ legacyAPI.use(parseOptions({
   amount: Number,
   fee: Number,
   unsafe: Boolean
+}))
+
+contactsAPI.use(parseOptions({
+  password: String,
+  api_code: String,
+  id: String,
+  name: String,
+  amount: Number,
+  message: String
 }))
 
 merchantAPI.all(
@@ -159,6 +170,25 @@ accountsAPI.all(
   '/:account/unarchive',
   required(['password']),
   callApi('unarchiveAccount')
+)
+
+// Routing: Contacts
+contactsAPI.all(
+  '/',
+  required(['password']),
+  callApi('listContacts')
+)
+
+contactsAPI.all(
+  '/create_invitation',
+  required(['password', 'name']),
+  callApi('createInvitation')
+)
+
+contactsAPI.all(
+  '/request_payment',
+  required(['password', 'id', 'amount', 'message']),
+  callApi('requestPayment')
 )
 
 // v2 API
