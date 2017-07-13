@@ -263,8 +263,6 @@ MerchantAPI.prototype.unarchiveAccount = function (guid, options) {
 }
 
 // 📔 Contacts
-var businessInfo = { name: 'blockchain-wallet-service' }
-
 MerchantAPI.prototype.getWalletContacts = function (guid, options) {
   return this.getWalletHD(guid, options).then(function (wallet) {
     return wallet.loadContacts()
@@ -276,7 +274,8 @@ MerchantAPI.prototype.getWalletContacts = function (guid, options) {
 MerchantAPI.prototype.createInvitation = function (guid, options) {
   return this.getWalletContacts(guid, options).then(function (contacts) {
     var customerInfo = { name: options.name }
-    return contacts.createInvitation(businessInfo, customerInfo).then(function (invitation) {
+    var businessInfo = { name: options.companyName }
+    return contacts.createInvitation(customerInfo, businessInfo).then(function (invitation) {
       return contacts.save().then(function () {
         return invitation
       })

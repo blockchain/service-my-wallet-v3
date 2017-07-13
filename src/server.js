@@ -67,6 +67,7 @@ contactsAPI.use(parseOptions({
   api_code: String,
   id: String,
   name: String,
+  companyName: String,
   amount: Number,
   message: String
 }))
@@ -189,7 +190,7 @@ contactsAPI.all(
 
 contactsAPI.all(
   '/create_invitation',
-  required(['password', 'name']),
+  required(['password', 'name', 'companyName']),
   callApi('createInvitation')
 )
 
