@@ -33,14 +33,6 @@ merchantAPI.use('/contacts', contactsAPI)
 app.param('guid', setParam('guid'))
 accountsAPI.param('account', setParam('account'))
 
-app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE')
-  res.header('Access-Control-Allow-Headers', 'Content-Type')
-  if (req.method === 'OPTIONS') res.status(200).end()
-  else next()
-})
-
 app.use(function (req, res) {
   res.status(404).json({ error: 'Not found' })
 })
@@ -71,6 +63,15 @@ contactsAPI.use(parseOptions({
   amount: Number,
   message: String
 }))
+
+contactsAPI.use(function (req, res, next) {
+  winston.info('Setting Access-Control headers')
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE')
+  res.header('Access-Control-Allow-Headers', 'Content-Type')
+  if (req.method === 'OPTIONS') res.status(200).end()
+  else next()
+})
 
 merchantAPI.all(
   '/login',
