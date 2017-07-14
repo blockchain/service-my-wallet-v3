@@ -275,7 +275,7 @@ MerchantAPI.prototype.createInvitation = function (guid, options) {
   return this.getWalletContacts(guid, options).then(function (contacts) {
     var customerInfo = { name: options.name }
     var businessInfo = { name: options.companyName }
-    return contacts.createInvitation(customerInfo, businessInfo).then(function (invitation) {
+    return contacts.createInvitation(businessInfo, customerInfo).then(function (invitation) {
       return contacts.save().then(function () {
         return invitation
       })
