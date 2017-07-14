@@ -277,7 +277,9 @@ MerchantAPI.prototype.createInvitation = function (guid, options) {
     var businessInfo = { name: options.companyName }
     return contacts.createInvitation(businessInfo, customerInfo).then(function (invitation) {
       return contacts.save().then(function () {
-        return invitation
+        var contactId = Object.keys(contacts.list)
+          .find(id => contacts.get(id).invitationSent === invitation.invitationReceived)
+        return Object.assign({ contactId }, invitation)
       })
     })
   })
