@@ -287,11 +287,14 @@ MerchantAPI.prototype.createInvitation = function (guid, options) {
 
 MerchantAPI.prototype.listContacts = function (guid, options) {
   return this.getWalletContacts(guid, options).then(function (contacts) {
-    return Object.values(contacts.list).map(function (contact) {
-      return Object.assign({}, contact, {
-        facilitatedTxList: Object.values(contact.facilitatedTxList)
-      })
-    })
+    return Object.values(contacts.list).map(formatContact)
+  })
+}
+
+MerchantAPI.prototype.getContact = function (guid, options) {
+  return this.getWalletContacts(guid, options).then(function (contacts) {
+    var contact = contacts.list[options.contact]
+    return contact ? formatContact(contact) : Promise.reject('Contact with that id not found')
   })
 }
 
@@ -357,6 +360,12 @@ function formatAcct (a) {
     receivingAddressLabels: a.receivingAddressesLabels,
     receiveAddress: a.receiveAddress
   }
+}
+
+function formatContact (contact) {
+  return Object.assign({}, contact, {
+    facilitatedTxList: Object.values(contact.facilitatedTxList)
+  })
 }
 
 function add (total, next) {
