@@ -297,7 +297,7 @@ function handleResponse (apiAction, res, errCode) {
         res.status(errCode || 500).json(addWarning(e))
       } else {
         winston.error(e)
-        var err = ecodes[e] || ecodes['ERR_UNEXPECT']
+        var err = ecodes[e] || e
         if (
           stringContains(e, 'Missing query parameter') ||
           stringContains(e, 'Error Decrypting Wallet')
