@@ -32,6 +32,7 @@ merchantAPI.use('/contacts', contactsAPI)
 
 app.param('guid', setParam('guid'))
 accountsAPI.param('account', setParam('account'))
+contactsAPI.param('contact', setParam('contact'))
 
 app.use(function (req, res) {
   res.status(404).json({ error: 'Not found' })
@@ -187,6 +188,12 @@ contactsAPI.all(
   '/',
   required(['password']),
   callApi('listContacts')
+)
+
+contactsAPI.all(
+  '/:contact',
+  required(['password']),
+  callApi('getContact')
 )
 
 contactsAPI.all(
