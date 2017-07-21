@@ -191,12 +191,6 @@ contactsAPI.all(
 )
 
 contactsAPI.all(
-  '/:contact',
-  required(['password']),
-  callApi('getContact')
-)
-
-contactsAPI.all(
   '/create_invitation',
   required(['password', 'name', 'companyName']),
   callApi('createInvitation')
@@ -206,6 +200,12 @@ contactsAPI.all(
   '/request_payment',
   required(['password', 'id', 'amount', 'message']),
   callApi('requestPayment')
+)
+
+contactsAPI.all(
+  '/:contact',
+  required(['password']),
+  callApi('getContact')
 )
 
 // v2 API
