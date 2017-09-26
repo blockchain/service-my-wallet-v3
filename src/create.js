@@ -67,6 +67,7 @@ function createWallet (password, options) {
     }
 
     var createHdWallet = function (label) {
+      label = label == null ? 'My Bitcoin Wallet' : label
       var mnemonic = BIP39.generateMnemonic(undefined, Blockchain.RNG.run.bind(Blockchain.RNG))
       var hd = HDWallet.new(mnemonic)
       hd.newAccount(label)
@@ -88,7 +89,7 @@ function createWallet (password, options) {
     }
 
     if (typeof secPass === 'string' && secPass.length) {
-      walletJSON = new Wallet(walletJSON).encrypt(secPass).toJSON()
+      walletJSON = JSON.parse(JSON.stringify(new Wallet(walletJSON).encrypt(secPass)))
     }
 
     return walletJSON
