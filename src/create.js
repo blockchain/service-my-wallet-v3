@@ -11,6 +11,7 @@ overrides.clearModuleRequireCache()
 var Blockchain = require('blockchain-wallet-client')
 var Address = Blockchain.Address
 var WalletNetwork = Blockchain.WalletNetwork
+var Wallet = require('blockchain-wallet-client/lib/blockchain-wallet')
 var HDWallet = require('blockchain-wallet-client/lib/hd-wallet')
 
 overrides.configureApiUrls(Blockchain.API)
@@ -21,6 +22,7 @@ overrides.disableSyncWallet(Blockchain.MyWallet)
  *  email: String (optional)
  *  firstLabel: String (optional)
  *  privateKey: String (optional)
+ *  secondPassword: String (optional)
  *  hd: Boolean (default: false)
  */
 
@@ -33,6 +35,7 @@ function createWallet (password, options) {
   var email = options.email
   var firstLabel = options.firstLabel
   var privateKey = options.privateKey
+  var secPass = options.secondPassword
   var isHdWallet = Boolean(options.hd)
 
   Blockchain.API.API_CODE = options.api_code
@@ -82,6 +85,10 @@ function createWallet (password, options) {
       winston.warn(warnings.CREATED_NON_HD)
       var firstAddress = createLegacyAddress(privateKey, firstLabel)
       walletJSON.keys = [firstAddress.toJSON()]
+    }
+
+    if (typeof secPass === 'string' && secPass.length) {
+      walletJSON = new Wallet(walletJSON).encrypt(secPass).toJSON()
     }
 
     return walletJSON

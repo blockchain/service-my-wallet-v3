@@ -169,6 +169,7 @@ v2API.use(parseOptions({
   hd: Boolean,
   api_code: String,
   priv: String,
+  second_password: MaybeString,
   label: MaybeString,
   email: MaybeString
 }))

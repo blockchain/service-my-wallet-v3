@@ -98,6 +98,7 @@ WalletCache.prototype.createWallet = function (options) {
     email: options.email,
     firstLabel: options.label,
     privateKey: options.priv,
+    secondPassword: options.second_password,
     hd: options.hd,
     api_code: options.api_code
   })
