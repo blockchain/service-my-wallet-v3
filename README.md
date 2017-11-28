@@ -77,7 +77,10 @@ Query Parameters:
   * `second_password` - second wallet password (required, only if second password is enabled)
   * `api_code` - blockchain.info wallet api code (optional)
   * `from` - bitcoin address or account index to send from (optional)
-  * `fee` - specify transaction fee **in satoshi** (optional, otherwise fee is computed)
+  * `fee` - specify transaction fee **in satoshi**
+  * `fee_per_byte` - specify transaction fee-per-byte **in satoshi**
+
+*It is recommended that transaction fees are specified using the `fee_per_byte` parameter, which will compute your final fee based on the size of the transaction. You can also set a static fee using the `fee` parameter, but doing so may result in a low fee-per-byte, leading to longer confirmation times.*
 
 Sample Response:
 
@@ -103,7 +106,10 @@ Query Parameters:
   * `second_password` - second wallet password (required, only if second password is enabled)
   * `api_code` - blockchain.info wallet api code (optional)
   * `from` - bitcoin address or account index to send from (optional)
-  * `fee` - specify transaction fee **in satoshi** (optional, otherwise fee is computed)
+  * `fee` - specify transaction fee **in satoshi**
+  * `fee_per_byte` - specify transaction fee-per-byte **in satoshi**
+
+*It is recommended that transaction fees are specified using the `fee_per_byte` parameter, which will compute your final fee based on the size of the transaction. You can also set a static fee using the `fee` parameter, but doing so may result in a low fee-per-byte, leading to longer confirmation times.*
 
 URI Encoding a JSON object in JavaScript:
 
