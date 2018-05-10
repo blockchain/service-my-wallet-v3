@@ -97,6 +97,8 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
         payment.fee(10000)
       }
 
+      payment.prebuild()
+
       var password
       if (wallet.isDoubleEncrypted) password = options.second_password
 
