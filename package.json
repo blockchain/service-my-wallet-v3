@@ -1,6 +1,6 @@
 {
   "name": "blockchain-wallet-service",
-  "version": "0.26.0",
+  "version": "0.26.1",
   "description": "Blockchain.info wallet api service",
   "main": "index.js",
   "preferGlobal": true,
