@@ -21,15 +21,18 @@ var v2API = express()
 var merchantAPI = express()
 var legacyAPI = express()
 var accountsAPI = express()
+var contactsAPI = express()
 
 // Configuration
 app.use('/merchant/:guid', merchantAPI)
 app.use('/api/v2', v2API)
 merchantAPI.use('/', legacyAPI)
 merchantAPI.use('/accounts', accountsAPI)
+merchantAPI.use('/contacts', contactsAPI)
 
 app.param('guid', setParam('guid'))
 accountsAPI.param('account', setParam('account'))
+contactsAPI.param('contact', setParam('contact'))
 
 app.use(function (req, res) {
   res.status(404).json({ error: 'Not found' })
@@ -51,6 +54,25 @@ legacyAPI.use(parseOptions({
   fee: Number,
   unsafe: Boolean
 }))
+
+contactsAPI.use(parseOptions({
+  password: String,
+  api_code: String,
+  id: String,
+  name: String,
+  companyName: String,
+  amount: Number,
+  message: String
+}))
+
+contactsAPI.use(function (req, res, next) {
+  winston.info('Setting Access-Control headers')
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE')
+  res.header('Access-Control-Allow-Headers', 'Content-Type')
+  if (req.method === 'OPTIONS') res.status(200).end()
+  else next()
+})
 
 merchantAPI.all(
   '/login',
@@ -161,6 +183,31 @@ accountsAPI.all(
   callApi('unarchiveAccount')
 )
 
+// Routing: Contacts
+contactsAPI.all(
+  '/',
+  required(['password']),
+  callApi('listContacts')
+)
+
+contactsAPI.all(
+  '/create_invitation',
+  required(['password', 'name', 'companyName']),
+  callApi('createInvitation')
+)
+
+contactsAPI.all(
+  '/request_payment',
+  required(['password', 'id', 'amount', 'message']),
+  callApi('requestPayment')
+)
+
+contactsAPI.all(
+  '/:contact',
+  required(['password']),
+  callApi('getContact')
+)
+
 // v2 API
 v2API.use(bodyParser.json())
 v2API.use(bodyParser.urlencoded({ extended: true }))
@@ -251,7 +298,7 @@ function handleResponse (apiAction, res, errCode) {
         res.status(errCode || 500).json(addWarning(e))
       } else {
         winston.error(e)
-        var err = ecodes[e] || ecodes['ERR_UNEXPECT']
+        var err = ecodes[e] || e
         if (
           stringContains(e, 'Missing query parameter') ||
           stringContains(e, 'Error Decrypting Wallet')
