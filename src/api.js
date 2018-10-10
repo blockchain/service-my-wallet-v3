@@ -85,6 +85,7 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
         .amount(options.amount)
         .from(from)
 
+      var staticFee
       var warning
       if (!isNaN(options.fee_per_byte)) {
         if (options.fee_per_byte < 50) warning = warnings.LOW_FEE_PER_BYTE
@@ -92,12 +93,14 @@ MerchantAPI.prototype.makePayment = function (guid, options) {
       } else if (!isNaN(options.fee)) {
         warning = warnings.STATIC_FEE_AMOUNT
         payment.fee(options.fee)
+        staticFee = options.fee
       } else {
         warning = warnings.USING_DEFAULT_FEE
         payment.fee(10000)
+        staticFee = 10000
       }
 
-      payment.prebuild()
+      payment.prebuild(staticFee)
 
       var password
       if (wallet.isDoubleEncrypted) password = options.second_password
