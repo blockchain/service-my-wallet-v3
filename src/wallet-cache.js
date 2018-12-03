@@ -32,7 +32,7 @@ WalletCache.prototype.login = function (guid, options) {
   var needsAuth = deferred.reject.bind(null, 'ERR_AUTH')
   var timeout = setTimeout(deferred.reject.bind(null, 'ERR_TIMEOUT'), TIMEOUT_MS)
   var done = clearTimeout.bind(null, timeout)
-  var remove = function () { this.instanceStore[guid] = undefined }.bind(this)
+  var removeFromStore = function () { this.instanceStore[guid] = this.pwHashStore[guid] = undefined }.bind(this)
 
   var handleLoginError = function (error) {
     if (error.indexOf('Error decrypting wallet') > -1) {
@@ -54,6 +54,7 @@ WalletCache.prototype.login = function (guid, options) {
   }.bind(this)
 
   instance.API.API_CODE = options.api_code
+  instance.MyWallet.logout = removeFromStore
   instance.WalletStore.isLogoutDisabled = function () { return true }
   overrides.configureApiUrls(instance.API)
   overrides.handleSocketErrors(instance.MyWallet.ws)
@@ -90,7 +91,7 @@ WalletCache.prototype.login = function (guid, options) {
     instance.WalletStore.addEventListener(listener)
   }.bind(this))
 
-  return startupPromise.catch(remove).fin(done)
+  return startupPromise.catch(removeFromStore).fin(done)
 }
 
 WalletCache.prototype.createWallet = function (options) {
