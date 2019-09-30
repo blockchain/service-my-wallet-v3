@@ -1,5 +1,5 @@
 
-# Blockchain Wallet API V2
+# Blockchain Wallet API V3
 
 Programmatically interface with your Blockchain.info wallet.
 
