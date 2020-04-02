@@ -1,0 +1,175 @@
+<!--
+  The MIT License
+ 
+  Copyright (c) 2018, Etherscan.
+ 
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+ 
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+ 
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+-->
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>EthValidate</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="apple-touch-icon" href="img/favicon2.ico">
+    <link rel="shortcut icon" href="img/favicon2.ico" />
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="fonts/font-awesome/css/font-awesome.min.css">
+</head>
+
+<body>
+    <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+    <div class="wrapper" style="height: auto!important; min-height: 100%;margin-bottom: 20px;">
+        <div class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+            <div class="container">
+                <a href="/ethvalidate" class="navbar-brand">
+                    <img src="img/logo.png" width="42" height="40" style="margin-top:-5px;" alt=""> EthValidate
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav">
+                        <li class="nav-item ">
+                            <a class="nav-link" href="/ethvalidate">Transaction</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="address">Address</a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link" href="token">Token</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
+                    <h5>Token Balance</h5>
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="form-group">
+                                <label for="searchAddr">Address</label>
+                                <input type="input" class="form-control" id="searchAddr" maxlength="42" placeholder="Address">
+                            </div>
+                            <div class="form-group">
+                                <label for="searchContractAddr">Contract Address</label>
+                                <input type="input" class="form-control" id="searchContractAddr" maxlength="42" placeholder="Token Address">
+                            </div>
+                            <button class="btn btn-default btn-go" type="button">Go!</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 data-info"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 datasource" style="display: none">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <font style="margin-left:5px;" size="1">Price Source: <a href="https://www.cryptocompare.com/"
+                                            target="_blank" title="Pricing Data Provided by CryptoCompare" rel="nofollow">CryptoCompare</a></font>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="loader" style="display: none"></div>
+                </div>
+                <div class="col-md-3 right-menu">
+                    <h5>Network</h5>
+                    <div class="Network">
+                        <ul class="list-group network-group ulmainnet">
+                            <li class="list-group-item active  bg-dark">
+                                <input type="checkbox" id="ethnetworkall" name="ethnetworkall"> Mainnet
+                                <a href="#" class="customnode" style="float: right;color:#fff;" data-id='mainnet' title="Add custom node"><i
+                                        class="fa fa-plus"></i></a>
+                            </li>
+                        </ul>
+                        <ul class="list-group network-group ultestnet">
+                            <li class="list-group-item active bg-dark">
+                                <input type="checkbox" id="testnetworkall" name="testnetworkall"> Testnet
+                                <a href="#" class="customnode" style="float: right;color:#fff;" data-id='testnet' title="Add custom node"><i
+                                        class="fa fa-plus"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 text-center text-md-left">
+                    <div class="d-lg-flex">
+                        <small class="d-block g-font-size-default">Powered by <a href="https://etherscan.io">Etherscan.io</a>. Browse <a href="https://github.com/etherscan/ethvalidate" target="_blank">source code</a></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div class="modal fade" id="addnode" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Custom Node - <span id="nodenetwork"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="col-md-12 mb-2">
+                        <label for="txtNodeName">Node Name</label>
+                        <input id="txtNodeName" class="form-control" type="text" placeholder="My Node">
+                    </div>
+                    <div class="col-md-8 mb-2">
+                        <label for="txtUrl">Url</label>
+                        <input id="txtUrl" class="form-control" type="text" placeholder="http://localhost">
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label for="txtPort">Port</label>
+                        <input id="txtPort" class="form-control" type="text" placeholder="8545">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button id="btnNode" type="button" class="btn btn-default">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /container -->
+    <script src="js/vendor/jquery-3.3.1.min.js"></script>
+    <script src="js/vendor/bootstrap.min.js"></script>
+
+    <script src="js/bignumber.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/helper.js"></script>
+    <script src="js/token.js"></script>   
+</body>
+
+</html>
