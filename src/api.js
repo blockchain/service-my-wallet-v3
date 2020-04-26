@@ -262,6 +262,63 @@ MerchantAPI.prototype.unarchiveAccount = function (guid, options) {
   })
 }
 
+// 📔 Contacts
+MerchantAPI.prototype.getWalletContacts = function (guid, options) {
+  return this.getWalletHD(guid, options).then(function (wallet) {
+    return wallet.loadContacts()
+      .then(function () { return wallet.contacts.digestNewMessages() })
+      .then(function () { return wallet.contacts })
+  })
+}
+
+MerchantAPI.prototype.createInvitation = function (guid, options) {
+  return this.getWalletContacts(guid, options).then(function (contacts) {
+    var customerInfo = { name: options.name }
+    var businessInfo = { name: options.companyName }
+    return contacts.createInvitation(businessInfo, customerInfo).then(function (invitation) {
+      return contacts.save().then(function () {
+        var contactId = Object.keys(contacts.list)
+          .find(id => contacts.get(id).invitationSent === invitation.invitationReceived)
+        return Object.assign({ contactId }, invitation)
+      })
+    })
+  })
+}
+
+MerchantAPI.prototype.listContacts = function (guid, options) {
+  return this.getWalletContacts(guid, options).then(function (contacts) {
+    return Object.values(contacts.list).map(formatContact)
+  })
+}
+
+MerchantAPI.prototype.getContact = function (guid, options) {
+  return this.getWalletContacts(guid, options).then(function (contacts) {
+    var contact = contacts.list[options.contact]
+    return contact ? formatContact(contact) : Promise.reject('Contact with that id not found')
+  })
+}
+
+MerchantAPI.prototype.requestPayment = function (guid, options) {
+  return this.getWalletContacts(guid, options).then(function (contacts) {
+    var { id, amount, message } = options
+    var contact = contacts.list[id]
+
+    if (contact == null) {
+      return Promise.reject('Contact with that id not found')
+    }
+
+    var complete = contact.trusted
+      ? Promise.resolve()
+      : contacts.completeRelation(id)
+
+    return complete.then(function () {
+      return contacts.sendPR(id, amount, void 0, message).then(function () {
+        return Object.values(contacts.list[id].facilitatedTxList)
+      })
+    })
+  })
+}
+
 module.exports = new MerchantAPI()
 
 // Helper functions
@@ -303,6 +360,12 @@ function formatAcct (a) {
     receivingAddressLabels: a.receivingAddressesLabels,
     receiveAddress: a.receiveAddress
   }
+}
+
+function formatContact (contact) {
+  return Object.assign({}, contact, {
+    facilitatedTxList: Object.values(contact.facilitatedTxList)
+  })
 }
 
 function add (total, next) {
