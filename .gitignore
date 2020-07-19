@@ -5,3 +5,4 @@ npm-debug.log
 spec.config.js
 artillery*
 .env
+.DS_Store
