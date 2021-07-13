@@ -1,7 +1,7 @@
 
 # Blockchain Wallet API V2
 
-Programmatically interface with your Blockchain.info wallet.
+Programmatically interface with your Blockchain.com wallet.
 
 ## Contents
 
@@ -17,7 +17,7 @@ Programmatically interface with your Blockchain.info wallet.
 
 ## Getting Started
 
-To use this API, you will need to run small local service which be responsible for managing your Blockchain.info wallet. Your application interacts with this service locally via HTTP API calls.
+To use this API, you will need to run small local service which be responsible for managing your Blockchain.com wallet. Your application interacts with this service locally via HTTP API calls.
 
 Start by completing the following steps:
 
@@ -27,15 +27,15 @@ Start by completing the following steps:
 
 Note that `blockchain-wallet-service` is designed to be run locally on the same machine as your application and therefore will only accept connections from `localhost`. If you modify this service to accept external connections, be sure to add the appropriate firewall rules to prevent unauthorized use.
 
-An API code is required for wallet creation and higher request limits. For basic usage, no API code is required. Request an API code [here](https://blockchain.info/api/api_create_code).
+An API code is required for wallet creation and higher request limits. For basic usage, no API code is required. Request an API code [here](https://blockchain.com/api/api_create_code).
 
 ## Upgrading
 
-If you already have an application that uses [Blockchain.info's Wallet API](https://blockchain.info/api/blockchain_wallet_api), you will need to complete the steps in the Getting Started section above and then, in your application code, replace calls to `blockchain.info/merchant/...` with `localhost:<port>/merchant/...`.
+If you already have an application that uses [Blockchain.com's Wallet API](https://blockchain.com/api/blockchain_wallet_api), you will need to complete the steps in the Getting Started section above and then, in your application code, replace calls to `blockchain.info/merchant/...` with `localhost:<port>/merchant/...`.
 
 ## API Documentation
 
-View the [original documentation](https://blockchain.info/api/blockchain_wallet_api).
+View the [original documentation](https://blockchain.com/api/blockchain_wallet_api).
 
 All endpoints present in the API documentation above are supported in Blockchain Wallet API V2. The differences between two are:
 
@@ -50,7 +50,7 @@ Endpoint: `/api/v2/create`
 Query Parameters:
 
   * `password` - main wallet password (required)
-  * `api_code` - blockchain.info wallet api code (required)
+  * `api_code` - blockchain.com wallet api code (required)
   * `priv` - private key to import into wallet as first address (optional)
   * `label` - label to give to the first address generated in the wallet (optional)
   * `email` - email to associate with the newly created wallet (optional)
