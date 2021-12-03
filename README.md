@@ -27,7 +27,7 @@ Start by completing the following steps:
 
 Note that `blockchain-wallet-service` is designed to be run locally on the same machine as your application and therefore will only accept connections from `localhost`. If you modify this service to accept external connections, be sure to add the appropriate firewall rules to prevent unauthorized use.
 
-An API code is required for wallet creation and higher request limits. For basic usage, no API code is required. Request an API code [here](https://blockchain.info/api/api_create_code).
+An API code is required for wallet creation and higher request limits. For basic usage, no API code is required. Request an API code [here](https://www.blockchain.com/api/request).
 
 ## Upgrading
 
