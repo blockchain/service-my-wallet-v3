@@ -5,3 +5,5 @@ npm-debug.log
 spec.config.js
 artillery*
 .env
+
+.fake
