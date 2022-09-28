@@ -20,7 +20,7 @@
     "npm": ">= 3.0.0"
   },
   "scripts": {
-    "start": "node_modules/nodemon/bin/nodemon.js scripts/start.js",
+    "start": "node scripts/start.js",
     "start:debug": "node-debug scripts/start.js",
     "test": "node_modules/mocha/bin/mocha test/*.spec.js --timeout 5000",
     "test:int": "node_modules/mocha/bin/mocha test/integration.js --timeout 5000",
@@ -43,11 +43,12 @@
     "bitcoinjs-lib": "~2.2.0",
     "blockchain-wallet-client": "3.32.4",
     "blockchain.info": "~2.2.2",
-    "body-parser": "~1.14.1",
+    "body-parser": "^1.19.0",
     "colors": "~1.1.2",
     "commander": "~2.9.0",
-    "express": "~4.13.3",
-    "json-rpc2": "~1.0.2",
+    "express": "^4.17.1",
+    "json-rpc2": "^2.0.0",
+    "npm-force-resolutions": "0.0.3",
     "q": "~1.4.1",
     "ramda": "~0.23.0",
     "registry-url": "~3.1.0",
@@ -59,11 +60,17 @@
   "devDependencies": {
     "chai": "~3.4.1",
     "chai-as-promised": "~5.2.0",
-    "mocha": "~2.3.4",
+    "mocha": "^8.1.2",
     "node-env-file": "~0.1.8",
-    "nodemon": "~1.8.1",
+    "nodemon": "^2.0.4",
     "sinon": "~1.17.3",
     "sinon-chai": "~2.8.0",
     "standard": "~8.6.0"
+  },
+  "resolutions": {
+    "bitcoin-sfox-client": "0.2.1"
+  },
+  "config": {
+    "unsafe-perm": true
   }
 }
