@@ -46,7 +46,7 @@
     "body-parser": "~1.14.1",
     "colors": "~1.1.2",
     "commander": "~2.9.0",
-    "express": "~4.13.3",
+    "express": "~4.17.3",
     "json-rpc2": "~1.0.2",
     "q": "~1.4.1",
     "ramda": "~0.23.0",
