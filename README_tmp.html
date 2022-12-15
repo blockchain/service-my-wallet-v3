@@ -1,0 +1,738 @@
+<head>
+	<meta charset="utf-8"></head><head></head><body><meta-viewport></meta-viewport>
+markdown-language-features="e"&gt;
+
+<title>README.md</title>
+<meta-charset-utf-8> http-equiv="Content-type" content="text/html;charset=UTF-8"&gt;
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="blockchain-wallet-api-v2">Blockchain Wallet API V2</h1>
+<p>Programmatically interface with your Blockchain.info wallet.</p>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#getting-started">Getting Started</a></li>
+<li><a href="#upgrading">Upgrading</a></li>
+<li><a href="#api-documentation">API Documentation</a></li>
+<li><a href="#rpc">RPC API</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#development">Development</a></li>
+<li><a href="#deployment">Deployment</a></li>
+</ul>
+<h2 id="getting-started">Getting Started</h2>
+<p>To use this API, you will need to run small local service which be responsible for managing your Blockchain.info wallet. Your application interacts with this service locally via HTTP API calls.</p>
+<p>Start by completing the following steps:</p>
+<ol>
+<li>Follow the <a href="#installation">installation instructions</a></li>
+<li>Start the server: <code>$ blockchain-wallet-service start --port 3000</code></li>
+<li>Reference the <a href="#api-documentation">documentation</a> and start interacting with your wallet programmatically!</li>
+</ol>
+<p>Note that <code>blockchain-wallet-service</code> is designed to be run locally on the same machine as your application and therefore will only accept connections from <code>localhost</code>. If you modify this service to accept external connections, be sure to add the appropriate firewall rules to prevent unauthorized use.</p>
+<p>An API code is required for wallet creation and higher request limits. For basic usage, no API code is required. Request an API code <a href="https://blockchain.info/api/api_create_code">here</a>.</p>
+<h2 id="upgrading">Upgrading</h2>
+<p>If you already have an application that uses <a href="https://blockchain.info/api/blockchain_wallet_api">Blockchain.info's Wallet API</a>, you will need to complete the steps in the Getting Started section above and then, in your application code, replace calls to <code>blockchain.info/merchant/...</code> with <code>localhost:&lt;port&gt;/merchant/...</code>.</p>
+<h2 id="api-documentation">API Documentation</h2>
+<p>View the <a href="https://blockchain.info/api/blockchain_wallet_api">original documentation</a>.</p>
+<p>All endpoints present in the API documentation above are supported in Blockchain Wallet API V2. The differences between two are:</p>
+<ul>
+<li>The "consolidate addresses" endpoint has been omitted</li>
+</ul>
+<p>All endpoints can be called with <code>GET</code> or <code>POST</code>, and can only be accessed from <code>localhost</code>.</p>
+<h3 id="creating-a-new-blockchain-wallet">Creating a new Blockchain Wallet</h3>
+<p>Endpoint: <code>/api/v2/create</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (required)</li>
+<li><code>priv</code> - private key to import into wallet as first address (optional)</li>
+<li><code>label</code> - label to give to the first address generated in the wallet (optional)</li>
+<li><code>email</code> - email to associate with the newly created wallet (optional)</li>
+</ul>
+<p>Sample Response:</p>
+<pre class="hljs"><code><div>{
+  <span class="hljs-attr">"guid"</span>: <span class="hljs-string">"05f290be-dbef-4636-a809-868893c51711"</span>,
+  <span class="hljs-attr">"address"</span>: <span class="hljs-string">"13R9dBgKwBP29JKo11zhfi74YuBsMxJ4qY"</span>,
+  <span class="hljs-attr">"label"</span>: <span class="hljs-string">"Main address"</span>
+}
+</div></code></pre>
+<h3 id="make-payment">Make Payment</h3>
+<p>Endpoint: <code>/merchant/:guid/payment</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>to</code> - bitcoin address to send to (required)</li>
+<li><code>amount</code> - amount <strong>in satoshi</strong> to send (required)</li>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>second_password</code> - second wallet password (required, only if second password is enabled)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (optional)</li>
+<li><code>from</code> - bitcoin address or account index to send from (optional)</li>
+<li><code>fee</code> - specify transaction fee <strong>in satoshi</strong></li>
+<li><code>fee_per_byte</code> - specify transaction fee-per-byte <strong>in satoshi</strong></li>
+</ul>
+<p><em>It is recommended that transaction fees are specified using the <code>fee_per_byte</code> parameter, which will compute your final fee based on the size of the transaction. You can also set a static fee using the <code>fee</code> parameter, but doing so may result in a low fee-per-byte, leading to longer confirmation times.</em></p>
+<p>Sample Response:</p>
+<pre class="hljs"><code><div>{
+  <span class="hljs-attr">"to"</span> : [<span class="hljs-string">"1A8JiWcwvpY7tAopUkSnGuEYHmzGYfZPiq"</span>],
+  <span class="hljs-attr">"from"</span>: [<span class="hljs-string">"17p49XUC2fw4Fn53WjZqYAm4APKqhNPEkY"</span>],
+  <span class="hljs-attr">"amounts"</span>: [<span class="hljs-number">200000</span>],
+  <span class="hljs-attr">"fee"</span>: <span class="hljs-number">1000</span>,
+  <span class="hljs-attr">"txid"</span>: <span class="hljs-string">"f322d01ad784e5deeb25464a5781c3b20971c1863679ca506e702e3e33c18e9c"</span>,
+  <span class="hljs-attr">"success"</span>: <span class="hljs-literal">true</span>
+}
+</div></code></pre>
+<h3 id="send-to-many">Send to Many</h3>
+<p>Endpoint: <code>/merchant/:guid/sendmany</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>recipients</code> - a <em>URI encoded</em> <a href="http://json.org/example.html">JSON object</a>, with bitcoin addresses as keys and the <strong>satoshi</strong> amounts as values (required, see example below)</li>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>second_password</code> - second wallet password (required, only if second password is enabled)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (optional)</li>
+<li><code>from</code> - bitcoin address or account index to send from (optional)</li>
+<li><code>fee</code> - specify transaction fee <strong>in satoshi</strong></li>
+<li><code>fee_per_byte</code> - specify transaction fee-per-byte <strong>in satoshi</strong></li>
+</ul>
+<p><em>It is recommended that transaction fees are specified using the <code>fee_per_byte</code> parameter, which will compute your final fee based on the size of the transaction. You can also set a static fee using the <code>fee</code> parameter, but doing so may result in a low fee-per-byte, leading to longer confirmation times.</em></p>
+<p>URI Encoding a JSON object in JavaScript:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">var</span> myObject = { <span class="hljs-attr">address1</span>: <span class="hljs-number">10000</span>, <span class="hljs-attr">address2</span>: <span class="hljs-number">50000</span> };
+<span class="hljs-keyword">var</span> myJSONString = <span class="hljs-built_in">JSON</span>.stringify(myObject);
+<span class="hljs-comment">// `encodeURIComponent` is a global function</span>
+<span class="hljs-keyword">var</span> myURIEncodedJSONString = <span class="hljs-built_in">encodeURIComponent</span>(myJSONString);
+<span class="hljs-comment">// use `myURIEncodedJSONString` as the `recipients` parameter</span>
+</div></code></pre>
+<p>Sample Response:</p>
+<pre class="hljs"><code><div>{
+  <span class="hljs-attr">"to"</span> : [<span class="hljs-string">"1A8JiWcwvpY7tAopUkSnGuEYHmzGYfZPiq"</span>, <span class="hljs-string">"18fyqiZzndTxdVo7g9ouRogB4uFj86JJiy"</span>],
+  <span class="hljs-attr">"from"</span>: [<span class="hljs-string">"17p49XUC2fw4Fn53WjZqYAm4APKqhNPEkY"</span>],
+  <span class="hljs-attr">"amounts"</span>: [<span class="hljs-number">16000</span>, <span class="hljs-number">5400030</span>],
+  <span class="hljs-attr">"fee"</span>: <span class="hljs-number">2000</span>,
+  <span class="hljs-attr">"txid"</span>: <span class="hljs-string">"f322d01ad784e5deeb25464a5781c3b20971c1863679ca506e702e3e33c18e9c"</span>,
+  <span class="hljs-attr">"success"</span>: <span class="hljs-literal">true</span>
+}
+</div></code></pre>
+<h3 id="fetch-wallet-balance">Fetch Wallet Balance</h3>
+<p>Endpoint: <code>/merchant/:guid/balance</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (required)</li>
+</ul>
+<p>Sample Response:</p>
+<pre class="hljs"><code><div>{ <span class="hljs-attr">"balance"</span>: <span class="hljs-number">10000</span> }
+</div></code></pre>
+<h3 id="enable-hd-functionality">Enable HD Functionality</h3>
+<p>Endpoint: <code>/merchant/:guid/enableHD</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (optional)</li>
+</ul>
+<p>This will upgrade a wallet to an HD (Hierarchical Deterministic) Wallet, which allows the use of accounts. See <a href="https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki">BIP32</a> for more information on HD wallets and accounts.</p>
+<h3 id="list-active-hd-accounts">List Active HD Accounts</h3>
+<p>Endpoint: <code>/merchant/:guid/accounts</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (optional)</li>
+</ul>
+<h3 id="list-hd-xpubs">List HD xPubs</h3>
+<p>Endpoint: <code>/merchant/:guid/accounts/xpubs</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (optional)</li>
+</ul>
+<h3 id="create-new-hd-account">Create New HD Account</h3>
+<p>Endpoint: <code>/merchant/:guid/accounts/create</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>label</code> - label to assign to the newly created account (optional)</li>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (optional)</li>
+</ul>
+<h3 id="get-single-hd-account">Get Single HD Account</h3>
+<p>Endpoint: <code>/merchant/:guid/accounts/:xpub_or_index</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (optional)</li>
+</ul>
+<h3 id="get-hd-account-receiving-address">Get HD Account Receiving Address</h3>
+<p>Endpoint: <code>/merchant/:guid/accounts/:xpub_or_index/receiveAddress</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (optional)</li>
+</ul>
+<h3 id="check-hd-account-balance">Check HD Account Balance</h3>
+<p>Endpoint: <code>/merchant/:guid/accounts/:xpub_or_index/balance</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (optional)</li>
+</ul>
+<h3 id="archive-hd-account">Archive HD Account</h3>
+<p>Endpoint: <code>/merchant/:guid/accounts/:xpub_or_index/archive</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (optional)</li>
+</ul>
+<h3 id="unarchive-hd-account">Unarchive HD Account</h3>
+<p>Endpoint: <code>/merchant/:guid/accounts/:xpub_or_index/unarchive</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (optional)</li>
+</ul>
+<h3 id="list-addresses-deprecated-use-the-hd-api-instead">List Addresses (deprecated, use the HD API instead)</h3>
+<p>Endpoint: <code>/merchant/:guid/list</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (optional)</li>
+</ul>
+<p>Sample Response:</p>
+<pre class="hljs"><code><div>{
+  <span class="hljs-attr">"addresses"</span>: [
+    {
+        <span class="hljs-attr">"balance"</span>: <span class="hljs-number">79434360</span>,
+        <span class="hljs-attr">"address"</span>: <span class="hljs-string">"1A8JiWcwvpY7tAopUkSnGuEYHmzGYfZPiq"</span>,
+        <span class="hljs-attr">"label"</span>: <span class="hljs-string">"My Wallet"</span>,
+        <span class="hljs-attr">"total_received"</span>: <span class="hljs-number">453300048335</span>
+    },
+    {
+        <span class="hljs-attr">"balance"</span>: <span class="hljs-number">0</span>,
+        <span class="hljs-attr">"address"</span>: <span class="hljs-string">"17p49XUC2fw4Fn53WjZqYAm4APKqhNPEkY"</span>,
+        <span class="hljs-attr">"total_received"</span>: <span class="hljs-number">0</span>
+    }
+  ]
+}
+</div></code></pre>
+<h3 id="fetch-address-balance-deprecated-use-the-hd-api-instead">Fetch Address Balance (deprecated, use the HD API instead)</h3>
+<p>Endpoint: <code>/merchant/:guid/address_balance</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>address</code> - address to fetch balance for (required)</li>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (optional)</li>
+</ul>
+<p>Note: unlike the hosted API, there is no option of a <code>confirmations</code> parameter for specifying minimum confirmations.</p>
+<p>Sample Response:</p>
+<pre class="hljs"><code><div>{ <span class="hljs-attr">"balance"</span>: <span class="hljs-number">129043</span>, <span class="hljs-attr">"address"</span>: <span class="hljs-string">"19r7jAbPDtfTKQ9VJpvDzFFxCjUJFKesVZ"</span>, <span class="hljs-attr">"total_received"</span>: <span class="hljs-number">53645423</span> }
+</div></code></pre>
+<h3 id="generate-address-deprecated-use-the-hd-api-instead">Generate Address (deprecated, use the HD API instead)</h3>
+<p>Endpoint: <code>/merchant/:guid/new_address</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>label</code> - label to give to the address (optional)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (optional)</li>
+</ul>
+<p>Sample Response:</p>
+<pre class="hljs"><code><div>{ <span class="hljs-attr">"address"</span> : <span class="hljs-string">"18fyqiZzndTxdVo7g9ouRogB4uFj86JJiy"</span> , <span class="hljs-attr">"label"</span>:  <span class="hljs-string">"My New Address"</span> }
+</div></code></pre>
+<h3 id="archive-address-deprecated-use-the-hd-api-instead">Archive Address (deprecated, use the HD API instead)</h3>
+<p>Endpoint: <code>/merchant/:guid/archive_address</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>address</code> - address to archive (required)</li>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (optional)</li>
+</ul>
+<p>Sample Response:</p>
+<pre class="hljs"><code><div>{ <span class="hljs-attr">"archived"</span> : <span class="hljs-string">"18fyqiZzndTxdVo7g9ouRogB4uFj86JJiy"</span> }
+</div></code></pre>
+<h3 id="unarchive-address-deprecated-use-the-hd-api-instead">Unarchive Address (deprecated, use the HD API instead)</h3>
+<p>Endpoint: <code>/merchant/:guid/unarchive_address</code></p>
+<p>Query Parameters:</p>
+<ul>
+<li><code>address</code> - address to unarchive (required)</li>
+<li><code>password</code> - main wallet password (required)</li>
+<li><code>api_code</code> - blockchain.info wallet api code (optional)</li>
+</ul>
+<p>Sample Response:</p>
+<pre class="hljs"><code><div>{ <span class="hljs-attr">"active"</span> : <span class="hljs-string">"18fyqiZzndTxdVo7g9ouRogB4uFj86JJiy"</span> }
+</div></code></pre>
+<h2 id="rpc">RPC</h2>
+<p>Bitcoind compatible RPC API. Full documentation available <a href="https://blockchain.info/api/json_rpc_api">here</a>.</p>
+<p>Starting the RPC server:</p>
+<pre class="hljs"><code><div>blockchain-wallet-service start-rpc [options]
+</div></code></pre>
+<p>View additional options and instructions under <a href="#usage">Usage</a>.</p>
+<p>Differences from server API:</p>
+<ul>
+<li>Option <code>-rpcssl</code> is not supported</li>
+<li>Method <code>listsinceblock</code> is not supported</li>
+<li>Param <code>minConfimations</code> is not supported for methods <code>listreceivedbyaccount</code> and <code>listreceivedbyaddress</code></li>
+<li>Param <code>minimumConfirmations</code> is not supported for method <code>getbalance</code></li>
+<li>Param <code>confirmations</code> is not supported for method <code>listaccounts</code></li>
+<li>Responses representing transactions have a different format</li>
+</ul>
+<h2 id="installation">Installation</h2>
+<p><a href="https://nodejs.org"><code>nodejs</code></a> and <a href="https://npmjs.com"><code>npm</code></a> are required to install and use this API service. Installation:</p>
+<pre class="hljs"><code><div>npm install -g blockchain-wallet-service
+</div></code></pre>
+<p>For the best stability and performance, make sure you are always using the latest version.</p>
+<p>To check your version:</p>
+<pre class="hljs"><code><div>blockchain-wallet-service -V
+</div></code></pre>
+<p>To update to the latest version:</p>
+<pre class="hljs"><code><div>npm update -g blockchain-wallet-service
+</div></code></pre>
+<p>Requires:</p>
+<ul>
+<li>node &gt;= 6.0.0</li>
+<li>npm &gt;= 3.0.0</li>
+</ul>
+<p>If you have issues with the installation process, see the troubleshooting section below.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p>Installation errors:</p>
+<ul>
+<li>
+<p>If you are getting <code>EACCESS</code> or permissions-related errors, it might be necessary to run the install as root, using the <code>sudo</code> command.</p>
+</li>
+<li>
+<p>If you are getting errors concerning node-gyp or python, install with <code>npm install --no-optional</code></p>
+</li>
+</ul>
+<p>Startup errors:</p>
+<ul>
+<li>If startup fails with <code>/usr/bin/env: node: No such file or directory</code>, it's possible node is not installed, or was installed with a different name (Ubuntu, for example, installs node as nodejs). If node was installed with a different name, create a symlink to your node binary: <code>sudo ln -s /usr/bin/nodejs /usr/bin/node</code>, or install node through <a href="https://github.com/creationix/nvm">Node Version Manager</a>.</li>
+</ul>
+<p>Runtime errors:</p>
+<ul>
+<li>
+<p>If you are seeing a <code>TypeError</code> claiming that an object <code>has no method 'compare'</code>, it is because you are on a version of Node older than 0.12, before the <code>compare</code> method was added to Buffers. Try upgrading to at least Node version 0.12.</p>
+</li>
+<li>
+<p>If you are getting wallet decryption errors despite having correct credentials, then it's possible that you do not have Java installed, which is required by a dependency of the my-wallet-v3 module. Not having Java installed during the <code>npm install</code> process can result in the inability to decrypt wallets. Download the JDK from <a href="https://support.apple.com/kb/DL1572">here for Mac</a> or by running <code>apt-get install default-jdk</code> on debian-based linux systems.</p>
+</li>
+</ul>
+<p>Timeout Errors:</p>
+<ul>
+<li>If you are getting a timeout response, additional authorization from your blockchain wallet may be required. This can occur when using an unrecognized browser or IP address. An email authorizing the API access attempt will be sent to the registered user that will require action in order to authorize future requests.</li>
+</ul>
+<p>If this section did not help, please open a github issue or visit our <a href="https://blockchain.zendesk.com">support center</a>.</p>
+<h2 id="usage">Usage</h2>
+<p>After installing the service, the command <code>blockchain-wallet-service</code> will be available for use.</p>
+<h3 id="options">Options</h3>
+<ul>
+<li><code>-h, --help</code> - output usage information</li>
+<li><code>-V, --version</code> - output the version number</li>
+<li><code>-c, --cwd</code> - use the current directory as the wallet service module (development only)</li>
+</ul>
+<h3 id="commands">Commands</h3>
+<h4 id="start">start</h4>
+<p>Usage: <code>blockchain-wallet-service start [options]</code></p>
+<p>This command will start the service, making Blockchain Wallet API V2 available on a specified port.</p>
+<p>Command options:</p>
+<ul>
+<li><code>-h, --help</code> - output usage information</li>
+<li><code>-p, --port</code> - port number to run the server on (defaults to <code>3000</code>)</li>
+<li><code>-b, --bind</code> - bind to a specific ip (defaults to <code>127.0.0.1</code>, note that binding to an ip other than this can lead to security vulnerabilities)</li>
+<li><code>--ssl-key</code> - the path to your ssl key (optional)</li>
+<li><code>--ssl-cert</code> - the path to your ssl certificate (optional)</li>
+</ul>
+<p>To open the service to all incoming connections, bind to <code>0.0.0.0</code>.</p>
+<h4 id="start-rpc">start-rpc</h4>
+<p>Usage: <code>blockchain-wallet-service start-rpc [options]</code></p>
+<p>This command will start the JSON RPC server.</p>
+<p>Options:</p>
+<ul>
+<li><code>-k, --key</code> - api code to use for server requests (required option)</li>
+<li><code>-p, --rpcport</code> - rpc server port (default: 8000)</li>
+<li><code>-b, --bind</code> - bind to a specific ip (defaults to <code>127.0.0.1</code>, note that binding to an ip other than this can lead to security vulnerabilities)</li>
+</ul>
+<p>Get an API code <a href="https://blockchain.info/api/api_create_code">here</a>.</p>
+<h3 id="examples">Examples</h3>
+<p>To start the Wallet API service on port 3000:</p>
+<pre class="hljs"><code><div>blockchain-wallet-service start --port 3000
+</div></code></pre>
+<h2 id="development">Development</h2>
+<ol>
+<li>Clone this repo</li>
+<li>Run <code>yarn --ignore-engines</code></li>
+<li>Run <code>yarn start</code></li>
+<li>Dev server is now running on port 3000</li>
+</ol>
+<p>If you are developing <code>blockchain-wallet-client</code> alongside this module, it is useful to create a symlink to <code>my-wallet-v3</code>:</p>
+<pre class="hljs"><code><div>ln -s ../path/to/my-wallet-v3 node_modules/blockchain-wallet-client
+</div></code></pre>
+<h3 id="testing">Testing</h3>
+<pre class="hljs"><code><div>yarn <span class="hljs-built_in">test</span>
+</div></code></pre>
+<h3 id="configuration">Configuration</h3>
+<p>Optional parameters can be configured in a <code>.env</code> file:</p>
+<ul>
+<li><code>PORT</code> - port number for running dev server (default: <code>3000</code>)</li>
+<li><code>BIND</code> - ip address to bind the service to (default: <code>127.0.0.1</code>)</li>
+</ul>
+<h2 id="deployment">Deployment</h2>
+<p>If you want to use blockchain-wallet-service in your UNIX production server, you just have to run:</p>
+<pre class="hljs"><code><div>nohup blockchain-wallet-service start --port 3000 &amp;
+</div></code></pre>
+
+
+
+</meta-charset-utf-8></body></html></meta-charset-utf-8></body></html>
